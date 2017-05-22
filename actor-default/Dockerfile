@@ -5,9 +5,13 @@ FROM node:7-alpine
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
+COPY package.json main.js /usr/src/app/
+
 # Install default dependencies
-COPY package.json /usr/src/app/
 RUN yarn install --production
+
+# Bundle app source
+COPY . /usr/src/app
 
 # Not using "npm start" to avoid unnecessary process
 ENTRYPOINT [ "node", "main.js" ]

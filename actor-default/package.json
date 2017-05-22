@@ -1,5 +1,6 @@
 {
     "description": "Anonymous act on the Apifier platform",
+    "version": "0.0.1",
     "license": "UNLICENSED",
     "main": "main.js",
     "scripts": {
