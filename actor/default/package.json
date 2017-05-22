@@ -1,0 +1,12 @@
+{
+    "description": "Anonymous act on the Apifier platform",
+    "license": "UNLICENSED",
+    "main": "main.js",
+    "scripts": {
+        "start": "node main.js"
+    },
+    "dependencies": {
+        "apifier": ">=0.0.38",
+        "apify-client": ">=0.0.3"
+    }
+}
