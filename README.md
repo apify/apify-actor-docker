@@ -26,13 +26,13 @@ docker login
 Then build the Docker image:
 
 ```bash
-docker build --no-cache --tag apify/actor-default:dev --tag apify/actor-default:latest ./default/.
+docker build --no-cache --tag apify/actor-default:beta --tag apify/actor-default:latest ./default/.
 ```
 
-and push it to the appropriate Apify repository under the `dev` tag:
+and push it to the appropriate Apify repository under the `beta` tag:
 
 ```bash
-docker push apify/actor-default:dev
+docker push apify/actor-default:beta
 ```
 
 After the Docker image is well tested, it can be pushed with the `latest` tag:
@@ -42,4 +42,4 @@ docker push apify/actor-default:latest
 ```
 
 
-**TODO: Setup Circle CI to do this automatically, development branch is beta, master is latest**
+**TODO: Setup Circle CI to do this automatically on commit, development branch corresponds to beta, master to latest**
