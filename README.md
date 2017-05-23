@@ -26,7 +26,7 @@ docker login
 Then build the Docker image:
 
 ```bash
-docker build --no-cache --tag apify/actor-default:beta --tag apify/actor-default:latest ./default/.
+docker build --no-cache --tag apify/actor-default:beta --tag apify/actor-default:latest ./default/
 ```
 
 and push it to the appropriate Apify repository under the `beta` tag:
