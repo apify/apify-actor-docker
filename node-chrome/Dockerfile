@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:latest
 
 # This image was inspired by https://github.com/ebidel/lighthouse-ci/blob/master/builder/Dockerfile
 
@@ -46,6 +46,7 @@ RUN chmod +x /usr/src/app/chromeuser-script.sh
 # Set the entrypoint
 COPY entrypoint.sh /usr/src/app
 RUN chmod +x /usr/src/app/entrypoint.sh
-#ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
 
-CMD ["/bin/bash"]
+ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
+
+# CMD ["/bin/bash"]
