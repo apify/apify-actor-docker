@@ -26,13 +26,7 @@ docker login
 Then build the Docker image:
 
 ```bash
-docker build --no-cache --tag apify/actor-nodejs-basic:beta --tag apify/actor-nodejs-basic:latest ./nodejs-basic/
-```
-
-and push it to the appropriate Apify repository under the `beta` tag:
-
-```bash
-docker push apify/actor-nodejs-basic:beta
+./build.sh nodejs-basic
 ```
 
 After the Docker image is well tested, it can be pushed with the `latest` tag:
@@ -43,7 +37,7 @@ docker push apify/actor-nodejs-basic:latest
 
 Then you can remove the images from your computer:
 ```bash
-docker rmi apify/actor-nodejs-basic:beta apify/actor-nodejs-basic:latest
+./clean.sh
 ```
 
 **TODO: Setup Circle CI to do this automatically on commit, development branch corresponds to beta, master to latest**
