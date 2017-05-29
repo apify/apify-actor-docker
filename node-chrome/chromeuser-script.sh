@@ -19,4 +19,6 @@
 nohup google-chrome \
   --headless \
   --disable-gpu \
-  --remote-debugging-port=9222 'about:blank' &
+  --remote-debugging-port=9222 \
+  --no-sandbox \
+  'about:blank' &

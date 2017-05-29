@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM debian:jessie
 
 # This image was inspired by https://github.com/ebidel/lighthouse-ci/blob/master/builder/Dockerfile
 
@@ -6,20 +6,20 @@ LABEL maintainer="support@apifier.com" Description="Image used to run Apifier ac
 
 # Install utilities
 RUN apt-get update --fix-missing && apt-get -y upgrade \
- && apt-get install -y sudo curl wget unzip git
+ && apt-get install -y --no-install-recommends sudo curl unzip ca-certificates
 
 # Install Node 7
 RUN curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash - \
- && sudo apt-get install -y nodejs
+ && sudo apt-get install -y --no-install-recommends nodejs
 
 # Install Yarn
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - \
  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list \
  && sudo apt-get update \
- && sudo apt-get install -y yarn
+ && sudo apt-get install -y --no-install-recommends yarn
 
 # Install Chrome 59+
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - \
+RUN curl -sS https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - \
  && sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' \
  && sudo apt-get update \
  && sudo apt-get install -y google-chrome-beta
@@ -46,6 +46,6 @@ RUN chmod +x /usr/src/app/chromeuser-script.sh
 # Set the entrypoint
 COPY entrypoint.sh /usr/src/app
 RUN chmod +x /usr/src/app/entrypoint.sh
-ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
+#ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
 
-# CMD ["/bin/bash"]
+CMD ["/bin/bash"]
