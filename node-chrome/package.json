@@ -8,6 +8,7 @@
     },
     "dependencies": {
         "apifier": ">=0.0.38",
-        "apify-client": ">=0.0.3"
+        "apify-client": ">=0.0.3",
+        "lighthouse": ">=2.0.0"
     }
 }

@@ -2,7 +2,7 @@
 
 if [ -z $1 ]; then
     echo "Builds Docker images and publishes it with 'beta' tag"
-    echo "Usage: ./build.sh <directory>"
+    echo "Usage: ./build.sh <directory> [extra args for docker build]"
     exit
 fi
 
@@ -10,8 +10,9 @@ fi
 set -e
 
 DIR="$1"
+EXTRA_ARGS="$2"
 
-docker build --no-cache --tag apify/actor-${DIR}:beta --tag apify/actor-${DIR}:latest ./${DIR}/
+docker build --tag apify/actor-${DIR}:beta --tag apify/actor-${DIR}:latest ${EXTRA_ARGS} ./${DIR}/
 
 docker push apify/actor-${DIR}:beta
 

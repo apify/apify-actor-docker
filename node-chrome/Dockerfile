@@ -24,6 +24,12 @@ RUN curl -sS https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-ke
  && sudo apt-get update \
  && sudo apt-get install -y google-chrome-beta
 
+# Install ChromeDriver for Selenium
+RUN sudo apt-get install -y --no-install-recommends libglib2.0-0 libx11-6 libnss3 libgconf-2-4 libfontconfig1 \
+ && curl http://chromedriver.storage.googleapis.com/2.29/chromedriver_linux64.zip > /tmp.zip \
+ && unzip tmp.zip \
+ && rm tmp.zip \
+ && mv /chromedriver /bin
 
 # Create app directory
 RUN mkdir -p /usr/src/app
@@ -47,6 +53,5 @@ RUN chmod +x /usr/src/app/chromeuser-script.sh
 COPY entrypoint.sh /usr/src/app
 RUN chmod +x /usr/src/app/entrypoint.sh
 
-ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
-
-# CMD ["/bin/bash"]
+# Not using "npm start" to avoid unnecessary process, using CMD to enable simple overriding
+CMD [ "node", "main.js" ]

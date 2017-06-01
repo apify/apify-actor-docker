@@ -13,5 +13,5 @@ COPY package.json main.js /usr/src/app/
 # Install default dependencies
 RUN yarn install --production
 
-# Not using "npm start" to avoid unnecessary process
-ENTRYPOINT [ "node", "main.js" ]
+# Not using "npm start" to avoid unnecessary process, using CMD to enable simple overriding
+CMD [ "node", "main.js" ]
