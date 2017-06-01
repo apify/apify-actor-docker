@@ -25,8 +25,7 @@ RUN curl -sS https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-ke
  && sudo apt-get install -y google-chrome-beta
 
 # Install ChromeDriver for Selenium
-RUN sudo apt-get install -y --no-install-recommends libglib2.0-0 libx11-6 libnss3 libgconf-2-4 libfontconfig1 \
- && curl http://chromedriver.storage.googleapis.com/2.29/chromedriver_linux64.zip > /tmp.zip \
+RUN curl http://chromedriver.storage.googleapis.com/2.29/chromedriver_linux64.zip > /tmp.zip \
  && unzip tmp.zip \
  && rm tmp.zip \
  && mv /chromedriver /bin
