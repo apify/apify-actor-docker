@@ -40,17 +40,5 @@ COPY package.json main.js /usr/src/app/
 # Install default dependencies
 RUN yarn install --production
 
-# Add a user and make it a sudo user
-RUN useradd -m chromeuser \
- && sudo adduser chromeuser sudo
-
-# Copy the chrome-user script used to start Chrome as non-root
-COPY chromeuser-script.sh /usr/src/app
-RUN chmod +x /usr/src/app/chromeuser-script.sh
-
-# Set the entrypoint
-COPY entrypoint.sh /usr/src/app
-RUN chmod +x /usr/src/app/entrypoint.sh
-
 # Not using "npm start" to avoid unnecessary process, using CMD to enable simple overriding
 CMD [ "node", "main.js" ]
