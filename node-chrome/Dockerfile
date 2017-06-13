@@ -37,8 +37,14 @@ WORKDIR /usr/src/app
 # Copy source code
 COPY package.json main.js /usr/src/app/
 
-# Install default dependencies
-RUN yarn install --production
+# Install default dependencies, print versions of everything
+RUN yarn install --production \
+ && echo "Installed versions of dependencies:" \
+ && node --version \
+ && yarn --version \
+ && yarn list \
+ && google-chrome-beta --version \
+ && chromedriver --version
 
 # Not using "npm start" to avoid unnecessary process, using CMD to enable simple overriding
 CMD [ "node", "main.js" ]
