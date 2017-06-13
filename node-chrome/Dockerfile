@@ -39,12 +39,12 @@ COPY package.json main.js /usr/src/app/
 
 # Install default dependencies, print versions of everything
 RUN yarn install --production \
+ && echo "Installed NPM packages:" \
+ && yarn list \
  && echo "Node.js version:" \
  && node --version \
  && echo "Yarn version:" \
  && yarn --version \
- && echo "Installed NPM packages:" \
- && yarn list
  && echo "Google Chrome version:" \
  && google-chrome-beta --version \
  && echo "ChromeDriver version:" \
