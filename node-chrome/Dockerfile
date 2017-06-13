@@ -39,11 +39,15 @@ COPY package.json main.js /usr/src/app/
 
 # Install default dependencies, print versions of everything
 RUN yarn install --production \
- && echo "Installed versions of dependencies:" \
+ && echo "Node.js version:" \
  && node --version \
+ && echo "Yarn version:" \
  && yarn --version \
- && yarn list \
+ && echo "Installed NPM packages:" \
+ && yarn list
+ && echo "Google Chrome version:" \
  && google-chrome-beta --version \
+ && echo "ChromeDriver version:" \
  && chromedriver --version
 
 # Not using "npm start" to avoid unnecessary process, using CMD to enable simple overriding
