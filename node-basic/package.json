@@ -7,7 +7,7 @@
         "start": "node main.js"
     },
     "dependencies": {
-        "apifier": ">=0.0.47",
+        "apifier": ">=0.0.48",
         "apify-client": ">=0.1.13"
     }
 }
