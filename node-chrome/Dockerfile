@@ -9,8 +9,8 @@ RUN apt-get update --fix-missing && apt-get -y upgrade \
  && apt-get install -y --no-install-recommends sudo curl unzip ca-certificates
 
 # Install Squid
-RUN apt-get install -y --no-install-recommends squid3
- && sudo squid3 -k shutdown
+RUN apt-get install -y --no-install-recommends squid3 \
+ && sudo squid3 -k shutdown \
  && sudo ln -s /usr/sbin/squid3 /usr/sbin/squid
 
 # Install Node 7
