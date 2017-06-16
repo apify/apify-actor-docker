@@ -7,7 +7,7 @@
     "start": "node main.js"
   },
   "dependencies": {
-    "apifier": ">=0.0.48",
+    "apifier": ">=0.0.50",
     "apify-client": ">=0.1.13",
     "selenium-webdriver": "^3.4.0"
   }
