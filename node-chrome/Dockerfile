@@ -8,15 +8,14 @@ LABEL maintainer="support@apifier.com" Description="Image used to run Apifier ac
 RUN apt-get update --fix-missing && apt-get -y upgrade \
  && apt-get install -y --no-install-recommends sudo curl unzip ca-certificates
 
+# Install Squid
+RUN apt-get install -y --no-install-recommends squid3
+ && sudo squid3 -k shutdown
+ && sudo ln -s /usr/sbin/squid3 /usr/sbin/squid
+
 # Install Node 7
 RUN curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash - \
  && sudo apt-get install -y --no-install-recommends nodejs
-
-# Install Yarn
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - \
- && echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list \
- && sudo apt-get update \
- && sudo apt-get install -y --no-install-recommends yarn
 
 # Install Chrome Beta
 RUN curl -sS https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - \
@@ -29,6 +28,12 @@ RUN curl -sS http://chromedriver.storage.googleapis.com/2.30/chromedriver_linux6
  && unzip tmp.zip \
  && rm tmp.zip \
  && mv /chromedriver /bin
+
+# Install Yarn
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - \
+ && echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list \
+ && sudo apt-get update \
+ && sudo apt-get install -y --no-install-recommends yarn
 
 # Create app directory
 RUN mkdir -p /usr/src/app
