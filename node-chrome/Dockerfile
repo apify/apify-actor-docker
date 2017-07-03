@@ -1,4 +1,4 @@
-FROM debian:latest
+FROM debian:jessie
 
 # This image was inspired by https://github.com/ebidel/lighthouse-ci/blob/master/builder/Dockerfile
 
@@ -11,7 +11,8 @@ RUN apt-get update --fix-missing \
 
 # Install Squid
 RUN sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends squid3 \
- && sudo squid3 -k shutdown
+ && sudo squid3 -k shutdown \
+ && sudo ln -s /usr/sbin/squid3 /usr/sbin/squid
 
 # Install Node 7
 RUN curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash - \
