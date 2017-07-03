@@ -3,6 +3,8 @@
 if [ -z $1 ]; then
     echo "Builds a Docker image and publishes it with 'beta' tag"
     echo "Usage: ./build.sh <directory> [extra args for docker build]"
+    echo ""
+    echo "The following extra args are recommended: --no-cache --pull"
     exit
 fi
 
