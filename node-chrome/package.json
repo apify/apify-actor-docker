@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "apify": ">=0.4.7",
-    "apify-client": ">=0.1.13",
+    "apify-client": ">=0.1.22",
     "selenium-webdriver": "^3.4.0"
   }
 }
