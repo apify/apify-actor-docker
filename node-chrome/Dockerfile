@@ -11,8 +11,7 @@ RUN apt-get update --fix-missing \
 
 # Install Squid
 RUN sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends squid3 \
- && sudo squid3 -k shutdown \
- && sudo ln -s /usr/sbin/squid3 /usr/sbin/squid
+ && sudo squid3 -k shutdown
 
 # Install Node 7
 RUN curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash - \
@@ -54,7 +53,9 @@ RUN yarn install --production \
  && echo "Google Chrome version:" \
  && google-chrome-beta --version \
  && echo "ChromeDriver version:" \
- && chromedriver --version
+ && chromedriver --version \
+ && echo "Squid version:" \
+ && squid -v
 
 # Not using "npm start" to avoid unnecessary process, using CMD to enable simple overriding
 CMD [ "node", "main.js" ]

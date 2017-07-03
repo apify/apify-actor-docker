@@ -2,9 +2,10 @@
 
 if [ -z $1 ]; then
     echo "Builds a Docker image and publishes it with 'beta' tag"
-    echo "Usage: ./build.sh <directory> [args for docker build]"
+    echo "Usage: ./build.sh <directory> [--cache]"
     echo ""
-    echo "The following args are STRONGLY recommended: --no-cache --pull"
+    echo "The --cache argument instructs build to use Docker layer cache."
+    echo "Only use it if you know what you are doing!"
     exit
 fi
 
@@ -12,9 +13,15 @@ fi
 set -e
 
 DIR="$1"
-EXTRA_ARGS="$2"
 
-docker build --tag apify/actor-${DIR}:beta --tag apify/actor-${DIR}:latest ${EXTRA_ARGS} ./${DIR}/
+NO_CACHE=""
+if [ "${2}" = "--cache" ]; then
+  echo "WARNING: Using Docker layer cache, the resulting image might be outdated!"
+else
+  NO_CACHE="--no-cache"
+fi
+
+docker build --pull --tag apify/actor-${DIR}:beta --tag apify/actor-${DIR}:latest ${NO_CACHE} ./${DIR}/
 
 docker push apify/actor-${DIR}:beta
 
