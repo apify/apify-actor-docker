@@ -5,23 +5,24 @@ FROM debian:latest
 LABEL maintainer="support@apifier.com" Description="Image used to run Apifier acts with Google Chrome"
 
 # Install utilities
-RUN apt-get update --fix-missing && apt-get -y upgrade \
- && apt-get install -y --no-install-recommends sudo curl unzip ca-certificates
+RUN apt-get update --fix-missing \
+ && DEBIAN_FRONTEND=noninteractive apt-get -y upgrade \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends apt-utils sudo curl unzip ca-certificates
 
 # Install Squid
-RUN apt-get install -y --no-install-recommends squid3 \
+RUN sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends squid3 \
  && sudo squid3 -k shutdown \
  && sudo ln -s /usr/sbin/squid3 /usr/sbin/squid
 
 # Install Node 7
 RUN curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash - \
- && sudo apt-get install -y --no-install-recommends nodejs
+ && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends nodejs
 
 # Install Chrome Beta
 RUN curl -sS https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - \
  && sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' \
- && sudo apt-get update \
- && sudo apt-get install -y google-chrome-beta
+ && sudo DEBIAN_FRONTEND=noninteractive apt-get update \
+ && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y google-chrome-beta
 
 # Install ChromeDriver for Selenium
 RUN curl -sS http://chromedriver.storage.googleapis.com/2.30/chromedriver_linux64.zip > /tmp.zip \
@@ -32,8 +33,8 @@ RUN curl -sS http://chromedriver.storage.googleapis.com/2.30/chromedriver_linux6
 # Install Yarn
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - \
  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list \
- && sudo apt-get update \
- && sudo apt-get install -y --no-install-recommends yarn
+ && sudo DEBIAN_FRONTEND=noninteractive apt-get update \
+ && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends yarn
 
 # Create app directory
 RUN mkdir -p /usr/src/app
