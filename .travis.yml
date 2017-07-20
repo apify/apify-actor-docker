@@ -8,7 +8,7 @@ branches:
   - master
 
 script:
-  - docker login --username $DOCKERHUB_USER --password $DOCKERHUB_PASS
+  - docker login --username "${DOCKERHUB_USER} --password "${DOCKERHUB_PASS}"
   - ./build.sh node-basic
   - ./build.sh node-chrome
 
