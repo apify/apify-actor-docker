@@ -1,4 +1,4 @@
-FROM debian:latest
+FROM debian:jessie
 
 # This image was inspired by https://github.com/ebidel/lighthouse-ci/blob/master/builder/Dockerfile
 
@@ -54,7 +54,9 @@ RUN yarn install --production \
  && echo "Google Chrome version:" \
  && google-chrome-beta --version \
  && echo "ChromeDriver version:" \
- && chromedriver --version
+ && chromedriver --version \
+ && echo "Squid version:" \
+ && squid -v
 
 # Not using "npm start" to avoid unnecessary process, using CMD to enable simple overriding
 CMD [ "node", "main.js" ]
