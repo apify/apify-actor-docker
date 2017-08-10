@@ -52,7 +52,7 @@ RUN yarn install --production \
  && echo "Yarn version:" \
  && yarn --version \
  && echo "Google Chrome version:" \
- && google-chrome-beta --version \
+ && google-chrome-stable --version \
  && echo "ChromeDriver version:" \
  && chromedriver --version \
  && echo "Squid version:" \
