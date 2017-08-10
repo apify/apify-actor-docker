@@ -22,10 +22,10 @@ RUN curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash - \
 RUN curl -sS https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - \
  && sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' \
  && sudo DEBIAN_FRONTEND=noninteractive apt-get update \
- && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y google-chrome-beta
+ && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y google-chrome-stable
 
 # Install ChromeDriver for Selenium
-RUN curl -sS http://chromedriver.storage.googleapis.com/2.30/chromedriver_linux64.zip > /tmp.zip \
+RUN curl -sS http://chromedriver.storage.googleapis.com/2.31/chromedriver_linux64.zip > /tmp.zip \
  && unzip tmp.zip \
  && rm tmp.zip \
  && mv /chromedriver /bin
