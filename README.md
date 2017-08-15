@@ -26,18 +26,30 @@ docker login
 Then build the Docker image:
 
 ```bash
-./build.sh nodejs-basic
+./build.sh node-basic
 ```
 
 After the Docker image is well tested, it can be pushed with the `latest` tag:
 
 ```bash
-docker push apify/actor-nodejs-basic:latest
+docker push apify/actor-node-basic:latest
 ```
 
 Then you can remove the images from your computer:
 ```bash
 ./clean.sh
 ```
+
+*IMPORTANT*
+
+If the `beta` images were built by Travis CI and are already available on Docker Hub
+but not your local computer, then to publish them with the `latest` you need to
+run the following script:
+
+```bash
+./publish_beta_as_latest.sh node-basic
+```
+
+Do the same for other images,
 
 **TODO: Setup Circle CI to do this automatically on commit, development branch corresponds to beta, master to latest**
