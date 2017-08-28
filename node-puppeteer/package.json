@@ -1,0 +1,14 @@
+{
+  "description": "Anonymous act on the Apifier platform (with Puppeteer)",
+  "version": "0.0.1",
+  "license": "UNLICENSED",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "dependencies": {
+    "apify": ">=0.4.18",
+    "apify-client": ">=0.1.42",
+    "puppeteer": "^0.10.1"
+  }
+}
