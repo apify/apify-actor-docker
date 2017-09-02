@@ -6,15 +6,26 @@ LABEL maintainer="support@apifier.com" Description="Image used to run Apifier ac
 
 # NOTE: as a quick workaround, we added poppler-utils package, remove it after we have custom Docerkfile support!
 RUN apt-get update --fix-missing \
- && DEBIAN_FRONTEND=noninteractive apt-get install -yq gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget poppler-utils \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -yq gconf-service libasound2 libatk1.0-0 libc6 libcairo2 \
+    libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 \
+    libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 \
+    libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates \
+    fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget poppler-utils \
  && rm -r /var/lib/apt/lists/*
 
-# Create app directory
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+# Run Chrome under normal user with passwordless sudo
+RUN set -xe \
+ && useradd -u 1000 -g 100 -G sudo --shell /bin/bash user \
+ && echo 'ALL ALL = (ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+USER user
+
+# Change to app directory
+RUN mkdir -p /home/user/
+WORKDIR /home/user/
 
 # Copy source code
-COPY package.json main.js /usr/src/app/
+COPY package.json main.js /home/user/
 
 # Install default dependencies, print versions of everything
 RUN yarn install --production \
