@@ -13,19 +13,15 @@ RUN apt-get update --fix-missing \
     fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget poppler-utils \
  && rm -r /var/lib/apt/lists/*
 
-# Run Chrome under normal user with passwordless sudo
-RUN set -xe \
- && useradd -u 1000 -g 100 -G sudo --shell /bin/bash user \
- && echo 'ALL ALL = (ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
-
-USER user
+# Run Chrome under non-root user
+USER node
 
 # Change to app directory
-RUN mkdir -p /home/user/
-WORKDIR /home/user/
+RUN mkdir -p /home/node/
+WORKDIR /home/node/
 
 # Copy source code
-COPY package.json main.js /home/user/
+COPY package.json main.js /home/node/
 
 # Install default dependencies, print versions of everything
 RUN yarn install --production \
