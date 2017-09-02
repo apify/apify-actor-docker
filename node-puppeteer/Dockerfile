@@ -13,15 +13,18 @@ RUN apt-get update --fix-missing \
     fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget poppler-utils \
  && rm -r /var/lib/apt/lists/*
 
-# Run Chrome under non-root user
-USER node
 
 # Change to app directory
 RUN mkdir -p /home/node/
 WORKDIR /home/node/
 
-# Copy source code
+# Copy source code and change user to node
 COPY package.json main.js /home/node/
+
+RUN chown node:node *
+
+# Run Chrome under non-root user
+USER node
 
 # Install default dependencies, print versions of everything
 RUN yarn install --production \
