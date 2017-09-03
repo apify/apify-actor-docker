@@ -13,27 +13,23 @@ RUN apt-get update --fix-missing \
     fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget poppler-utils \
  && rm -r /var/lib/apt/lists/*
 
-
-# Change to app directory
+# Go to app directory
 RUN mkdir -p /home/node/
 WORKDIR /home/node/
 
-# Copy source code and change user to node
+# Copy source code
 COPY package.json main.js /home/node/
 
-RUN chown node:node *
-
-# Run Chrome under non-root user
-USER node
-
 # Install default dependencies, print versions of everything
+# and change owner from root because Chrome must run as non-root!
 RUN yarn install --production \
  && echo "Installed NPM packages:" \
  && yarn list \
  && echo "Node.js version:" \
  && node --version \
  && echo "Yarn version:" \
- && yarn --version
+ && yarn --version \
+ && chown -R node:node *
 
 # Not using "npm start" to avoid unnecessary process, using CMD to enable simple overriding
 CMD [ "node", "main.js" ]
