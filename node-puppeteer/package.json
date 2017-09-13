@@ -10,5 +10,6 @@
     "apify": ">=0.4.23",
     "apify-client": ">=0.1.44",
     "puppeteer": "^0.10.1"
-  }
+  },
+  "repository": {}
 }
