@@ -11,7 +11,7 @@ RUN apt-get update --fix-missing \
     libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 \
     libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates \
     fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget poppler-utils \
- && rm -r /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/*
 
 # Go to app directory
 RUN mkdir -p /home/node/
@@ -22,13 +22,13 @@ COPY package.json main.js /home/node/
 
 # Install default dependencies, print versions of everything
 # and change owner from root because Chrome must run as non-root!
-RUN yarn install --production \
+RUN npm install --only=prod --no-optional \
  && echo "Installed NPM packages:" \
- && yarn list \
+ && npm list \
  && echo "Node.js version:" \
  && node --version \
- && echo "Yarn version:" \
- && yarn --version \
+ && echo "NPM version:" \
+ && npm --version \
  && chown -R node:node *
 
 # Not using "npm start" to avoid unnecessary process, using CMD to enable simple overriding
