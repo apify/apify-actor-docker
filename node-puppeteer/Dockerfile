@@ -22,7 +22,8 @@ COPY package.json main.js /home/node/
 
 # Install default dependencies, print versions of everything
 # and change owner from root because Chrome must run as non-root!
-RUN npm install --only=prod --no-optional \
+RUN npm --quiet set progress=false \
+ && npm install --only=prod --no-optional \
  && echo "Installed NPM packages:" \
  && npm list \
  && echo "Node.js version:" \
