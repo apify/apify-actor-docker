@@ -32,8 +32,5 @@ RUN npm --quiet set progress=false \
  && npm --version \
  && chown -R node:node *
 
-# Run Chrome under non-root user
-USER node
-
 # Not using "npm start" to avoid unnecessary process, using CMD to enable simple overriding
 CMD [ "node", "main.js" ]
