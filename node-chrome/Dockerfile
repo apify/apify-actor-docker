@@ -14,9 +14,10 @@ RUN sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommen
  && sudo squid3 -k shutdown \
  && sudo ln -s /usr/sbin/squid3 /usr/sbin/squid
 
-# Install Node 7
+# Install Node 7 and latest NPM
 RUN curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash - \
- && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends nodejs build-essential
+ && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends nodejs build-essential \
+ && sudo npm install npm@latest -g
 
 # Install Chrome Beta
 RUN curl -sS https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - \
