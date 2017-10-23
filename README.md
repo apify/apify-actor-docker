@@ -1,6 +1,6 @@
 # apify-actor-docker
 
-Public Docker images for the Apifier Actor runtime (https://www.apifier.com)
+Public Docker images for Apify Actor serverless platform (https://www.apify.com/docs/actor)
 
 The sources for the images are present in subdirectories that are named as the corresponding
 Docker image. For example, the `default` directory corresponds to the
