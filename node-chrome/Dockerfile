@@ -26,8 +26,8 @@ RUN curl -sS https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-ke
  && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y google-chrome-stable \
  && rm -rf /var/lib/apt/lists/*
 
-# Install ChromeDriver for Selenium
-RUN curl -sS http://chromedriver.storage.googleapis.com/2.32/chromedriver_linux64.zip > /tmp.zip \
+# Install ChromeDriver for Selenium (see https://sites.google.com/a/chromium.org/chromedriver/)
+RUN curl -sS http://chromedriver.storage.googleapis.com/2.33/chromedriver_linux64.zip > /tmp.zip \
  && unzip tmp.zip \
  && rm tmp.zip \
  && mv /chromedriver /bin
