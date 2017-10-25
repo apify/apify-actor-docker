@@ -1,5 +1,5 @@
 {
-  "description": "Anonymous act on the Apifier platform (with Puppeteer)",
+  "description": "Anonymous act on the Apify Actor (with Puppeteer)",
   "version": "0.0.1",
   "license": "UNLICENSED",
   "main": "main.js",
@@ -7,8 +7,8 @@
     "start": "node main.js"
   },
   "dependencies": {
-    "apify": ">=0.4.28",
-    "apify-client": ">=0.1.48",
+    "apify": ">=0.4.29",
+    "apify-client": ">=0.1.50",
     "puppeteer": "^0.10.1"
   },
   "repository": {}
