@@ -20,5 +20,8 @@ RUN npm --quiet set progress=false \
  && echo "NPM version:" \
  && npm --version
 
+# Tell Node.js this is a production environemnt
+ENV NODE_ENV=production
+
 # Not using "npm start" to avoid unnecessary process, using CMD to enable simple overriding
 CMD [ "node", "main.js" ]

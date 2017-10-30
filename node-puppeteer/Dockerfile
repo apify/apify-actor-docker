@@ -14,14 +14,18 @@ RUN apt-get update --fix-missing \
  && rm -rf /var/lib/apt/lists/*
 
 # Go to app directory
-RUN mkdir -p /home/node/
+RUN mkdir -p /home/node/ \
+ && chown -R node:node /home/node/
+
 WORKDIR /home/node/
 
+# Chrome should run as a non-root user!
+USER node:node
+
 # Copy source code
-COPY package.json main.js /home/node/
+COPY --chown=node:node package.json main.js /home/node/
 
 # Install default dependencies, print versions of everything
-# and change owner from root because Chrome must run as non-root!
 RUN npm --quiet set progress=false \
  && npm install --only=prod --no-optional \
  && echo "Installed NPM packages:" \
@@ -29,8 +33,10 @@ RUN npm --quiet set progress=false \
  && echo "Node.js version:" \
  && node --version \
  && echo "NPM version:" \
- && npm --version \
- && chown -R node:node *
+ && npm --version
+
+# Tell Node.js this is a production environemnt
+ENV NODE_ENV=production
 
 # Not using "npm start" to avoid unnecessary process, using CMD to enable simple overriding
 CMD [ "node", "main.js" ]
