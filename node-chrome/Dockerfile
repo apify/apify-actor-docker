@@ -2,7 +2,7 @@ FROM debian:jessie
 
 # This image was inspired by https://github.com/ebidel/lighthouse-ci/blob/master/builder/Dockerfile
 
-LABEL maintainer="support@apifier.com" Description="Image used to run Apifier acts with Google Chrome"
+LABEL maintainer="support@apify.com" Description="Image used to run Apify acts with Google Chrome"
 
 # Install utilities
 RUN apt-get update --fix-missing \

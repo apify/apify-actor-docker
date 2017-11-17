@@ -1,7 +1,7 @@
 # Image is based on Node.js 8.X
 FROM node:8-alpine
 
-LABEL maintainer="support@apifier.com" Description="Image is used to run basic Apifier acts"
+LABEL maintainer="support@apify.com" Description="Image is used to run basic Apify acts"
 
 # Create app directory
 RUN mkdir -p /usr/src/app

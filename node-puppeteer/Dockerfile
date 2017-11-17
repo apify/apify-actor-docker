@@ -2,7 +2,7 @@ FROM node:8
 
 # This image was inspired by https://github.com/zenato/docker-puppeteer/blob/master/Dockerfile
 
-LABEL maintainer="support@apifier.com" Description="Image used to run Apifier acts with Chromium + Puppeteer"
+LABEL maintainer="support@apify.com" Description="Image used to run Apify acts with Chromium + Puppeteer"
 
 # NOTE: as a quick workaround, we added poppler-utils package, remove it after we have custom Docerkfile support!
 RUN apt-get update --fix-missing \
