@@ -1,5 +1,5 @@
-# Image is based on Node.js 7.X
-FROM node:7-alpine
+# Image is based on Node.js 8.X
+FROM node:8-alpine
 
 LABEL maintainer="support@apifier.com" Description="Image is used to run basic Apifier acts"
 
