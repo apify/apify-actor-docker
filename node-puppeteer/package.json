@@ -7,7 +7,7 @@
     "start": "node main.js"
   },
   "dependencies": {
-    "apify": ">=0.4.36",
+    "apify": ">=0.4.38",
     "apify-client": ">=0.1.55",
     "puppeteer": "^0.13.0"
   },
