@@ -8,8 +8,8 @@
   },
   "dependencies": {
     "apify": ">=0.4.39",
-    "apify-client": ">=0.1.55",
-    "puppeteer": "^0.13.0"
+    "apify-client": ">=0.1.60",
+    "puppeteer": "^1.0.0"
   },
   "repository": {}
 }

@@ -8,7 +8,7 @@
     },
     "dependencies": {
         "apify": ">=0.4.39",
-        "apify-client": ">=0.1.55"
+        "apify-client": ">=0.1.60"
     },
     "repository": {}
 }
