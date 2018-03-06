@@ -9,7 +9,7 @@
   "dependencies": {
     "apify": ">=0.5.7",
     "apify-client": ">=0.1.69",
-    "puppeteer": "^1.0.0"
+    "puppeteer": "^1.1.1"
   },
   "repository": {}
 }
