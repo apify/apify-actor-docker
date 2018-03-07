@@ -1,43 +1,47 @@
-FROM debian:jessie
+FROM node:8-slim
 
-# This image was inspired by https://github.com/ebidel/lighthouse-ci/blob/master/builder/Dockerfile
+# This image is based on https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-in-docker
 
-LABEL maintainer="support@apify.com" Description="Image used to run Apify acts with Google Chrome"
+# See https://crbug.com/795759
+#RUN apt-get update \
+# && apt-get install -yq libgconf-2-4
 
-# Install utilities
-RUN apt-get update --fix-missing \
- && DEBIAN_FRONTEND=noninteractive apt-get -y upgrade \
- && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends apt-utils sudo curl unzip ca-certificates
-
-# Install Squid
-RUN sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends squid3 \
- && sudo squid3 -k shutdown \
- && sudo ln -s /usr/sbin/squid3 /usr/sbin/squid
-
-# Install Node 7 and latest NPM
-RUN curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash - \
- && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends nodejs build-essential \
- && sudo npm install npm@latest -g
-
-# Install Chrome Beta
-RUN curl -sS https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - \
- && sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' \
- && sudo DEBIAN_FRONTEND=noninteractive apt-get update \
- && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y google-chrome-stable \
- && rm -rf /var/lib/apt/lists/*
-
+# Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
+# Note: this installs the necessary libs to make the bundled version of Chromium that Puppeteer
+# installs, work.
 # Install ChromeDriver for Selenium (see https://sites.google.com/a/chromium.org/chromedriver/)
-RUN curl -sS http://chromedriver.storage.googleapis.com/2.33/chromedriver_linux64.zip > /tmp.zip \
+RUN DEBIAN_FRONTEND=noninteractive apt-get update \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y wget --no-install-recommends \
+ && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+ && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+ && DEBIAN_FRONTEND=noninteractive apt-get update \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y unzip google-chrome-beta fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont \
+    --no-install-recommends \
+ && curl -sS http://chromedriver.storage.googleapis.com/2.36/chromedriver_linux64.zip > /tmp.zip \
  && unzip tmp.zip \
  && rm tmp.zip \
- && mv /chromedriver /bin
+ && mv /chromedriver /bin \
+ && rm -rf /var/lib/apt/lists/* \
+ && rm -rf /src/*.deb \
+ && DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y curl unzip \
+ && rm -rf /opt/yarn /usr/local/bin/yarn /usr/local/bin/yarnpkg
 
-# Create app directory
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+# Add user so we don't need --no-sandbox.
+RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
+    && mkdir -p /home/myuser/Downloads \
+    && chown -R myuser:myuser /home/myuser
+
+# Run everything after as non-privileged user.
+USER myuser
+WORKDIR /home/myuser
 
 # Copy source code
-COPY package.json main.js /usr/src/app/
+COPY --chown=myuser:myuser package.json main.js /home/myuser/
+
+# Uncomment to skip the chromium download when installing puppeteer. If you do,
+# you'll need to launch puppeteer with:
+#     browser.launch({executablePath: 'google-chrome-beta'})
+# ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
@@ -49,11 +53,9 @@ RUN npm --quiet set progress=false \
  && echo "NPM version:" \
  && npm --version \
  && echo "Google Chrome version:" \
- && google-chrome-stable --version \
+ && google-chrome-beta --version \
  && echo "ChromeDriver version:" \
- && chromedriver --version \
- && echo "Squid version:" \
- && squid -v
+ && chromedriver --version
 
 # Tell Node.js this is a production environemnt
 ENV NODE_ENV=production
