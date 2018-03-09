@@ -6,7 +6,7 @@ console.log('Testing Puppeteer in headless mode ...');
 const Apify = require('apify');
 
 Apify.main(async () => {
-    const browser = await Apify.launchPuppeteer();
+    const browser = await Apify.launchPuppeteer({ headless: true });
     const page = await browser.newPage();
     await page.goto('http://example.com');
     const pageTitle = await page.title();
