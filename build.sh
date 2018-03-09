@@ -23,6 +23,9 @@ fi
 
 docker build --pull --tag apify/actor-${DIR}:beta --tag apify/actor-${DIR}:latest ${NO_CACHE} ./${DIR}/
 
+# Test image locally
+docker run apify/actor-${DIR}:beta
+
 docker push apify/actor-${DIR}:beta
 
 echo "Docker image was built and published as apify/actor-${DIR}:beta"
