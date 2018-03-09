@@ -6,8 +6,6 @@ console.log('Testing node-chrome-xvfb image...');
 const Apify = require('apify');
 
 Apify.main(async () => {
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
     const browser = await Apify.launchPuppeteer({
         headless: false,
     });
