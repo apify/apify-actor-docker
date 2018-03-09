@@ -3,6 +3,9 @@ FROM node:8-alpine
 
 LABEL maintainer="support@apify.com" Description="Image is used to run basic Apify acts"
 
+# Remove yarn, it's not needed
+RUN rm -rf /opt/yarn /usr/local/bin/yarn /usr/local/bin/yarnpkg
+
 # Create app directory
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
