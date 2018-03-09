@@ -10,8 +10,13 @@ USER myuser
 WORKDIR /home/myuser
 
 # Copy source code
-COPY --chown=myuser:myuser main.js /home/myuser/
+COPY --chown=myuser:myuser main.js start_xvfb_and_run_cmd.sh /home/myuser/
+
+ENV DISPLAY=:99
+ENV XVFB_WHD=1280x720x16
+
+# This starts xvfb frame buffer and then executes Dockerfile CMD
+ENTRYPOINT [ "./start_xvfb_and_run_cmd.sh" ]
 
 # Not using "npm start" to avoid unnecessary process, using CMD to enable simple overriding
 CMD [ "node", "main.js" ]
-
