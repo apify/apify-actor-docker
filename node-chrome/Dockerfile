@@ -42,6 +42,15 @@ COPY --chown=myuser:myuser package.json main.js /home/myuser/
 #     browser.launch({executablePath: 'google-chrome'})
 # ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
+# Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
+ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
+
+# Tell Node.js this is a production environemnt
+ENV NODE_ENV=production
+
+# Enable Node.js process to use a lot of memory
+ENV NODE_OPTIONS="--max_old_space_size=16000"
+
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
  && npm install --only=prod --no-optional \
@@ -52,15 +61,9 @@ RUN npm --quiet set progress=false \
  && echo "NPM version:" \
  && npm --version \
  && echo "Google Chrome version:" \
- && google-chrome --version \
+ && bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version" \
  && echo "ChromeDriver version:" \
  && chromedriver --version
-
-# Tell Node.js this is a production environemnt
-ENV NODE_ENV=production
-
-# Enable Node.js process to use a lot of memory
-ENV NODE_OPTIONS="--max_old_space_size=16000"
 
 # Not using "npm start" to avoid unnecessary process, using CMD to enable simple overriding
 CMD [ "node", "main.js" ]
