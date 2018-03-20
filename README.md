@@ -53,5 +53,3 @@ run the following script:
 ```
 
 Do the same for other images,
-
-**TODO: Setup Circle CI to do this automatically on commit, development branch corresponds to beta, master to latest**
