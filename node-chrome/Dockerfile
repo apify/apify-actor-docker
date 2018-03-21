@@ -7,17 +7,16 @@ FROM node:8-slim
 # && apt-get install -yq libgconf-2-4
 
 # Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
-# Note: this installs the necessary libs to make the bundled version of Chromium that Puppeteer
-# installs, work.
-# Install ChromeDriver for Selenium (see https://sites.google.com/a/chromium.org/chromedriver/)
+# Note: this installs the necessary libs to make the bundled version of Chromium that Puppeteer installs, work.
+# Also installs Chrome (latest) and ChromeDriver for Selenium (see https://sites.google.com/a/chromium.org/chromedriver/)
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y wget --no-install-recommends \
  && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
  && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
  && DEBIAN_FRONTEND=noninteractive apt-get update \
- && DEBIAN_FRONTEND=noninteractive apt-get install -y unzip google-chrome-beta fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y unzip google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont \
     --no-install-recommends \
- && curl -sS http://chromedriver.storage.googleapis.com/2.36/chromedriver_linux64.zip > /tmp.zip \
+ && curl -sS http://chromedriver.storage.googleapis.com/2.37/chromedriver_linux64.zip > /tmp.zip \
  && unzip tmp.zip \
  && rm tmp.zip \
  && mv /chromedriver /bin \
@@ -40,8 +39,17 @@ COPY --chown=myuser:myuser package.json main.js /home/myuser/
 
 # Uncomment to skip the chromium download when installing puppeteer. If you do,
 # you'll need to launch puppeteer with:
-#     browser.launch({executablePath: 'google-chrome-beta'})
+#     browser.launch({executablePath: 'google-chrome'})
 # ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+
+# Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
+ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
+
+# Tell Node.js this is a production environemnt
+ENV NODE_ENV=production
+
+# Enable Node.js process to use a lot of memory
+ENV NODE_OPTIONS="--max_old_space_size=16000"
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
@@ -53,15 +61,9 @@ RUN npm --quiet set progress=false \
  && echo "NPM version:" \
  && npm --version \
  && echo "Google Chrome version:" \
- && google-chrome-beta --version \
+ && bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version" \
  && echo "ChromeDriver version:" \
  && chromedriver --version
-
-# Tell Node.js this is a production environemnt
-ENV NODE_ENV=production
-
-# Enable Node.js process to use a lot of memory
-ENV NODE_OPTIONS="--max_old_space_size=16000"
 
 # Not using "npm start" to avoid unnecessary process, using CMD to enable simple overriding
 CMD [ "node", "main.js" ]
