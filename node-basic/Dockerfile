@@ -8,7 +8,8 @@ RUN rm -rf /opt/yarn /usr/local/bin/yarn /usr/local/bin/yarnpkg
 
 # Install git as it may be required to install some NPM dependencies
 RUN apk update && apk upgrade && \
-    apk add --no-cache git openssh
+    apk add --no-cache git openssh-client \
+    rm -rf /var/cache/apk/*
 
 # Create app directory
 RUN mkdir -p /usr/src/app
