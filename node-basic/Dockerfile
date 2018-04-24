@@ -7,9 +7,8 @@ LABEL maintainer="support@apify.com" Description="Image is used to run basic Api
 RUN rm -rf /opt/yarn /usr/local/bin/yarn /usr/local/bin/yarnpkg
 
 # Install git as it may be required to install some NPM dependencies
-RUN apt-get update --fix-missing \
- && DEBIAN_FRONTEND=noninteractive apt-get install -yq git \
- && rm -rf /var/lib/apt/lists/*
+RUN apk update && apk upgrade && \
+    apk add --no-cache git openssh
 
 # Create app directory
 RUN mkdir -p /usr/src/app
