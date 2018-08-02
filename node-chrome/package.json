@@ -9,7 +9,7 @@
   "dependencies": {
     "apify": ">=0.5.49",
     "apify-client": ">=0.2.9",
-    "selenium-webdriver": "^3.11.0",
+    "selenium-webdriver": "^3.6.0",
     "puppeteer": "^1.6.2"
   },
   "repository": {}
