@@ -5,8 +5,8 @@
 Public Docker images for Apify Actor serverless platform (https://www.apify.com/docs/actor)
 
 The sources for the images are present in subdirectories that are named as the corresponding
-Docker image. For example, the `default` directory corresponds to the
-[apify/actor-default](https://hub.docker.com/r/apify/actor-default/) Docker image.
+Docker image. For example, the `node-basic` directory corresponds to the
+[apify/actor-node-basic](https://hub.docker.com/r/apify/actor-node-basic/) Docker image.
 
 The images are using the following tags:
 
