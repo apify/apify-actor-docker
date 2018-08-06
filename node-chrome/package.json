@@ -7,8 +7,8 @@
     "start": "node main.js"
   },
   "dependencies": {
-    "apify": ">=0.5.49",
-    "apify-client": ">=0.2.10",
+    "apify": ">=0.5.50",
+    "apify-client": ">=0.2.13",
     "selenium-webdriver": "^3.6.0",
     "puppeteer": "^1.6.2"
   },
