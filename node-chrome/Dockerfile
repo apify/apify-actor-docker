@@ -65,5 +65,5 @@ RUN npm --quiet set progress=false \
  && echo "ChromeDriver version:" \
  && chromedriver --version
 
-# Not using "npm start" to avoid unnecessary process, using CMD to enable simple overriding
-CMD [ "node", "main.js" ]
+# NOTE: This needs to be compatible with CLI.
+CMD [ "npm", "run", "start" ]

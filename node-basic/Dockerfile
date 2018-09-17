@@ -29,5 +29,5 @@ ENV NODE_ENV=production
 # Enable Node.js process to use a lot of memory
 ENV NODE_OPTIONS="--max_old_space_size=16000"
 
-# Not using "npm start" to avoid unnecessary process, using CMD to enable simple overriding
-CMD [ "node", "main.js" ]
+# NOTE: This needs to be compatible with CLI.
+CMD [ "npm", "run", "start" ]
