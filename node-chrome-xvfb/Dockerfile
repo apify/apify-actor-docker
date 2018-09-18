@@ -21,5 +21,5 @@ ENV APIFY_XVFB=1
 # This starts xvfb frame buffer and then executes Dockerfile CMD
 ENTRYPOINT [ "./start_xvfb_and_run_cmd.sh" ]
 
-# Not using "npm start" to avoid unnecessary process, using CMD to enable simple overriding
-CMD [ "node", "main.js" ]
+# NOTE: This needs to be compatible with CLI.
+CMD [ "npm", "run", "start" ]
