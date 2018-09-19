@@ -18,8 +18,12 @@ ENV DISPLAY=:99
 ENV XVFB_WHD=1280x720x16
 ENV APIFY_XVFB=1
 
-# This starts xvfb frame buffer and then executes Dockerfile CMD
-ENTRYPOINT [ "./start_xvfb_and_run_cmd.sh" ]
-
 # NOTE: This needs to be compatible with CLI.
-CMD [ "npm", "run", "start" ]
+# NOTE: Fallback to "node main.js" is there for backwards compatibility. We should remove in the future.
+ENTRYPOINT ./start_xvfb_and_run_cmd.sh && (\
+    npm run start \
+    || printf "\nWARNING: The npm start script not found in package.json. Using \"node main.js\" instead. \
+Please update your package.json file. For more information see \
+https://github.com/apifytech/apify-cli/blob/develop/version_migrations.md\n\n"\
+    && node main.js \
+)\
