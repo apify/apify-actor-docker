@@ -13,7 +13,7 @@ PACKAGE_START=$(node -e "
 ")
 
 # If not found print warning and fallback to old "node main.js".
-if [ -z $PACKAGE_START ]; then
+if [ -z "$PACKAGE_START" ]; then
     printf '\nWARNING: The npm start script not found in package.json. Using "node main.js" instead. Please update your package.json file. For more information see https://github.com/apifytech/apify-cli/blob/master/MIGRATIONS.md\n\n'
 fi
 START_SCRIPT=${PACKAGE_START:='node main.js'}
