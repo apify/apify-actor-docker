@@ -22,8 +22,8 @@ ENV APIFY_XVFB=1
 # NOTE: Fallback to "node main.js" is there for backwards compatibility. We should remove in the future.
 ENTRYPOINT ./start_xvfb_and_run_cmd.sh && (\
     npm run start \
-    || printf "\nWARNING: The npm start script not found in package.json. Using \"node main.js\" instead. \
+    || (printf "\nWARNING: The npm start script not found in package.json. Using \"node main.js\" instead. \
 Please update your package.json file. For more information see \
 https://github.com/apifytech/apify-cli/blob/develop/MIGRATIONS.md\n\n"\
-    && node main.js \
+    && node main.js) \
 )\
