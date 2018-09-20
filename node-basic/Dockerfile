@@ -11,7 +11,7 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 # Copy source code
-COPY package.json main.js /usr/src/app/
+COPY package.json main.js start_actor.sh /usr/src/app/
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
@@ -31,8 +31,4 @@ ENV NODE_OPTIONS="--max_old_space_size=16000"
 
 # NOTE: This needs to be compatible with CLI.
 # NOTE: Fallback to "node main.js" is there for backwards compatibility. We should remove in the future.
-ENTRYPOINT npm run start \
-    || (printf "\nWARNING: The npm start script not found in package.json. Using \"node main.js\" instead. \
-Please update your package.json file. For more information see \
-https://github.com/apifytech/apify-cli/blob/develop/MIGRATIONS.md\n\n"\
-    && node main.js) \
+ENTRYPOINT ./start_actor.sh

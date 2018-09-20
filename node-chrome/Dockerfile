@@ -35,7 +35,7 @@ USER myuser
 WORKDIR /home/myuser
 
 # Copy source code
-COPY --chown=myuser:myuser package.json main.js /home/myuser/
+COPY --chown=myuser:myuser package.json main.js start_actor.sh /home/myuser/
 
 # Uncomment to skip the chromium download when installing puppeteer. If you do,
 # you'll need to launch puppeteer with:
@@ -67,8 +67,4 @@ RUN npm --quiet set progress=false \
 
 # NOTE: This needs to be compatible with CLI.
 # NOTE: Fallback to "node main.js" is there for backwards compatibility. We should remove in the future.
-ENTRYPOINT npm run start \
-    || (printf "\nWARNING: The npm start script not found in package.json. Using \"node main.js\" instead. \
-Please update your package.json file. For more information see \
-https://github.com/apifytech/apify-cli/blob/develop/MIGRATIONS.md\n\n"\
-    && node main.js) \
+ENTRYPOINT ./start_actor.sh
