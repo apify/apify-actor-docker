@@ -18,5 +18,4 @@ if [ -z $PACKAGE_START ]; then
 fi
 START_SCRIPT=${PACKAGE_START:='node main.js'}
 
-eval $START_SCRIPT
-
+exec $START_SCRIPT
