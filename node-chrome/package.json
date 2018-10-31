@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "apify": ">=0.8.15",
-    "apify-client": ">=0.3.0",
+    "apify-client": ">=0.3.4",
     "selenium-webdriver": "^3.6.0",
     "puppeteer": "^1.8.0"
   },
