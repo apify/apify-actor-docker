@@ -7,7 +7,7 @@
     "start": "node main.js"
   },
   "dependencies": {
-    "apify": ">=0.9.11",
+    "apify": ">=0.9.12",
     "apify-client": ">=0.5.0"
   },
   "repository": {}
