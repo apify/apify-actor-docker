@@ -14,5 +14,8 @@ console.log('Testing node-basic image...');
 const Apify = require('apify');
 
 Apify.main(async () => {
+    // Test "ps" command is available, sometimes it was missing in official Node builds
+    await Apify.getMemoryInfo();
+
     console.log('... test PASSED');
 });

@@ -23,5 +23,8 @@ Apify.main(async () => {
         throw new Error(`Puppeteer test failed - returned title "${pageTitle}"" !== "Example Domain"`);
     }
 
+    // Test "ps" command is available, sometimes it was missing in official Node builds
+    await Apify.getMemoryInfo();
+
     console.log('... test PASSED');
 });
