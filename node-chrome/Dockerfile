@@ -1,4 +1,4 @@
-FROM node:8.13-slim
+FROM node:8.12-slim
 
 # This image is based on https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-in-docker
 
