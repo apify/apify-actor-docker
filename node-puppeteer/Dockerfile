@@ -1,4 +1,4 @@
-FROM node:8.12
+FROM node:8
 
 RUN echo "WARNING: This Docker image is now deprecated! Use apify/actor-node-chrome instead."
 
