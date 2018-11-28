@@ -18,6 +18,7 @@ ENV DISPLAY=:99
 ENV XVFB_WHD=1280x720x16
 ENV APIFY_XVFB=1
 
-# NOTE: This needs to be compatible with CLI.
-# NOTE: Fallback to "node main.js" is there for backwards compatibility. We should remove in the future.
-ENTRYPOINT ./start_xvfb_and_run_cmd.sh && ./start_actor.sh
+# NOTEs:
+# - This needs to be compatible with CLI.
+# - Using CMD instead of ENTRYPOINT, to allow manual overriding
+CMD ./start_xvfb_and_run_cmd.sh && ./start_actor.sh

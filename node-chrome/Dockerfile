@@ -65,6 +65,7 @@ RUN npm --quiet set progress=false \
  && echo "ChromeDriver version:" \
  && chromedriver --version
 
-# NOTE: This needs to be compatible with CLI.
-# NOTE: Fallback to "node main.js" is there for backwards compatibility. We should remove in the future.
-ENTRYPOINT ./start_actor.sh
+# NOTEs:
+# - This needs to be compatible with CLI.
+# - Using CMD instead of ENTRYPOINT, to allow manual overriding
+CMD ./start_actor.sh

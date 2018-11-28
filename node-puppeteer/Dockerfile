@@ -43,6 +43,7 @@ ENV NODE_ENV=production
 # Enable Node.js process to use a lot of memory
 ENV NODE_OPTIONS="--max_old_space_size=16000"
 
-# NOTE: This needs to be compatible with CLI.
-# NOTE: Fallback to "node main.js" is there for backwards compatibility. We should remove in the future.
-ENTRYPOINT ./start_actor.sh
+# NOTEs:
+# - This needs to be compatible with CLI.
+# - Using CMD instead of ENTRYPOINT, to allow manual overriding
+CMD ./start_actor.sh
