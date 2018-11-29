@@ -11,8 +11,9 @@ set -e
 
 DIR="$1"
 
-# Using tee to ignore error sayin images are not present
-docker image rm apify/actor-${DIR}:beta apify/actor-${DIR}:latest | tee
+# Using tee to ignore error saying images are not present
+# TODO: Unfortunatelly this ignores other errors, improve this!!!
+docker image rm --force apify/actor-${DIR}:beta apify/actor-${DIR}:latest | tee
 
 docker pull apify/actor-${DIR}:beta
 docker image tag apify/actor-${DIR}:beta apify/actor-${DIR}:latest
