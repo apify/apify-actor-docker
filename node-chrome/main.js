@@ -28,7 +28,7 @@ Apify.main(async () => {
     // Second, try to use full Chrome
     console.log('Testing Puppeteer with full Chrome');
     const browser2 = await Apify.launchPuppeteer({ headless: true, useChrome: true });
-    const page2 = await browser1.newPage();
+    const page2 = await browser2.newPage();
     await page2.goto('http://www.example.com');
     const pageTitle2 = await page2.title();
     if (pageTitle2 !== 'Example Domain') {
@@ -38,13 +38,13 @@ Apify.main(async () => {
 
     // Third, try to use WebDriver with headless Chrome
     console.log('Testing WebDriver with full Chrome');
-    const webDriver = await Apify.launchWebDriver();
+    const webDriver = await Apify.launchWebDriver({ headless: true });
     await webDriver.get('http://www.example.com');
     const pageTitle3 = await webDriver.executeScript(() => {
         return document.title;
     });
     if (pageTitle3 !== 'Example Domain') {
-        throw new Error(`Webdriver+Chrome test failed - returned title "${pageTitle2}"" !== "Example Domain"`);
+        throw new Error(`Webdriver+Chrome test failed - returned title "${pageTitle3}"" !== "Example Domain"`);
     }
     await webDriver.close();
 
