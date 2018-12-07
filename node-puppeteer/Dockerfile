@@ -1,6 +1,6 @@
 FROM node:8
 
-RUN echo "WARNING: This Docker image is now deprecated! Use apify/actor-node-chrome instead."
+RUN echo "WARNING: The apify/actor-node-puppeteer Docker image is deprecated! Use apify/actor-node-chrome instead."
 
 # This image was inspired by https://github.com/zenato/docker-puppeteer/blob/master/Dockerfile
 

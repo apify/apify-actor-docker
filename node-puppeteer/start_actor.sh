@@ -1,5 +1,7 @@
 #!/bin/sh
 
+echo "WARNING: The apify/actor-node-puppeteer Docker image is deprecated! Use apify/actor-node-chrome instead."
+
 # Try to get start script from package.json.
 PACKAGE_START=$(node -e "
     try {
