@@ -7,10 +7,10 @@
     "start": "node main.js"
   },
   "dependencies": {
-    "apify": ">=0.9.14",
-    "apify-client": ">=0.5.1",
+    "apify": ">=0.9.15",
+    "apify-client": ">=0.5.2",
     "selenium-webdriver": "^3.6.0",
-    "puppeteer": "^1.9.0"
+    "puppeteer": "^1.11.0"
   },
   "repository": {}
 }
