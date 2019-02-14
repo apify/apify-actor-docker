@@ -1,4 +1,4 @@
-// This code is used to test that both Node and PhantomJS work.
+// This code is used to test that both Node.js and PhantomJS work.
 
 const { exec } = require('child_process');
 
