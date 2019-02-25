@@ -1,4 +1,4 @@
-FROM node:8-slim
+FROM node:10-slim
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using headless Chrome"
 

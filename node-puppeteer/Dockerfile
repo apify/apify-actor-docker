@@ -1,4 +1,4 @@
-FROM node:8
+FROM node:10
 
 RUN echo "WARNING: The apify/actor-node-puppeteer Docker image is deprecated! Use apify/actor-node-chrome instead."
 
