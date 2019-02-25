@@ -1,7 +1,7 @@
 # Image is based on Node.js 8.X
 FROM node:8-alpine
 
-LABEL maintainer="support@apify.com" Description="Image is used to run basic Apify acts"
+LABEL maintainer="support@apify.com" Description="Base image for simple Apify actors"
 
 # Remove yarn, it's not needed
 RUN rm -rf /opt/yarn /usr/local/bin/yarn /usr/local/bin/yarnpkg

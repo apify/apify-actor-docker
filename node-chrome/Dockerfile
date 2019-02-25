@@ -1,5 +1,7 @@
 FROM node:8-slim
 
+LABEL maintainer="support@apify.com" Description="Base image for Apify actors using headless Chrome"
+
 # This image is based on https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-in-docker
 
 # See https://crbug.com/795759
@@ -16,7 +18,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y procps unzip git google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont \
     --no-install-recommends \
- && curl -sS http://chromedriver.storage.googleapis.com/2.44/chromedriver_linux64.zip > /tmp.zip \
+ && curl -sS http://chromedriver.storage.googleapis.com/2.46/chromedriver_linux64.zip > /tmp.zip \
  && unzip tmp.zip \
  && rm tmp.zip \
  && mv /chromedriver /bin \
