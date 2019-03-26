@@ -1,4 +1,4 @@
-# Image is based on Node.js 8.X
+# Image is based on Node.js 10.X
 FROM node:10-alpine
 
 LABEL maintainer="support@apify.com" Description="Base image for simple Apify actors"
@@ -15,7 +15,7 @@ COPY package.json main.js start_actor.sh /usr/src/app/
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
- && npm install --only=prod --no-optional \
+ && npm install --only=prod --no-optional --no-package-lock \
  && echo "Installed NPM packages:" \
  && npm list \
  && echo "Node.js version:" \

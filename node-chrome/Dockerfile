@@ -55,7 +55,7 @@ ENV NODE_OPTIONS="--max_old_space_size=16000"
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
- && npm install --only=prod --no-optional \
+ && npm install --only=prod --no-optional --no-package-lock \
  && echo "Installed NPM packages:" \
  && npm list \
  && echo "Node.js version:" \

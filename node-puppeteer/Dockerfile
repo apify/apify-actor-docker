@@ -29,7 +29,7 @@ COPY --chown=node:node package.json main.js start_actor.sh /home/node/
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
- && npm install --only=prod --no-optional \
+ && npm install --only=prod --no-optional --no-package-lock \
  && echo "Installed NPM packages:" \
  && npm list \
  && echo "Node.js version:" \
