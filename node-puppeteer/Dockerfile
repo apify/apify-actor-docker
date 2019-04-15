@@ -31,7 +31,7 @@ COPY --chown=node:node package.json main.js start_actor.sh /home/node/
 RUN npm --quiet set progress=false \
  && npm install --only=prod --no-optional --no-package-lock \
  && echo "Installed NPM packages:" \
- && npm list \
+ && npm list || true \
  && echo "Node.js version:" \
  && node --version \
  && echo "NPM version:" \
