@@ -15,7 +15,6 @@ Tag         | Description
 `latest`    | Well-tested production version of the image.
 `beta`      | Development version of the image.
 
-
 ## Maintenance
 
 In order to build and publish a new version of the Docker images,
