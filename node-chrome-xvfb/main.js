@@ -36,18 +36,6 @@ Apify.main(async () => {
     }
     await browser2.close();
 
-    // Third, try to use WebDriver with headless Chrome
-    console.log('Testing WebDriver with full Chrome');
-    const webDriver = await Apify.launchWebDriver({ headless: false });
-    await webDriver.get('http://www.example.com');
-    const pageTitle3 = await webDriver.executeScript(() => {
-        return document.title;
-    });
-    if (pageTitle3 !== 'Example Domain') {
-        throw new Error(`Webdriver+Chrome test failed - returned title "${pageTitle3}"" !== "Example Domain"`);
-    }
-    await webDriver.close();
-
     // Test that "ps" command is available, sometimes it was missing in official Node builds
     await Apify.getMemoryInfo();
 

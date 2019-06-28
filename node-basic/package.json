@@ -1,13 +1,13 @@
 {
-  "description": "Anonymous actor on the Apify platform",
-  "version": "0.0.1",
-  "license": "UNLICENSED",
-  "main": "main.js",
-  "scripts": {
-    "start": "node main.js"
-  },
-  "dependencies": {
-    "apify": ">=0.14.6"
-  },
-  "repository": {}
+    "description": "Anonymous actor on the Apify platform",
+    "version": "0.0.1",
+    "license": "UNLICENSED",
+    "main": "main.js",
+    "scripts": {
+        "start": "node main.js"
+    },
+    "dependencies": {
+        "apify": "0.15.1-beta.11"
+    },
+    "repository": {}
 }
