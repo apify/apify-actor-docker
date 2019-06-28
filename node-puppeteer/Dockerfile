@@ -37,11 +37,11 @@ RUN npm --quiet set progress=false \
  && echo "NPM version:" \
  && npm --version
 
-# Tell Node.js this is a production environemnt
+# Tell Node.js this is a production environemnt (actor has limit of 32GB)
 ENV NODE_ENV=production
 
 # Enable Node.js process to use a lot of memory
-ENV NODE_OPTIONS="--max_old_space_size=16000"
+ENV NODE_OPTIONS="--max_old_space_size=30000"
 
 # NOTEs:
 # - This needs to be compatible with CLI.

@@ -33,8 +33,8 @@ COPY --chown=myuser:myuser test.js /home/myuser/
 # Tell Node.js this is a production environemnt
 ENV NODE_ENV=production
 
-# Enable Node.js process to use a lot of memory
-ENV NODE_OPTIONS="--max_old_space_size=16000"
+# Enable Node.js process to use a lot of memory (actor has limit of 32GB)
+ENV NODE_OPTIONS="--max_old_space_size=30000"
 
 # Install default dependencies, print versions of everything
 RUN echo "Node.js version:" \
