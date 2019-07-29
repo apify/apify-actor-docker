@@ -1,4 +1,4 @@
-FROM apify/actor-node-chrome:beta
+FROM apify/actor-node-chrome
 
 # Install xvfb frame buffer needed for non-headless Chrome
 USER root
