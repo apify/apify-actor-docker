@@ -7,7 +7,7 @@
         "start": "node main.js"
     },
     "dependencies": {
-        "apify": "0.15.5-beta.3"
+        "apify": "0.15.5"
     },
     "repository": {}
 }
