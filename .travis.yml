@@ -16,6 +16,4 @@ script:
   - ./build.sh node-basic
   - ./build.sh node-chrome-xvfb
   - ./build.sh node-phantomjs
-  # TODO: this is deprecated and might be removed at some point
-  - ./build.sh node-puppeteer
 
