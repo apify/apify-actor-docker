@@ -11,7 +11,7 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 # Copy source code
-COPY package.json main.js start_actor.sh /usr/src/app/
+COPY package.json main.js start_actor.js /usr/src/app/
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
@@ -32,4 +32,4 @@ ENV NODE_OPTIONS="--max_old_space_size=30000"
 # NOTEs:
 # - This needs to be compatible with CLI.
 # - Using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD ./start_actor.sh
+CMD node start_actor.js
