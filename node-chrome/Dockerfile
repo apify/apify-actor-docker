@@ -18,7 +18,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y procps unzip git google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont \
     --no-install-recommends \
- && curl -sS http://chromedriver.storage.googleapis.com/2.46/chromedriver_linux64.zip > /tmp.zip \
+ && curl -sS http://chromedriver.storage.googleapis.com/77.0.3865.40/chromedriver_linux64.zip > /tmp.zip \
  && unzip tmp.zip \
  && rm tmp.zip \
  && mv /chromedriver /bin \
