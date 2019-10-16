@@ -37,7 +37,7 @@ USER myuser
 WORKDIR /home/myuser
 
 # Copy source code
-COPY --chown=myuser:myuser package.json main.js start_actor.sh /home/myuser/
+COPY --chown=myuser:myuser package.json main.js /home/myuser/
 
 # Uncomment to skip the chromium download when installing puppeteer. If you do,
 # you'll need to launch puppeteer with:
@@ -70,4 +70,4 @@ RUN npm --quiet set progress=false \
 # NOTEs:
 # - This needs to be compatible with CLI.
 # - Using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD ./start_actor.sh
+CMD npm start

@@ -25,7 +25,7 @@ WORKDIR /home/node/
 USER node:node
 
 # Copy source code
-COPY --chown=node:node package.json main.js start_actor.sh /home/node/
+COPY --chown=node:node package.json main.js /home/node/
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
@@ -46,4 +46,4 @@ ENV NODE_OPTIONS="--max_old_space_size=30000"
 # NOTEs:
 # - This needs to be compatible with CLI.
 # - Using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD ./start_actor.sh
+CMD npm start
