@@ -27,7 +27,7 @@ RUN npm --quiet set progress=false \
 ENV NODE_ENV=production
 
 # Enable Node.js process to use a lot of memory (actor has limit of 32GB)
-ENV NODE_OPTIONS="--max_old_space_size=30000"
+ENV NODE_OPTIONS="--max_old_space_size=30000 --max-http-header-size=80000"
 
 # NOTEs:
 # - This needs to be compatible with CLI.
