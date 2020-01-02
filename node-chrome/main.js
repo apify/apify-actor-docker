@@ -12,6 +12,7 @@ For more information, see https://www.apify.com/docs/actor#custom-dockerfile
 console.log('Testing Docker image...');
 
 const Apify = require('apify');
+const testPuppeteerChrome = require('./puppeteer-chrome-test');
 
 Apify.main(async () => {
     // First, try to open Chromium to see all dependencies are correctly installed
@@ -26,15 +27,7 @@ Apify.main(async () => {
     await browser1.close();
 
     // Second, try to use full Chrome
-    console.log('Testing Puppeteer with full Chrome');
-    const browser2 = await Apify.launchPuppeteer({ headless: true, useChrome: true });
-    const page2 = await browser2.newPage();
-    await page2.goto('http://www.example.com');
-    const pageTitle2 = await page2.title();
-    if (pageTitle2 !== 'Example Domain') {
-        throw new Error(`Puppeteer+Chrome test failed - returned title "${pageTitle2}"" !== "Example Domain"`);
-    }
-    await browser2.close();
+    await testPuppeteerChrome();
 
     // Test that "ps" command is available, sometimes it was missing in official Node builds
     await Apify.getMemoryInfo();
