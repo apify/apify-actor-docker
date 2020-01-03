@@ -2,23 +2,28 @@ FROM node:10-slim
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using headless Chrome"
 
-# This image is based on https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-in-docker
+# This image was inspired by https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-in-docker
 
-# See https://crbug.com/795759
-#RUN apt-get update \
-# && apt-get install -yq libgconf-2-4
+# Select Chrome version, must be compatible with Apify SDK's Puppeteer version!
+# Find versions at https://www.ubuntuupdates.org/pm/google-chrome-stable
+# or https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable
+ENV CHROME_VERSION="79.0.3945.88-1"
 
-# Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
+# ChromeDriver for Selenium version
+# Find versions at https://sites.google.com/a/chromium.org/chromedriver/downloads/)
+ENV CHROME_DRIVER_VERSION="79.0.3945.36"
+
+# Install latest Chrome dev packages and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
 # Note: this installs the necessary libs to make the bundled version of Chromium that Puppeteer installs, work.
-# Also installs Chrome (latest) and ChromeDriver for Selenium (see https://sites.google.com/a/chromium.org/chromedriver/)
+# then installs Chrome and ChromeDriver for Selenium
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y wget --no-install-recommends \
- && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+ && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | DEBIAN_FRONTEND=noninteractive apt-key add - \
  && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
  && DEBIAN_FRONTEND=noninteractive apt-get update \
- && DEBIAN_FRONTEND=noninteractive apt-get install -y procps unzip git google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y procps unzip git google-chrome-stable=${CHROME_VERSION} fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont \
     --no-install-recommends \
- && curl -sS http://chromedriver.storage.googleapis.com/77.0.3865.40/chromedriver_linux64.zip > /tmp.zip \
+ && curl -sS https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip > /tmp.zip \
  && unzip tmp.zip \
  && rm tmp.zip \
  && mv /chromedriver /bin \
@@ -37,7 +42,7 @@ USER myuser
 WORKDIR /home/myuser
 
 # Copy source code
-COPY --chown=myuser:myuser package.json main.js /home/myuser/
+COPY package.json main.js puppeteer_chrome_test.js /home/myuser/
 
 # Uncomment to skip the chromium download when installing puppeteer. If you do,
 # you'll need to launch puppeteer with:
