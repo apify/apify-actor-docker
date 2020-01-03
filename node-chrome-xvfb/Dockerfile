@@ -12,8 +12,9 @@ USER myuser
 WORKDIR /home/myuser
 
 # Copy source code
-COPY --chown=myuser:myuser main.js start_xvfb_and_run_cmd.sh /home/myuser/
+COPY --chown=myuser:myuser start_xvfb_and_run_cmd.sh /home/myuser/
 
+# Set up xvfb
 ENV DISPLAY=:99
 ENV XVFB_WHD=1280x720x16
 ENV APIFY_XVFB=1
