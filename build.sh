@@ -5,7 +5,7 @@ if [ -z $1 ]; then
     echo "Usage: ./build.sh <directory> [--cache]"
     echo ""
     echo "The --cache argument instructs build to use Docker layer cache."
-    echo "Only use it if you know what you are doing!"
+    echo "Use with caution, cached layers might become outdated."
     exit
 fi
 
