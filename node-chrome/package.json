@@ -7,7 +7,7 @@
         "start": "node main.js"
     },
     "dependencies": {
-        "apify": "0.19.0-beta.0",
+        "apify": "0.19.0-beta.1",
         "selenium-webdriver": "3.6.0",
         "puppeteer": "2.0.0"
     },
