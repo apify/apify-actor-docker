@@ -5,7 +5,7 @@ if [ -z $1 ]; then
     echo "Usage: ./build.sh <directory> [--cache]"
     echo ""
     echo "The --cache argument instructs build to use Docker layer cache."
-    echo "Only use it if you know what you are doing!"
+    echo "Use with caution, cached layers might become outdated."
     exit
 fi
 
@@ -23,9 +23,10 @@ fi
 
 docker build --pull --tag apify/actor-${DIR}:beta --tag apify/actor-${DIR}:latest ${NO_CACHE} ./${DIR}/
 
-# Test image locally
+echo "Running image for test"
 docker run apify/actor-${DIR}:beta
 
+echo "Pushing image to Docker Hub"
 docker push apify/actor-${DIR}:beta
 
 echo "Docker image was built and published as apify/actor-${DIR}:beta"

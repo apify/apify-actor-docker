@@ -12,7 +12,7 @@ For more information, see https://www.apify.com/docs/actor#custom-dockerfile
 console.log('Testing Docker image...');
 
 const Apify = require('apify');
-const testPuppeteerChrome = require('./puppeteer-chrome-test');
+const testPuppeteerChrome = require('./puppeteer_chrome_test');
 
 Apify.main(async () => {
     // First, try to open Chromium to see all dependencies are correctly installed

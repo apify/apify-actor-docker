@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/apifytech/apify-actor-docker.svg)](https://travis-ci.org/apifytech/apify-actor-docker)
 
-Public Docker images for Apify Actor serverless platform (https://www.apify.com/docs/actor)
+Public Docker images for Apify Actor serverless platform (https://docs.apify.com/actor)
 
 The sources for the images are present in subdirectories that are named as the corresponding
 Docker image. For example, the `node-basic` directory corresponds to the
