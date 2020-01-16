@@ -17,7 +17,7 @@ ENV CHROME_DRIVER_VERSION="79.0.3945.36"
 # Note: this installs the necessary libs to make the bundled version of Chromium that Puppeteer installs, work.
 # then installs Chrome and ChromeDriver for Selenium
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
- && DEBIAN_FRONTEND=noninteractive apt-get install -y wget --no-install-recommends \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg ca-certificates --no-install-recommends \
  && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | DEBIAN_FRONTEND=noninteractive apt-key add - \
  && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
  && DEBIAN_FRONTEND=noninteractive apt-get update \
