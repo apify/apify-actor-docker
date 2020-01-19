@@ -1,4 +1,4 @@
-FROM node:10-slim
+FROM node:12-slim
 
 # First, download PhantomJS and necessary libraries, these change rarely
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
