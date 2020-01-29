@@ -1,5 +1,5 @@
 # Image is based on Node.js 10.X
-FROM node:10-alpine
+FROM node:12-alpine
 
 LABEL maintainer="support@apify.com" Description="Base image for simple Apify actors"
 
