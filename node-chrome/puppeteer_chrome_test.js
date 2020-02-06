@@ -36,6 +36,10 @@ function isChromeVersionsMajorEqual(v1, v2) {
     return major1 === major2;
 }
 
+function trimPatchVersion(version) {
+    return version.split('.').slice(2).join('.');
+}
+
 const testCompatibility = async (browser) => {
     console.log('Puppeteer version: %s', puppeteerVersion);
 
@@ -48,7 +52,11 @@ const testCompatibility = async (browser) => {
     console.log('Puppeteer compatibility versions are:');
     console.log(compatibilityVersions);
 
-    const matchedCompatibilityVersion = compatibilityVersions.find(cv => cv.pptr === puppeteerVersion);
+    const matchedCompatibilityVersion = compatibilityVersions.find(cv => {
+        const cvMajorMinor = trimPatchVersion(cv);
+        const pptrMajorMinor = trimPatchVersion(puppeteerVersion);
+        return cvMajorMinor === pptrMajorMinor;
+    });
 
     if (!matchedCompatibilityVersion) {
         throw new Error(`Puppeteer+Chrome test failed: puppeteer version "${puppeteerVersion}" not found`);
