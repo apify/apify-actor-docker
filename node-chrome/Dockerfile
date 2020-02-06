@@ -7,7 +7,7 @@ LABEL maintainer="support@apify.com" Description="Base image for Apify actors us
 # Select Chrome version, must be compatible with Apify SDK's Puppeteer version!
 # Find versions at https://www.ubuntuupdates.org/pm/google-chrome-stable
 # or https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable
-ENV CHROME_VERSION="79.0.3945.130-1"
+ENV CHROME_VERSION="80.0.3987.87-1"
 
 # ChromeDriver for Selenium version
 # Find versions at https://sites.google.com/a/chromium.org/chromedriver/downloads/)
