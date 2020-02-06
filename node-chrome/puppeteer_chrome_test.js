@@ -37,7 +37,7 @@ function isChromeVersionsMajorEqual(v1, v2) {
 }
 
 function trimPatchVersion(version) {
-    return version.split('.').slice(2).join('.');
+    return version.split('.').slice(0, 2).join('.');
 }
 
 const testCompatibility = async (browser) => {
@@ -53,7 +53,7 @@ const testCompatibility = async (browser) => {
     console.log(compatibilityVersions);
 
     const matchedCompatibilityVersion = compatibilityVersions.find(cv => {
-        const cvMajorMinor = trimPatchVersion(cv);
+        const cvMajorMinor = trimPatchVersion(cv.pptr);
         const pptrMajorMinor = trimPatchVersion(puppeteerVersion);
         return cvMajorMinor === pptrMajorMinor;
     });
