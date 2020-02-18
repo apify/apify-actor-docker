@@ -17,7 +17,7 @@ COPY package.json main.js /usr/src/app/
 RUN npm --quiet set progress=false \
  && npm install --only=prod --no-optional --no-package-lock \
  && echo "Installed NPM packages:" \
- && npm list || true \
+ && (npm list || true) \
  && echo "Node.js version:" \
  && node --version \
  && echo "NPM version:" \
