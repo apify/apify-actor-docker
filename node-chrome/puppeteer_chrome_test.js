@@ -30,7 +30,7 @@ function parseCompatibilityVersions(text) {
     return versions;
 }
 
-function isChromeVersionsMajorEqual(v1, v2) {
+function areMajorVersionsEqual(v1, v2) {
     const major1 = v1.split('.')[0];
     const major2 = v2.split('.')[0];
     return major1 === major2;
@@ -62,7 +62,7 @@ const testCompatibility = async (browser) => {
         throw new Error(`Puppeteer+Chrome test failed: puppeteer version "${puppeteerVersion}" not found`);
     }
     const compatibleChromeVersion = matchedCompatibilityVersion.chrome;
-    if (!isChromeVersionsMajorEqual(compatibleChromeVersion, chromeVersion)){
+    if (!areMajorVersionsEqual(compatibleChromeVersion, chromeVersion)){
         throw new Error(`Puppeteer+Chrome test failed: puppeteer version "${puppeteerVersion}" is not compatible with Chrome version ${chromeVersion}, it's compatible with version ${compatibleChromeVersion}`);
     }
 
