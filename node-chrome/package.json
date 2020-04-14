@@ -8,7 +8,6 @@
     },
     "dependencies": {
         "apify": "0.20.3",
-        "selenium-webdriver": "3.6.0",
         "puppeteer": "2.1.1"
     },
     "repository": {}
