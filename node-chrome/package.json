@@ -7,7 +7,7 @@
         "start": "node main.js"
     },
     "dependencies": {
-        "apify": "0.20.4-beta.5",
+        "apify": "0.20.4-beta.6",
         "puppeteer": "3.0.0"
     },
     "repository": {}
