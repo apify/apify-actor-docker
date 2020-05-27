@@ -62,4 +62,4 @@ RUN npm --quiet set progress=false \
 # NOTEs:
 # - This needs to be compatible with CLI.
 # - Using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD npm start
+CMD npm start --silent
