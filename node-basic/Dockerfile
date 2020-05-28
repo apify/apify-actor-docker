@@ -35,4 +35,4 @@ ENV NODE_OPTIONS="--max_old_space_size=30000 --max-http-header-size=80000"
 # NOTEs:
 # - This needs to be compatible with CLI.
 # - Using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD npm start
+CMD npm start --silent

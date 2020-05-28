@@ -22,5 +22,5 @@ ENV APIFY_XVFB=1
 # NOTEs:
 # - This needs to be compatible with CLI.
 # - Using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD ./start_xvfb_and_run_cmd.sh && npm start
+CMD ./start_xvfb_and_run_cmd.sh && npm start --silent
 
