@@ -30,10 +30,10 @@ function parseCompatibilityVersions(text) {
     return versions;
 }
 
-function areMajorVersionsCompatible(compatible, actual) {
-    const comp = Number(compatible.split('.')[0]);
-    const actu = Number(actual.split('.')[0]);
-    return actu >= comp;
+function areVersionsCompatible(compatible, actual) {
+    const [compMajor, compMinor] = compatible.split('.').map(n => Number(n));
+    const [actualMajor, actualMinor] = actual.split('.').map(n => Number(n));
+    return actualMajor === compMajor && actualMinor >= compMinor;
 }
 
 function trimPatchVersion(version) {
@@ -52,17 +52,19 @@ const testCompatibility = async (browser) => {
     console.log('Puppeteer compatibility versions are:');
     console.log(compatibilityVersions);
 
+    // The list is only updated on Chrome releases, not Puppeteer releases, so e.g.
+    // when support for Chrome 83 comes with Puppeteer 3.1.0, 3.2.0 will not be listed.
+    // We must therefore check if we have Puppeteer >= the latest entry and if that's
+    // the case, then it supports the latest entry of Chrome.
     const matchedCompatibilityVersion = compatibilityVersions.find(cv => {
-        const cvMajorMinor = trimPatchVersion(cv.pptr);
-        const pptrMajorMinor = trimPatchVersion(puppeteerVersion);
-        return cvMajorMinor === pptrMajorMinor;
+        return areVersionsCompatible(cv.pptr, puppeteerVersion);
     });
 
     if (!matchedCompatibilityVersion) {
         throw new Error(`Puppeteer+Chrome test failed: puppeteer version "${puppeteerVersion}" not found`);
     }
     const chromeVersionCompatibleWithPuppeteer = matchedCompatibilityVersion.chrome;
-    if (!areMajorVersionsCompatible(chromeVersionCompatibleWithPuppeteer, chromeVersion)){
+    if (!areVersionsCompatible(chromeVersionCompatibleWithPuppeteer, chromeVersion)){
         throw new Error(`Puppeteer+Chrome test failed: puppeteer version "${puppeteerVersion}" is not compatible with Chrome version ${chromeVersion}, it's compatible with version ${chromeVersionCompatibleWithPuppeteer}`);
     }
 
