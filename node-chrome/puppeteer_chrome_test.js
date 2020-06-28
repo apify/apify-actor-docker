@@ -47,7 +47,7 @@ const testCompatibility = async (browser) => {
     console.log('Chrome version: %s', chromeVersion);
 
     const page = await browser.newPage();
-    const apiResponse = await page.goto('https://raw.githubusercontent.com/GoogleChrome/puppeteer/master/docs/api.md');
+    const apiResponse = await page.goto('https://raw.githubusercontent.com/GoogleChrome/puppeteer/main/docs/api.md');
     const compatibilityVersions = parseCompatibilityVersions(await apiResponse.text());
     console.log('Puppeteer compatibility versions are:');
     console.log(compatibilityVersions);
