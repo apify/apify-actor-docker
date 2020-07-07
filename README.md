@@ -1,4 +1,4 @@
-# apify-actor-docker
+# Apify base Docker images
 
 [![Build Status](https://travis-ci.com/apify/apify-actor-docker.svg?branch=master)](https://travis-ci.com/apify/apify-actor-docker)
 
