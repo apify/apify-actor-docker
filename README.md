@@ -1,6 +1,6 @@
 # apify-actor-docker
 
-[![Build Status](https://travis-ci.com/apifytech/apify-actor-docker.svg)](https://travis-ci.com/apifytech/apify-actor-docker)
+[![Build Status](https://travis-ci.com/apify/apify-actor-docker.svg)](https://travis-ci.com/apify/apify-actor-docker)
 
 Public Docker images for Apify Actor serverless platform (https://docs.apify.com/actor)
 
