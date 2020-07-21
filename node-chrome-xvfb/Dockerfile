@@ -1,4 +1,5 @@
-FROM apify/actor-node-chrome
+ARG TAG=latest
+FROM apify/actor-node-chrome:$TAG
 
 # Install xvfb frame buffer needed for non-headless Chrome
 USER root

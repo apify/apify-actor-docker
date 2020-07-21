@@ -21,7 +21,7 @@ else
   NO_CACHE="--no-cache"
 fi
 
-docker build --pull --tag apify/actor-${DIR}:beta --tag apify/actor-${DIR}:latest ${NO_CACHE} ./${DIR}/
+docker build --build-arg TAG=beta --pull --tag apify/actor-${DIR}:beta --tag apify/actor-${DIR}:latest ${NO_CACHE} ./${DIR}/
 
 echo "Running image for test"
 docker run apify/actor-${DIR}:beta
