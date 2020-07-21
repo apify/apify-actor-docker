@@ -56,16 +56,20 @@ const testCompatibility = async (browser) => {
     // when support for Chrome 83 comes with Puppeteer 3.1.0, 3.2.0 will not be listed.
     // We must therefore check if we have Puppeteer >= the latest entry and if that's
     // the case, then it supports the latest entry of Chrome.
-    const matchedCompatibilityVersion = compatibilityVersions.find(cv => {
+    const matchedCompatibilityVersions = compatibilityVersions.filter(cv => {
         return areVersionsCompatible(cv.pptr, puppeteerVersion);
     });
 
-    if (!matchedCompatibilityVersion) {
+    if (!matchedCompatibilityVersions.length) {
         throw new Error(`Puppeteer+Chrome test failed: puppeteer version "${puppeteerVersion}" not found`);
     }
-    const chromeVersionCompatibleWithPuppeteer = matchedCompatibilityVersion.chrome;
-    if (!areVersionsCompatible(chromeVersionCompatibleWithPuppeteer, chromeVersion)){
-        throw new Error(`Puppeteer+Chrome test failed: puppeteer version "${puppeteerVersion}" is not compatible with Chrome version ${chromeVersion}, it's compatible with version ${chromeVersionCompatibleWithPuppeteer}`);
+    const chromeVersionsCompatibleWithPuppeteer = matchedCompatibilityVersions.map(v => v.chrome);
+    const isCompatible = chromeVersionsCompatibleWithPuppeteer.some(chromeVersionCompatibleWithPuppeteer => {
+        return areVersionsCompatible(chromeVersionCompatibleWithPuppeteer, chromeVersion)
+    })
+
+    if (!isCompatible) {
+        throw new Error(`Puppeteer+Chrome test failed: puppeteer version "${puppeteerVersion}" is not compatible with Chrome version ${chromeVersion}, it's compatible with versions ${chromeVersionsCompatibleWithPuppeteer}`);
     }
 
     console.log('Success, Puppeteer+Chrome are compatible!');
@@ -89,3 +93,5 @@ const testPuppeteerChrome = async () => {
 };
 
 module.exports = testPuppeteerChrome;
+
+testPuppeteerChrome()
