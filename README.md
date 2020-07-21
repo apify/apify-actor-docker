@@ -51,4 +51,8 @@ run the following script:
 ./publish_beta_as_latest.sh node-basic
 ```
 
-Do the same for other images,
+To do the same for all images, run:
+
+```bash
+./publish_all_beta_as_latest.sh
+```
