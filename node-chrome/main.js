@@ -17,7 +17,8 @@ const testPuppeteerChrome = require('./puppeteer_chrome_test');
 Apify.main(async () => {
     // First, try to open Chromium to see all dependencies are correctly installed
     console.log('Testing Puppeteer with Chromium');
-    const browser1 = await Apify.launchPuppeteer({ headless: true });
+    // We need --no-sandbox, because even though the build is running on Travis, the test is running in Docker.
+    const browser1 = await Apify.launchPuppeteer({ headless: true, args: ['--no-sandbox'] });
     const page1 = await browser1.newPage();
     await page1.goto('http://www.example.com');
     const pageTitle1 = await page1.title();

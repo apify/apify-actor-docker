@@ -94,5 +94,3 @@ const testPuppeteerChrome = async () => {
 };
 
 module.exports = testPuppeteerChrome;
-
-testPuppeteerChrome()
