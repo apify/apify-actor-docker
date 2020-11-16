@@ -11,5 +11,5 @@ jobs:
       -
         name: Print Input
         run: |
-          echo "apify: ${{ github.event.client_payload.apifyVersion }}"
-          echo "puppeteer: ${{ github.event.client_payload.apifyVersion }}"
+          echo "apify: ${{ github.event.client_payload.apify_version }}"
+          echo "puppeteer: ${{ github.event.client_payload.puppeteer_version }}"
