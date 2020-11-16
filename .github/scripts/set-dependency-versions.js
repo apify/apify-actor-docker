@@ -9,7 +9,8 @@ const DEPENDENCY_VERSIONS = {
 
 const pkg = readPackageJson(PACKAGE_JSON_PATH);
 updateDependencyVersions(pkg, DEPENDENCY_VERSIONS);
-fs.writeFileSync(PACKAGE_JSON_PATH, JSON.stringify(pkg));
+fs.writeFileSync(PACKAGE_JSON_PATH, JSON.stringify(pkg, null, 4));
+
 
 function readPackageJson(path) {
     try {
@@ -25,14 +26,18 @@ function readPackageJson(path) {
 
 function updateDependencyVersions(pkg, dependencyVersions) {
     Object.entries(dependencyVersions).forEach(([name, version]) => {
-        if (!version) throw new Error(`Version not found for dependency: ${name}`)
         return updateDependencyVersion(pkg, name, version);
     })
 }
 
 function updateDependencyVersion(pkg, depName, depVersion) {
     const { dependencies } = pkg;
-    if (dependencies) throw new Error('Invalid package.json: Has no dependencies.');
+    if (!dependencies) throw new Error('Invalid package.json: Has no dependencies.');
     // Only update existing deps, so we don't add Puppeteer where it does not belong.
-    if (dependencies[depName]) dependencies[depName] = depVersion;
+    if (dependencies[depName]) {
+        // Enforce version only for dependencies that will be updated.
+        if (!depVersion) throw new Error(`Version not provided for dependency: ${depName}`)
+        console.log(`Setting dependency: ${depName} to version: ${depVersion}`);
+        dependencies[depName] = depVersion;
+    }
 }
