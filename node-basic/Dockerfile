@@ -15,7 +15,7 @@ COPY package.json main.js /usr/src/app/
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
- && npm install --only=prod --no-optional --no-package-lock \
+ && npm install --only=prod --no-optional --no-package-lock --prefer-online \
  && echo "Installed NPM packages:" \
  && (npm list || true) \
  && echo "Node.js version:" \
