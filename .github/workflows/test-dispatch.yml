@@ -1,0 +1,13 @@
+name: Test Inputs
+
+on:
+  repository_dispatch:
+    types: [ build-beta ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Print Input
+        run: echo ${{ github.event.inputs }}
