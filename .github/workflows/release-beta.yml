@@ -30,6 +30,8 @@ jobs:
           file: ./${{ matrix.image-name }}/Dockerfile
           load: true
           tags: apify/actor-${{ matrix.image-name }}:beta
+          build-args: |
+            TAG=beta
       -
          name: Test Images
          run: docker run apify/actor-${{ matrix.image-name }}:beta
