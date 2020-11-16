@@ -32,7 +32,7 @@ jobs:
           tags: apify/actor-${{ matrix.image-name }}:beta
       -
          name: Test
-         run: docker run ${{ matrix.image-name }}:beta
+         run: docker run apify/actor-${{ matrix.image-name }}:beta
       -
         name: Login to DockerHub
         uses: docker/login-action@v1 
