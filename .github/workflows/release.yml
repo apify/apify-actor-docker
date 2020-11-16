@@ -70,7 +70,7 @@ jobs:
   # Build images that depend on existence of previous builds of main images.
   build-dependent:
     runs-on: ubuntu-latest
-    needs: [ build-master ]
+    needs: [ build-main ]
     strategy:
       matrix:
         image-name: [node-chrome-xvfb]
