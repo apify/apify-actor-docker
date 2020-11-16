@@ -10,4 +10,6 @@ jobs:
     steps:
       -
         name: Print Input
-        run: echo ${{ github.event.inputs }}
+        run: |
+          echo "apify: ${{ github.event.client_payload.apifyVersion }}"
+          echo "puppeteer: ${{ github.event.client_payload.apifyVersion }}"
