@@ -28,7 +28,6 @@ jobs:
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
-          load: true
           tags: apify/actor-${{ matrix.image-name }}:beta
           build-args: |
             TAG=beta
