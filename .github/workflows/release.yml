@@ -1,4 +1,4 @@
-name: Build Beta
+name: Release Images
 
 on:
   workflow_dispatch:
@@ -16,10 +16,10 @@ on:
   repository_dispatch:
     types: [ build-images ]
 
-  env:
-    RELEASE_TAG: ${{ github.events.inputs.release_tag || github.events.client-payload.release_tag }}
-    APIFY_VERSION: ${{ github.events.inputs.apify_version || github.events.client-payload.apify_version }}
-    PUPPETEER_VERSION: ${{ github.events.inputs.puppeteer_version || github.events.client-payload.puppeteer_version }}
+env:
+  RELEASE_TAG: ${{ github.events.inputs.release_tag || github.events.client-payload.release_tag }}
+  APIFY_VERSION: ${{ github.events.inputs.apify_version || github.events.client-payload.apify_version }}
+  PUPPETEER_VERSION: ${{ github.events.inputs.puppeteer_version || github.events.client-payload.puppeteer_version }}
 
 jobs:
   # Build master images that are not dependent on existing builds.
