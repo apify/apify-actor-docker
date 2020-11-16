@@ -27,6 +27,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./${{ matrix.image-name }}
+          file: ./${{ matrix.image-name }}/Dockerfile
           load: true
           tags: apify/actor-${{ matrix.image-name }}:beta
       -
