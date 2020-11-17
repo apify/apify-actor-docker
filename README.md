@@ -1,6 +1,6 @@
 # Apify base Docker images
 
-[![Build Status](https://travis-ci.com/apify/apify-actor-docker.svg?branch=master)](https://travis-ci.com/apify/apify-actor-docker)
+[![Release Status](https://travis-ci.com/apify/apify-actor-docker.svg?branch=master)](https://github.com/apify/apify-actor-docker/workflows/Release%20Images/badge.svg)
 
 Public Docker images for Apify Actor serverless platform (https://docs.apify.com/actor)
 
@@ -18,41 +18,9 @@ Tag         | Description
 ## Maintenance
 
 In order to build and publish a new version of the Docker images,
-first ensure you're logged in to your Docker Hub account by running:
+open the Actions tab and find the Release Images workflow.
+You can then run the workflow by providing the following inputs:
 
-```bash
-docker login
-````
-
-Then build the Docker image:
-
-```bash
-./build.sh node-basic
-```
-
-After the Docker image is well tested, it can be pushed with the `latest` tag:
-
-```bash
-docker push apify/actor-node-basic:latest
-```
-
-Then you can remove the images from your computer:
-```bash
-./clean.sh
-```
-
-*IMPORTANT*
-
-If the `beta` images were built by Travis CI and are already available on Docker Hub
-but not your local computer, then to publish them with the `latest` you need to
-run the following script:
-
-```bash
-./publish_beta_as_latest.sh node-basic
-```
-
-To do the same for all images, run:
-
-```bash
-./publish_all_beta_as_latest.sh
-```
+- A tag, which will be used to tag the image in DockerHub. Typically beta or latest.
+- A version of the `apify` package that should be pre-installed in the images.
+- A version of the `puppeteer` package that should be pre-installed in the images that use Puppeteer.
