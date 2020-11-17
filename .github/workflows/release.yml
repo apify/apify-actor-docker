@@ -49,9 +49,9 @@ jobs:
         name: Wait For Package Registry
         uses: nick-invision/retry@v2
         with:
+          timeout_minutes: 2 # timeout for a single attempt
           max_attempts: 3
-          retry_wait_seconds: 60
-          retry_on: error
+          retry_wait_seconds: 60 # wait between retries
           command: cd ${{ matrix.image-name }} && npm i --dry-run
       -
         name: Build Images
