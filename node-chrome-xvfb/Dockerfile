@@ -2,11 +2,15 @@ ARG TAG=latest
 FROM apify/actor-node-chrome:$TAG
 
 # Install xvfb frame buffer needed for non-headless Chrome
+# The mkdir command should fix the following warning in console when starting a new actor:
+# > _XSERVTransmkdir: ERROR: euid != 0,directory /tmp/.X11-unix will not be created
+# See https://github.com/apify/apify-actor-docker/issues/22 for details
 USER root
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y xvfb \
  && rm -rf /var/lib/apt/lists/* \
- && rm -rf /src/*.deb
+ && rm -rf /src/*.deb \
+ && mkdir -p /tmp/.X11-unix
 
 # Run everything after as non-privileged user.
 USER myuser
