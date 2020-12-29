@@ -10,7 +10,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y xvfb \
  && rm -rf /var/lib/apt/lists/* \
  && rm -rf /src/*.deb \
- && mkdir -p /tmp/.X11-unix
+ && mkdir -p /tmp/.X11-unix \
+ && chmod 1777 /tmp/.X11-unix
 
 # Run everything after as non-privileged user.
 USER myuser
