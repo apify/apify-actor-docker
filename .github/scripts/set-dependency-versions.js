@@ -5,6 +5,7 @@ const PACKAGE_JSON_PATH = './package.json';
 const DEPENDENCY_VERSIONS = {
     'apify': process.env.APIFY_VERSION,
     'puppeteer': process.env.PUPPETEER_VERSION,
+    'playwright': process.env.PLAYWRIGHT_VERSION,
 }
 
 const pkg = readPackageJson(PACKAGE_JSON_PATH);
