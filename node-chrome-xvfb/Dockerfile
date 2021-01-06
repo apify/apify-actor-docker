@@ -2,16 +2,9 @@ ARG TAG=latest
 FROM apify/actor-node-chrome:$TAG
 
 # Install xvfb frame buffer needed for non-headless Chrome
-# The mkdir command should fix the following warning in console when starting a new actor:
-# > _XSERVTransmkdir: ERROR: euid != 0,directory /tmp/.X11-unix will not be created
-# See https://github.com/apify/apify-actor-docker/issues/22 for details
 USER root
-RUN DEBIAN_FRONTEND=noninteractive apt-get update \
- && DEBIAN_FRONTEND=noninteractive apt-get install -y xvfb \
- && rm -rf /var/lib/apt/lists/* \
- && rm -rf /src/*.deb \
- && mkdir -p /tmp/.X11-unix \
- && chmod 1777 /tmp/.X11-unix
+RUN apt-get update
+RUN apt-get install --fix-missing -yq --no-install-recommends libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 libnss3 wget
 
 # Run everything after as non-privileged user.
 USER myuser
@@ -21,12 +14,11 @@ WORKDIR /home/myuser
 COPY --chown=myuser:myuser start_xvfb_and_run_cmd.sh /home/myuser/
 
 # Set up xvfb
-ENV DISPLAY=:99
-ENV XVFB_WHD=1280x720x16
+ENV XVFB_WHD=1920x1080x16
 ENV APIFY_XVFB=1
 
 # NOTEs:
 # - This needs to be compatible with CLI.
 # - Using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD ./start_xvfb_and_run_cmd.sh && npm start --silent
+CMD xvfb-run npm start --silent
 

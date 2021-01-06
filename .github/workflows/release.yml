@@ -7,10 +7,13 @@ on:
         description: 'Tag for the images (e.g.: beta)'
         required: true
       apify_version:
-        description: 'Apify SDK version (e.g.: ^O.21.9)'
+        description: 'Apify SDK version (e.g.: ^1.0.0)'
         required: true
       puppeteer_version:
-        description: 'Puppeteer version (e.g.: 5.3.1)'
+        description: 'Puppeteer version (e.g.: 5.5.0)'
+        required: true
+      playwright_version:
+        description: 'Playwright version (e.g.: 1.7.1)'
         required: true
 
   repository_dispatch:
@@ -20,6 +23,7 @@ env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   PUPPETEER_VERSION: ${{ github.event.inputs.puppeteer_version || github.event.client_payload.puppeteer_version }}
+  PLAYWRIGHT_VERSION: ${{ github.event.inputs.playwright_version || github.event.client_payload.playwright_version }}
 
 jobs:
   # Build master images that are not dependent on existing builds.
