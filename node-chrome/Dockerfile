@@ -8,7 +8,7 @@ RUN apt-get install --fix-missing -yq --no-install-recommends libasound2 libatk1
 
 # Install chrome
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -nv
-RUN apt install --fix-missing -yq ./google-chrome-stable_current_amd64.deb
+RUN apt install --fix-missing -yq ./google-chrome-stable_current_amd64.deb && rm ./google-chrome-stable_current_amd64.deb
 
 # Add user so we don't need --no-sandbox.
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \

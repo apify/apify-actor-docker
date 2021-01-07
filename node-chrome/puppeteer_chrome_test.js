@@ -86,8 +86,8 @@ const testPageLoading = async browser => {
 
 const testPuppeteerChrome = async () => {
     console.log('Testing Puppeteer with full Chrome');
-    // We need --no-sandbox, because even though the build is running on Travis, the test is running in Docker.
-    const browser = await Apify.launchPuppeteer({ headless: true, useChrome: true, args: ['--no-sandbox'] });
+    // We need --no-sandbox, because even though the build is running on GitHub, the test is running in Docker.
+    const browser = await Apify.launchPuppeteer({ useChrome: true, launchOptions: { headless: true, args: ['--no-sandbox'] }});
     await testCompatibility(browser);
     await testPageLoading(browser);
     await browser.close();
