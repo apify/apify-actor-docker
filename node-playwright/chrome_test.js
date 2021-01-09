@@ -85,6 +85,8 @@ const testPageLoading = async browser => {
 };
 
 const testChrome = async () => {
+    const isV1 = typeof Apify.launchPlaywright === 'function';
+
     const launchOptions = { headless: true, args: ['--no-sandbox'] }
     const launchContext = isV1 ? { useChrome: true, launchOptions } : { useChrome: true, ...launchOptions }
 
