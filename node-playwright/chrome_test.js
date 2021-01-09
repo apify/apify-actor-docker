@@ -3,8 +3,6 @@ const { version: puppeteerVersion } = require('puppeteer/package.json');
 
 const VERSION_REGEX = /([\d.?]+)/g;
 
-const isV1 = typeof Apify.launchPlaywright === 'function';
-
 /*
  * This file tests whether Puppeteer is compatible with installed Chrome,
  * by parsing the "Releases per Chromium Version" section from https://github.com/puppeteer/puppeteer/blob/master/docs/api.md:
@@ -86,17 +84,30 @@ const testPageLoading = async browser => {
     }
 };
 
-const testPuppeteerChrome = async () => {
-    console.log('Testing Puppeteer with full Chrome');
-    // We need --no-sandbox, because even though the build is running on GitHub, the test is running in Docker.
-    const launchOptions = { headless: true, args: ['--no-sandbox'] };
-    const launchContext = isV1
-        ? { useChrome: true, launchOptions }
-        : { useChrome: true, ...launchOptions };
-    const browser = await Apify.launchPuppeteer(launchContext);
-    await testCompatibility(browser);
-    await testPageLoading(browser);
-    await browser.close();
+const testChrome = async () => {
+    const launchOptions = { headless: true, args: ['--no-sandbox'] }
+    const launchContext = isV1 ? { useChrome: true, launchOptions } : { useChrome: true, ...launchOptions }
+
+    const libraryNames = ['Puppeteer'];
+    if (isV1) libraryNames.push('Playwright');
+
+    const promises = libraryNames.map(async (name) => {
+        console.log(`Testing ${name} with Chrome`);
+        const launchFunctionName = `launch${name}`;
+        const launchFunction = Apify[launchFunctionName];
+
+        const browser = await launchFunction(launchContext);
+
+        // Only test compatibility for Puppeteer for now.
+        // TODO create Playwright compatibility test
+        if (name === 'Puppeteer') {
+            await testCompatibility(browser);
+        }
+
+        await testPageLoading(browser);
+        await browser.close();
+    });
+    await Promise.all(promises);
 };
 
-module.exports = testPuppeteerChrome;
+module.exports = testChrome;

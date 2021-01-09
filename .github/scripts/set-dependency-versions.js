@@ -25,6 +25,11 @@ function readPackageJson(path) {
     }
 }
 
+/**
+ * Updates versions of dependencies that are listed in the package.json
+ * @param {object} pkg
+ * @param {object} dependencyVersions
+ */
 function updateDependencyVersions(pkg, dependencyVersions) {
     Object.entries(dependencyVersions).forEach(([name, version]) => {
         return updateDependencyVersion(pkg, name, version);
