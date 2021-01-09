@@ -1,0 +1,15 @@
+{
+    "description": "Anonymous actor on the Apify platform (with Chrome)",
+    "version": "0.0.1",
+    "license": "UNLICENSED",
+    "main": "main.js",
+    "scripts": {
+        "start": "node main.js"
+    },
+    "dependencies": {
+        "apify": "APIFY_VERSION",
+        "puppeteer": "PUPPETEER_VERSION",
+        "playwright": "PLAYWRIGHT_VERSION"
+    },
+    "repository": {}
+}
