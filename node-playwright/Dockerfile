@@ -20,7 +20,7 @@ USER myuser
 WORKDIR /home/myuser
 
 # Copy source code
-COPY package.json main.js puppeteer_chrome_test.js /home/myuser/
+COPY package.json main.js chrome_test.js /home/myuser/
 
 # Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
 ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
