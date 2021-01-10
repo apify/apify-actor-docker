@@ -14,8 +14,7 @@ on:
         required: true
       playwright_version:
         description: 'Playwright version (e.g.: 1.7.1)'
-        required: false
-        default: '1.7.1'
+        required: true
 
   repository_dispatch:
     types: [ build-images ]
