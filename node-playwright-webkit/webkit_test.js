@@ -9,7 +9,7 @@ const testPageLoading = async browser => {
     }
 };
 
-const testFirefox = async (launchOptions) => {
+const testWebkit = async (launchOptions) => {
     const launchContext = {
          launcher: require("playwright").webkit,
          launchOptions,
@@ -23,4 +23,4 @@ const testFirefox = async (launchOptions) => {
     await browser.close();
 };
 
-module.exports = testFirefox;
+module.exports = testWebkit;
