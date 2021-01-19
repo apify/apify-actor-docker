@@ -5,7 +5,7 @@ const testPageLoading = async browser => {
     await page.goto('http://www.example.com');
     const pageTitle = await page.title();
     if (pageTitle !== 'Example Domain') {
-        throw new Error(`Playwright+Chrome test failed - returned title "${pageTitle}"" !== "Example Domain"`);
+        throw new Error(`Playwright+Webkit test failed - returned title "${pageTitle}"" !== "Example Domain"`);
     }
 };
 
@@ -15,7 +15,7 @@ const testWebkit = async (launchOptions) => {
          launchOptions,
          }
 
-    console.log(`Testing Playwright with Firefox`, launchOptions);
+    console.log(`Testing Playwright with Webkit`, launchOptions);
 
     const browser = await Apify.launchPlaywright(launchContext);
 
