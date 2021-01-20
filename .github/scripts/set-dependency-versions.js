@@ -6,6 +6,9 @@ const DEPENDENCY_VERSIONS = {
     'apify': process.env.APIFY_VERSION,
     'puppeteer': process.env.PUPPETEER_VERSION,
     'playwright': process.env.PLAYWRIGHT_VERSION || '1.7.1',
+    'playwright-chromium': process.env.PLAYWRIGHT_VERSION || '1.7.1',
+    'playwright-firefox': process.env.PLAYWRIGHT_VERSION || '1.7.1',
+    'playwright-webkit': process.env.PLAYWRIGHT_VERSION || '1.7.1',
 }
 
 const pkg = readPackageJson(PACKAGE_JSON_PATH);
