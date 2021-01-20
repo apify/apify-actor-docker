@@ -7,8 +7,8 @@
         "start": "node main.js"
     },
     "dependencies": {
-        "apify": "1.0.0-beta.14",
-        "playwright-webkit": "1.7.1"
+        "apify": "APIFY_VERSION",
+        "playwright-webkit": "PLAYWRIGHT_VERSION"
     },
     "repository": {}
 }
