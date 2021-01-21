@@ -1,21 +1,12 @@
-FROM node:12.18-buster-slim
+FROM ubuntu:focal
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Webkit"
 
-# Install Webkit dependencies
+# Install WebKit dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libwoff1 \
-    libvpx5 \
-    libc6 \
-    libicu63 \
-    libjpeg62-turbo \
     libopus0 \
     libwebp6 \
-    libnss3 \
-    libxss1 \
-    libasound2 \
-    fonts-noto-color-emoji \
-    libxtst6 \
     libwebpdemux2 \
     libenchant1c2a \
     libgudev-1.0-0 \
@@ -25,25 +16,31 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libegl1 \
     libnotify4 \
     libxslt1.1 \
-    libevent-2.1-6 \
+    libevent-2.1-7 \
     libgles2 \
     libxcomposite1 \
     libatk1.0-0 \
     libatk-bridge2.0-0 \
     libepoxy0 \
     libgtk-3-0 \
-    libharfbuzz-icu0\
-    libdbus-glib-1-2 \
-    libxt6 \
+    libharfbuzz-icu0 \
     procps \
-    xvfb
+    xvfb \
+    && apt-get clean -y && apt-get autoremove -y
 
 # Install gstreamer and plugins to support video playback in WebKit.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgstreamer-gl1.0-0 \
     libgstreamer-plugins-bad1.0-0 \
     gstreamer1.0-plugins-good \
-    gstreamer1.0-libav
+    gstreamer1.0-libav \
+    && apt-get clean -y && apt-get autoremove -y
+
+
+RUN apt-get update && apt-get install -y curl && \
+    curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
+    apt-get install -y nodejs \
+    && apt-get clean -y && apt-get autoremove -y
 
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
