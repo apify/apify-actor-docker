@@ -12,7 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libatk-bridge2.0-0 \
     libgtk-3-0 \
     procps \
-    xvfb
+    xvfb \
+    && mkdir -p /tmp/.X11-unix \
+    && chmod 1777 /tmp/.X11-unix
 
 # Install ffmpeg to bring in audio and video codecs necessary for playing videos in Firefox.
 RUN apt-get update && apt-get install -y --no-install-recommends \

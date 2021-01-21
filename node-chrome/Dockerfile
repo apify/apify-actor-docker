@@ -18,6 +18,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
  && rm -rf /src/*.deb \
  && rm -rf /opt/yarn /usr/local/bin/yarn /usr/local/bin/yarnpkg
 
+
 # Add user so we don't need --no-sandbox.
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
