@@ -16,7 +16,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
-    && rm -rf /opt/yarn* /usr/local/bin/yarn* /usr/local/bin/yarnpkg*
+    && rm -rf /opt/yarn* /usr/local/bin/yarn* /usr/local/bin/yarnpkg* \
+    && mkdir -p /tmp/.X11-unix \
+    && chmod 1777 /tmp/.X11-unix
 
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
