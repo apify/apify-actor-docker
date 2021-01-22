@@ -12,11 +12,13 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
  && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
  && DEBIAN_FRONTEND=noninteractive apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y wget unzip \
- && DEBIAN_FRONTEND=noninteractive apt-get install -y procps git google-chrome-stable libxss1 fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y procps git google-chrome-stable libxss1 fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefontxvfb \
     --no-install-recommends \
- && rm -rf /var/lib/apt/lists/* \
- && rm -rf /src/*.deb \
- && rm -rf /opt/yarn /usr/local/bin/yarn /usr/local/bin/yarnpkg
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /src/*.deb \
+    && mkdir -p /tmp/.X11-unix \
+    && chmod 1777 /tmp/.X11-unix \
+    && rm -rf /opt/yarn /usr/local/bin/yarn /usr/local/bin/yarnpkg
 
 
 # Add user so we don't need --no-sandbox.
@@ -31,6 +33,8 @@ WORKDIR /home/myuser
 
 # Copy source code
 COPY package.json main.js puppeteer_chrome_test.js /home/myuser/
+
+COPY --chown=myuser:myuser start_xvfb_and_run_cmd.sh /home/myuser/
 
 # Uncomment to skip the chromium download when installing puppeteer. If you do,
 # you'll need to launch puppeteer with:
@@ -61,7 +65,11 @@ RUN npm --quiet set progress=false \
  && echo "Google Chrome version:" \
  && bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version"
 
+# Set up xvfb
+ENV DISPLAY=:99
+ENV XVFB_WHD=1280x720x16
+
 # NOTEs:
 # - This needs to be compatible with CLI.
 # - Using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD npm start --silent
+CMD ./start_xvfb_and_run_cmd.sh && npm start --silent
