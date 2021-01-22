@@ -61,7 +61,7 @@ jobs:
         name: Build Image with puppeteer version
         id: docker_build
         uses: docker/build-push-action@v2
-        if: ${{ env.RELEASE_TAG == 'latest' && contains(matrix.image-name, "puppeteer") }}
+        if: ${{ env.RELEASE_TAG == 'latest' && contains(matrix.image-name, 'puppeteer') }}
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
@@ -71,7 +71,7 @@ jobs:
         name: Build Image with playwright version
         id: docker_build
         uses: docker/build-push-action@v2
-        if: ${{ env.RELEASE_TAG == 'latest' && contains(matrix.image-name, "playwright") }}
+        if: ${{ env.RELEASE_TAG == 'latest' && contains(matrix.image-name, 'playwright') }}
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
@@ -81,7 +81,7 @@ jobs:
         name: Build Image without automation library version tag
         id: docker_build
         uses: docker/build-push-action@v2
-        if: ${{ !contains(matrix.image-name, "puppeteer") && !contains(matrix.image-name, "playwright") }}
+        if: ${{ !contains(matrix.image-name, 'puppeteer') && !contains(matrix.image-name, 'playwright') }}
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
@@ -92,11 +92,11 @@ jobs:
         run: docker run apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
       -
         name: Test Image with puppeteer version tag
-        if: ${{ env.RELEASE_TAG == 'latest' && contains(matrix.image-name, "puppeteer") }}
+        if: ${{ env.RELEASE_TAG == 'latest' && contains(matrix.image-name, 'puppeteer') }}
         run: docker run apify/actor-${{ matrix.image-name }}:${{ env.PUPPETEER_VERSION }}
       -
         name: Test Image with playwright version tag
-        if: ${{ env.RELEASE_TAG == 'latest' && contains(matrix.image-name, "playwright") }}
+        if: ${{ env.RELEASE_TAG == 'latest' && contains(matrix.image-name, 'playwright') }}
         run: docker run apify/actor-${{ matrix.image-name }}:${{ env.PLAYWRIGHT_VERSION }}
       -
         name: Login to DockerHub
@@ -134,7 +134,7 @@ jobs:
         name: Build Image with puppeteer version
         id: docker_build
         uses: docker/build-push-action@v2
-        if: ${{ env.RELEASE_TAG == 'latest' && contains(matrix.image-name, "puppeteer") }}
+        if: ${{ env.RELEASE_TAG == 'latest' && contains(matrix.image-name, 'puppeteer') }}
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
@@ -155,7 +155,7 @@ jobs:
         run: docker run apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
       -
         name: Test Image with puppeteer version tag
-        if: ${{ env.RELEASE_TAG == 'latest' && contains(matrix.image-name, "puppeteer") }}
+        if: ${{ env.RELEASE_TAG == 'latest' && contains(matrix.image-name, 'puppeteer') }}
         run: docker run apify/actor-${{ matrix.image-name }}:${{ env.PUPPETEER_VERSION }}
  
       -
