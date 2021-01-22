@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image-name: [node-basic, node-puppeteer-chrome, node-phantomjs, node-playwright, node-playwright-chrome, node-playwright-firefox, node-playwright-webkit]
+        image-name: [node, node-puppeteer-chrome, node-phantomjs, node-playwright, node-playwright-chrome, node-playwright-firefox, node-playwright-webkit]
     steps:
       -
         name: Checkout
