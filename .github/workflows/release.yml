@@ -79,7 +79,7 @@ jobs:
       - 
         name: Build Image without automation library version tag
         uses: docker/build-push-action@v2
-        if: ${{ !contains(matrix.image-name, 'puppeteer') && !contains(matrix.image-name, 'playwright') }}
+        if: ${{ !contains(matrix.image-name, 'puppeteer') && !contains(matrix.image-name, 'playwright') || env.RELEASE_TAG != 'latest'}}
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
