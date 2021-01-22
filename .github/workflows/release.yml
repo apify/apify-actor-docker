@@ -141,7 +141,7 @@ jobs:
       -
         name: Build Image
         uses: docker/build-push-action@v2
-        if: env.RELEASE_TAG != 'latest'
+        if: env.RELEASE_TAG != 'test'
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
