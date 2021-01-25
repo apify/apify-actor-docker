@@ -103,5 +103,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Push Image
+        name: Push Image without automation library version tag
         run: docker push apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
+      -
+        name: Push Image with puppeteer version tag
+        if: ${{ env.RELEASE_TAG == 'test' && contains(matrix.image-name, 'puppeteer') }}
+        run: docker push apify/actor-${{ matrix.image-name }}:${{ env.PUPPETEER_VERSION }}
+      -
+        name: Push Image with playwirght version tag
+        if: ${{ env.RELEASE_TAG == 'test' && contains(matrix.image-name, 'playwright') }}
+        run: docker push apify/actor-${{ matrix.image-name }}:${{ env.PLAYWRIGHT_VERSION }}
