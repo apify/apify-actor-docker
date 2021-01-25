@@ -1,4 +1,4 @@
-FROM node:12.18-buster-slim
+FROM node:14-buster-slim
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Firefox"
 # Install Firefox dependencies
