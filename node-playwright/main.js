@@ -12,38 +12,34 @@ For more information, see https://www.apify.com/docs/actor#custom-dockerfile
 console.log('Testing Docker image...');
 
 const Apify = require('apify');
-const testChrome = require('./chrome_test');
+const playwright = require("playwright")
+const {testChrome, testPageLoading} = require('./chrome_test');
 
-const isV1 = typeof Apify.launchPlaywright === 'function';
+
 
 Apify.main(async () => {
-    // Sanity test browsers.
-    // We need --no-sandbox, because even though the build is running on GitHub, the test is running in Docker.
-    const launchOptions = { headless: true, args: ['--no-sandbox'] }
-    const launchContext = isV1 ? { launchOptions } : launchOptions
+    const browsers = ["webkit", "firefox", "chromium"]
+    const promisesHeadless = browsers.map( async browserName=>{
+        const browser = await Apify.launchPlaywright({launcher: playwright[browserName]})
+        return testPageLoading(browser)
 
-    const libraryNames = ['Puppeteer'];
-    if (isV1) libraryNames.push('Playwright');
-    const promises = libraryNames.map(async (name) => {
-        console.log(`Testing ${name} with Chromium`);
-        const launchFunctionName = `launch${name}`;
-        const launchFunction = Apify[launchFunctionName];
-
-        const browser = await launchFunction(launchContext);
-        const page = await browser.newPage();
-        await page.goto('https://www.example.com');
-        const pageTitle = await page.title();
-        if (pageTitle !== 'Example Domain') {
-            throw new Error(`${name}+Chromium test failed - returned title "${pageTitle}"" !== "Example Domain"`);
-        }
-        await browser.close();
     })
 
-    await Promise.all(promises);
+    const promisesHeadful = browsers.map( async browserName => {
+        const browser = await Apify.launchPlaywright({ launcher: playwright[browserName], launchOptions: {headless: false} })
+        return testPageLoading(browser)
 
-    // Second, try to use full Chrome
-    await testChrome();
+    })
 
+    await Promise.all(promisesHeadless);
+    await Promise.all(promisesHeadful);
+
+    // Try to use full Chrome headless
+    await testChrome({ headless: true })
+
+    // Try to use full Chrome with XVFB
+    await testChrome({ headless: false })
+    
     // Test that "ps" command is available, sometimes it was missing in official Node builds
     await Apify.getMemoryInfo();
 

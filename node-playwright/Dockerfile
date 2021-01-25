@@ -4,7 +4,7 @@ LABEL maintainer="support@apify.com" Description="Base image for Apify actors us
 
 # Install libs
 RUN apt-get update
-RUN apt-get install --fix-missing -yq --no-install-recommends libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 libnss3 wget
+RUN apt-get install --fix-missing -yq --no-install-recommends procps xvfb wget && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
 
 # Install chrome
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -nv
@@ -21,6 +21,7 @@ WORKDIR /home/myuser
 
 # Copy source code
 COPY package.json main.js chrome_test.js /home/myuser/
+COPY --chown=myuser:myuser start_xvfb_and_run_cmd.sh /home/myuser/
 
 # Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
 ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
@@ -46,7 +47,15 @@ RUN npm --quiet set progress=false \
  && echo "Google Chrome version:" \
  && bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version"
 
+# Set up xvfb
+
+# We should you the autodisplay detection as suggested here: https://github.com/microsoft/playwright/issues/2728#issuecomment-678083619
+ENV DISPLAY=:99
+ENV XVFB_WHD=1280x720x16
+# Uncoment this line if you want to run browser in headfull mode by defautl.
+# ENV APIFY_XVFB=1
+
 # NOTEs:
 # - This needs to be compatible with CLI.
 # - Using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD npm start --silent
+CMD ./start_xvfb_and_run_cmd.sh && npm start --silent

@@ -8,7 +8,7 @@
     },
     "dependencies": {
         "apify": "APIFY_VERSION",
-        "playwright": "PLAYWRIGHT_VERSION"
+        "puppeteer": "PUPPETEER_VERSION"
     },
     "repository": {}
 }
