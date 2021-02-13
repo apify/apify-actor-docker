@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libharfbuzz-icu0 \
     procps \
     xvfb \
+    git \
     && apt-get clean -y && apt-get autoremove -y \
     && mkdir -p /tmp/.X11-unix \
     && chmod 1777 /tmp/.X11-unix
