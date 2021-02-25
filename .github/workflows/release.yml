@@ -84,7 +84,7 @@ jobs:
       - 
         name: Build Image without automation library version tag
         uses: docker/build-push-action@v2
-        if: ${{ matrix.image-name != node && env.RELEASE_TAG !='latest'}}
+        if: ${{ matrix.image-name != 'node' && env.RELEASE_TAG !='latest'}}
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
@@ -93,7 +93,7 @@ jobs:
       - 
         name: Build image with node version.
         uses: docker/build-push-action@v2
-        if: ${{ matrix.image-name == node }}
+        if: ${{ matrix.image-name == 'node' }}
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
@@ -112,7 +112,7 @@ jobs:
         run: docker run apify/actor-${{ matrix.image-name }}:${{ env.PLAYWRIGHT_VERSION }}
       -
         name: Test Image with node version tag
-        if: ${{ matrix.image-name == node }}
+        if: ${{ matrix.image-name == 'node' }}
         run: docker run apify/actor-${{ matrix.image-name }}:${{ env.NODE_VERSION }}
       -
         name: Login to DockerHub
