@@ -15,6 +15,10 @@ on:
       playwright_version:
         description: 'Playwright version (e.g.: 1.7.1)'
         required: true
+      node_version:
+        description: 'NodeJs version for image actor-node'
+        required: false
+        default: '14'
 
   repository_dispatch:
     types: [ build-images ]
@@ -24,6 +28,7 @@ env:
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   PUPPETEER_VERSION: ${{ github.event.inputs.puppeteer_version || github.event.client_payload.puppeteer_version }}
   PLAYWRIGHT_VERSION: ${{ github.event.inputs.playwright_version || github.event.client_payload.playwright_version }}
+  NODE_VERSION: ${{ github.event.client_payload.node_version || github.event.inputs.node_version }}
 
 jobs:
   # Build master images that are not dependent on existing builds.
@@ -79,12 +84,21 @@ jobs:
       - 
         name: Build Image without automation library version tag
         uses: docker/build-push-action@v2
-        if: ${{ !contains(matrix.image-name, 'puppeteer') && !contains(matrix.image-name, 'playwright') || env.RELEASE_TAG !='latest'}}
+        if: ${{ matrix.image-name != node && env.RELEASE_TAG !='latest'}}
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
           load: true
           tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
+      - 
+        name: Build image with node version.
+        uses: docker/build-push-action@v2
+        if: ${{ matrix.image-name == node }}
+        with:
+          context: ./${{ matrix.image-name }}
+          file: ./${{ matrix.image-name }}/Dockerfile
+          load: true
+          tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }},apify/actor-${{ matrix.image-name }}:${{ env.NODE_VERSION }}
       -
         name: Test Image
         run: docker run apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
@@ -96,6 +110,10 @@ jobs:
         name: Test Image with playwright version tag
         if: ${{ env.RELEASE_TAG =='latest' && contains(matrix.image-name, 'playwright') }}
         run: docker run apify/actor-${{ matrix.image-name }}:${{ env.PLAYWRIGHT_VERSION }}
+      -
+        name: Test Image with node version tag
+        if: ${{ matrix.image-name == node }}
+        run: docker run apify/actor-${{ matrix.image-name }}:${{ env.NODE_VERSION }}
       -
         name: Login to DockerHub
         uses: docker/login-action@v1
