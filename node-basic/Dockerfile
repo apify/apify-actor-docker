@@ -1,5 +1,7 @@
-# Image is based on Node.js 10.X
-FROM node:12.18-alpine
+# Node 14 as default
+
+ARG VERSION=14 
+FROM node:${VERSION}-alpine
 
 LABEL maintainer="support@apify.com" Description="Base image for simple Apify actors"
 

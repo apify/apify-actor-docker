@@ -61,6 +61,7 @@ jobs:
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
+          build-args: VERSION=${{ env.NODE_VERSION }}
           load: true
           tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }},apify/actor-${{ matrix.image-name }}:${{ env.NODE_VERSION }}
       -
@@ -70,6 +71,7 @@ jobs:
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
+          build-args: VERSION=${{ env.NODE_VERSION }}
           load: true
           tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
  
