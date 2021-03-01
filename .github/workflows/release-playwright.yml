@@ -1,4 +1,4 @@
-name: Release Playwright images
+name: Release playwright images
 
 on:
   workflow_dispatch:
@@ -9,9 +9,6 @@ on:
       apify_version:
         description: 'Apify SDK version (e.g.: ^1.0.0)'
         required: true
-      puppeteer_version:
-        description: 'Puppeteer version (e.g.: 5.5.0)'
-        required: true
       playwright_version:
         description: 'Playwright version (e.g.: 1.7.1)'
         required: true
@@ -21,7 +18,6 @@ on:
 
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
-  APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   PUPPETEER_VERSION: ${{ github.event.inputs.puppeteer_version || github.event.client_payload.puppeteer_version }}
   PLAYWRIGHT_VERSION: ${{ github.event.inputs.playwright_version || github.event.client_payload.playwright_version }}
 
@@ -58,7 +54,7 @@ jobs:
           retry_wait_seconds: 60 # wait between retries
           command: cd ${{ matrix.image-name }} && npm i --dry-run
       - 
-        name: Build image with playwright version
+        name: Build image with playwright version and latest tag
         uses: docker/build-push-action@v2
         if: ${{ env.RELEASE_TAG == 'latest' }}
         with:
@@ -67,7 +63,7 @@ jobs:
           load: true
           tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }},apify/actor-${{ matrix.image-name }}:${{ env.PLAYWRIGHT_VERSION }}
       - 
-        name: Build image without playwright version (other than latest version tag)
+        name: Build image with release tag
         uses: docker/build-push-action@v2
         if: ${{env.RELEASE_TAG != 'latest'}}
         with:
@@ -76,7 +72,7 @@ jobs:
           load: true
           tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
       -
-        name: Test image
+        name: Test image with release tag
         run: docker run apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
       -
         name: Test image with playwright version tag
@@ -89,7 +85,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Push image without automation library version tag
+        name: Push image with release tag
         run: docker push apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
       -
         name: Push image with playwright version tag

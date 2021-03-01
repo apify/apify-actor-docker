@@ -55,7 +55,7 @@ jobs:
           retry_wait_seconds: 60 # wait between retries
           command: cd ${{ matrix.image-name }} && npm i --dry-run
       - 
-        name: Build image with node version.
+        name: Build image with node version and latest tag
         uses: docker/build-push-action@v2
         if: ${{ env.RELEASE_TAG == 'latest' }}
         with:
@@ -65,7 +65,7 @@ jobs:
           load: true
           tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }},apify/actor-${{ matrix.image-name }}:${{ env.NODE_VERSION }}
       -
-        name: Build Image without node version tag (other than latest version tag) 
+        name: Build image with release tag
         uses: docker/build-push-action@v2
         if: ${{ env.RELEASE_TAG != 'latest' }}
         with:
@@ -76,7 +76,7 @@ jobs:
           tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
  
       -
-        name: Test image
+        name: Test image with release tag
         run: docker run apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
       -
         name: Test image with node version tag
@@ -89,9 +89,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Push Image without node version tag
+        name: Push image with release tag
         run: docker push apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
       -
-        name: Push Image with node version tag
+        name: Push image with node version tag
         if: ${{ env.RELEASE_TAG == 'latest' }}
         run: docker push apify/actor-${{ matrix.image-name }}:${{ env.NODE_VERSION }}
