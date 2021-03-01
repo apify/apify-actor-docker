@@ -1,4 +1,4 @@
-name: Release Images
+name: Release Playwright images
 
 on:
   workflow_dispatch:
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image-name: [node, node-puppeteer-chrome, node-playwright, node-playwright-chrome, node-playwright-firefox, node-playwright-webkit]
+        image-name: [node-playwright, node-playwright-chrome, node-playwright-firefox, node-playwright-webkit]
     steps:
       -
         name: Checkout
@@ -57,44 +57,30 @@ jobs:
           max_attempts: 3
           retry_wait_seconds: 60 # wait between retries
           command: cd ${{ matrix.image-name }} && npm i --dry-run
-      -
-        name: Build Image with puppeteer version
-        id: docker_build
-        uses: docker/build-push-action@v2
-        if: ${{ env.RELEASE_TAG =='latest' && contains(matrix.image-name, 'puppeteer') }}
-        with:
-          context: ./${{ matrix.image-name }}
-          file: ./${{ matrix.image-name }}/Dockerfile
-          load: true
-          tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }},apify/actor-${{ matrix.image-name }}:${{ env.PUPPETEER_VERSION }}
       - 
-        name: Build Image with playwright version
+        name: Build image with playwright version
         uses: docker/build-push-action@v2
-        if: ${{ env.RELEASE_TAG =='latest' && contains(matrix.image-name, 'playwright') }}
+        if: ${{ env.RELEASE_TAG == 'latest' }}
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
           load: true
           tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }},apify/actor-${{ matrix.image-name }}:${{ env.PLAYWRIGHT_VERSION }}
       - 
-        name: Build Image without automation library version tag
+        name: Build image without playwright version (other than latest version tag)
         uses: docker/build-push-action@v2
-        if: ${{ !contains(matrix.image-name, 'puppeteer') && !contains(matrix.image-name, 'playwright') || env.RELEASE_TAG !='latest'}}
+        if: ${{env.RELEASE_TAG != 'latest'}}
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
           load: true
           tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
       -
-        name: Test Image
+        name: Test image
         run: docker run apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
       -
-        name: Test Image with puppeteer version tag
-        if: ${{ env.RELEASE_TAG =='latest' && contains(matrix.image-name, 'puppeteer') }}
-        run: docker run apify/actor-${{ matrix.image-name }}:${{ env.PUPPETEER_VERSION }}
-      -
-        name: Test Image with playwright version tag
-        if: ${{ env.RELEASE_TAG =='latest' && contains(matrix.image-name, 'playwright') }}
+        name: Test image with playwright version tag
+        if: ${{ env.RELEASE_TAG == 'latest'}}
         run: docker run apify/actor-${{ matrix.image-name }}:${{ env.PLAYWRIGHT_VERSION }}
       -
         name: Login to DockerHub
@@ -103,13 +89,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Push Image without automation library version tag
+        name: Push image without automation library version tag
         run: docker push apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
       -
-        name: Push Image with puppeteer version tag
-        if: ${{ env.RELEASE_TAG =='latest' && contains(matrix.image-name, 'puppeteer') }}
-        run: docker push apify/actor-${{ matrix.image-name }}:${{ env.PUPPETEER_VERSION }}
-      -
-        name: Push Image with playwirght version tag
-        if: ${{ env.RELEASE_TAG =='latest' && contains(matrix.image-name, 'playwright') }}
+        name: Push image with playwright version tag
+        if: ${{ env.RELEASE_TAG == 'latest' }}
         run: docker push apify/actor-${{ matrix.image-name }}:${{ env.PLAYWRIGHT_VERSION }}
