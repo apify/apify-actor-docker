@@ -19,6 +19,9 @@ RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
 USER myuser
 WORKDIR /home/myuser
 
+ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
+RUN mkdir ${PLAYWRIGHT_BROWSERS_PATH}
+
 # Copy source code
 COPY package.json main.js chrome_test.js /home/myuser/
 COPY --chown=myuser:myuser start_xvfb_and_run_cmd.sh /home/myuser/

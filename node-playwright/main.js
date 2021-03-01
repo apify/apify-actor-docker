@@ -25,14 +25,14 @@ Apify.main(async () => {
 
     })
 
-    const promisesHeadful = browsers.map( async browserName => {
+    const promisesHeadfull = browsers.map( async browserName => {
         const browser = await Apify.launchPlaywright({ launcher: playwright[browserName], launchOptions: {headless: false} })
         return testPageLoading(browser)
 
     })
 
     await Promise.all(promisesHeadless);
-    await Promise.all(promisesHeadful);
+    await Promise.all(promisesHeadfull);
 
     // Try to use full Chrome headless
     await testChrome({ headless: true })
@@ -43,5 +43,5 @@ Apify.main(async () => {
     // Test that "ps" command is available, sometimes it was missing in official Node builds
     await Apify.getMemoryInfo();
 
-    console.log('... test PASSED');
+    console.log('All tests passed!');
 });
