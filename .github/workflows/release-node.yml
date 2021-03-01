@@ -61,7 +61,7 @@ jobs:
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
-          build-args: VERSION=${{ env.NODE_VERSION }}
+          build-args: NODE_VERSION=${{ env.NODE_VERSION }}
           load: true
           tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }},apify/actor-${{ matrix.image-name }}:${{ env.NODE_VERSION }}
       -
@@ -71,7 +71,7 @@ jobs:
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
-          build-args: VERSION=${{ env.NODE_VERSION }}
+          build-args: NODE_VERSION=${{ env.NODE_VERSION }}
           load: true
           tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
  
@@ -80,7 +80,7 @@ jobs:
         run: docker run apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
       -
         name: Test image with node version tag
-        if: ${{ matrix.image-name == 'node' }}
+        if: ${{ env.RELEASE_TAG == 'latest' }}
         run: docker run apify/actor-${{ matrix.image-name }}:${{ env.NODE_VERSION }}
       -
         name: Login to DockerHub
