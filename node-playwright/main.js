@@ -25,14 +25,14 @@ Apify.main(async () => {
 
     })
 
-    const promisesHeadfull = browsers.map( async browserName => {
+    const promisesHeadful = browsers.map( async browserName => {
         const browser = await Apify.launchPlaywright({ launcher: playwright[browserName], launchOptions: {headless: false} })
         return testPageLoading(browser)
 
     })
 
     await Promise.all(promisesHeadless);
-    await Promise.all(promisesHeadfull);
+    await Promise.all(promisesHeadful);
 
     // Try to use full Chrome headless
     await testChrome({ headless: true })
