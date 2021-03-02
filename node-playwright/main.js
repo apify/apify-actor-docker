@@ -43,5 +43,5 @@ Apify.main(async () => {
     // Test that "ps" command is available, sometimes it was missing in official Node builds
     await Apify.getMemoryInfo();
 
-    console.log('... test PASSED');
+    console.log('All tests passed!');
 });
