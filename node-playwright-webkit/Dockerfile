@@ -1,6 +1,7 @@
 FROM ubuntu:focal
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Webkit"
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Install WebKit dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
