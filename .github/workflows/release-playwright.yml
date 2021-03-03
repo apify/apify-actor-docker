@@ -18,7 +18,7 @@ on:
 
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
-  PUPPETEER_VERSION: ${{ github.event.inputs.puppeteer_version || github.event.client_payload.puppeteer_version }}
+  APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   PLAYWRIGHT_VERSION: ${{ github.event.inputs.playwright_version || github.event.client_payload.playwright_version }}
 
 jobs:
