@@ -61,7 +61,7 @@ RUN npm --quiet set progress=false \
 # symlink the firefox binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
 RUN ln -s ${PLAYWRIGHT_BROWSERS_PATH}/firefox-*/firefox/firefox ${PLAYWRIGHT_BROWSERS_PATH}/
 
-ENV APIFY_DEUFAULT_FIREFOX_PATH=${PLAYWRIGHT_BROWSERS_PATH}/firefox
+ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/firefox
 
 # Playwright allows donwloading only one browser through separate package with same export. So we rename it to just playwright.
 RUN mv ./node_modules/playwright-firefox ./node_modules/playwright && rm -rf ./node_modules/playwright-firefox

@@ -84,7 +84,7 @@ RUN npm --quiet set progress=false \
 # symlink the webkit binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
 RUN ln -s ${PLAYWRIGHT_BROWSERS_PATH}/webkit-*/minibrowser-gtk/MiniBrowser ${PLAYWRIGHT_BROWSERS_PATH}/
 
-ENV APIFY_DEUFAULT_WEBKIT_PATH=${PLAYWRIGHT_BROWSERS_PATH}/MiniBrowser
+ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/MiniBrowser
 
 # Playwright allows donwloading only one browser through separate package with same export. So we rename it to just playwright.
 RUN mv ./node_modules/playwright-webkit ./node_modules/playwright && rm -rf ./node_modules/playwright-webkit

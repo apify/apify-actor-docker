@@ -63,7 +63,7 @@ RUN npm --quiet set progress=false \
 # symlink the chromium binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
 RUN ln -s ${PLAYWRIGHT_BROWSERS_PATH}/chromium-*/chrome-linux/chrome ${PLAYWRIGHT_BROWSERS_PATH}/
 
-ENV APIFY_DEUFAULT_CHROME_PATH=${PLAYWRIGHT_BROWSERS_PATH}/chrome
+ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/chrome
 
 # Playwright allows donwloading only one browser through separate package with same export. So we rename it to just playwright.
 RUN mv ./node_modules/playwright-chromium ./node_modules/playwright && rm -rf ./node_modules/playwright-chromium
