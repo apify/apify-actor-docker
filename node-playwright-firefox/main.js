@@ -23,6 +23,10 @@ Apify.main(async () => {
     // Try to use full Firefox with XVFB
     await testFirefox({ headless: false })
 
+    // Try to use playwright default
+    await testFirefox({ executablePath: undefined })
+    await testFirefox({ executablePath: process.env.APIFY_DEUFAULT_FIREFOX_PATH })
+
     // Test that "ps" command is available, sometimes it was missing in official Node builds
     await Apify.getMemoryInfo();
 });

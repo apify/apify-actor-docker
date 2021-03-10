@@ -28,6 +28,9 @@ RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
 USER myuser
 WORKDIR /home/myuser
 
+ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
+RUN mkdir ${PLAYWRIGHT_BROWSERS_PATH}
+
 # Copy source code
 COPY package.json main.js chrome_test.js /home/myuser/
 # Copy source code
@@ -56,6 +59,11 @@ RUN npm --quiet set progress=false \
     && npm --version \
     && echo "Google Chrome version:" \
     && bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version"
+
+# symlink the chromium binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
+RUN ln -s ${PLAYWRIGHT_BROWSERS_PATH}/chromium-*/chrome-linux/chrome ${PLAYWRIGHT_BROWSERS_PATH}/
+
+ENV APIFY_DEUFAULT_CHROME_PATH=${PLAYWRIGHT_BROWSERS_PATH}/chrome
 
 # Playwright allows donwloading only one browser through separate package with same export. So we rename it to just playwright.
 RUN mv ./node_modules/playwright-chromium ./node_modules/playwright && rm -rf ./node_modules/playwright-chromium

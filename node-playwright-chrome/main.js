@@ -29,6 +29,10 @@ Apify.main(async () => {
     // Try to use full Chrome with XVFB
     await testChrome({ headless: false })
 
+    // Try to use playwright default
+    await testChrome({ executablePath: undefined })
+    await testChrome({ executablePath: process.env.APIFY_DEUFAULT_CHROME_PATH })
+
     // Test that "ps" command is available, sometimes it was missing in official Node builds
     await Apify.getMemoryInfo();
 
