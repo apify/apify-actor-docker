@@ -54,6 +54,9 @@ RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
 USER myuser
 WORKDIR /home/myuser
 
+ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
+RUN mkdir ${PLAYWRIGHT_BROWSERS_PATH}
+
 # Copy source code
 COPY package.json main.js webkit_test.js /home/myuser/
 # Copy source code
@@ -77,6 +80,11 @@ RUN npm --quiet set progress=false \
     && node --version \
     && echo "NPM version:" \
     && npm --version
+
+# symlink the webkit binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
+RUN ln -s ${PLAYWRIGHT_BROWSERS_PATH}/webkit-*/minibrowser-gtk/MiniBrowser ${PLAYWRIGHT_BROWSERS_PATH}/
+
+ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/MiniBrowser
 
 # Playwright allows donwloading only one browser through separate package with same export. So we rename it to just playwright.
 RUN mv ./node_modules/playwright-webkit ./node_modules/playwright && rm -rf ./node_modules/playwright-webkit

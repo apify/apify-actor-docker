@@ -23,6 +23,10 @@ Apify.main(async () => {
     // Try to use full Webkit with XVFB
     await testWebkit({ headless: false })
     
+    // Try to use playwright default
+    await testWebkit({ executablePath: undefined })
+    await testWebkit({ executablePath: process.env.APIFY_DEFAULT_BROWSER_PATH })
+
     // Test that "ps" command is available, sometimes it was missing in official Node builds
     await Apify.getMemoryInfo();
 });
