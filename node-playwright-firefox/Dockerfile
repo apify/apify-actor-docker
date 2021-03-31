@@ -3,6 +3,7 @@ FROM node:14-buster-slim
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Firefox"
 # Install Firefox dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
     fonts-noto-color-emoji \
     libdbus-glib-1-2 \
     libxt6 \
