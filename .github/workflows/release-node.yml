@@ -34,10 +34,11 @@ jobs:
           CURRENT_NODE: ${{ matrix.node-version }}
           LATEST_NODE: ${{ env.NODE_LATEST }}
           RELEASE_TAG: ${{ env.RELEASE_TAG }}
-        script: |
-            const { CURRENT_NODE, LATEST_NODE, RELEASE_TAG } = process.env
+        with:
+          script: |
+              const { CURRENT_NODE, LATEST_NODE, RELEASE_TAG } = process.env
 
-            console.log(`Hello ${CURRENT_NODE} ${LATEST_NODE}, ${RELEASE_TAG}`)
+              console.log(`Hello ${CURRENT_NODE} ${LATEST_NODE}, ${RELEASE_TAG}`)
       -
         name: Checkout
         uses: actions/checkout@v2
