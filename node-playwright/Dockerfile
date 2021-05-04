@@ -1,11 +1,20 @@
 FROM mcr.microsoft.com/playwright:focal
+ARG NODE_VERSION=14 
+
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using headless Chrome"
 
 # Install libs
 RUN apt-get update
 RUN apt-get install --fix-missing -yq --no-install-recommends procps xvfb wget && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
+# Uninstall system NodeJs
+RUN apt-get purge -yq nodejs
+# Install custom node version
+ADD https://deb.nodesource.com/setup_${NODE_VERSION}.x /
 
+RUN apt-get update && apt-get install -y nodejs \
+    && apt-get clean -y && apt-get autoremove -y
+    
 # Install chrome
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -nv
 RUN apt install --fix-missing -yq ./google-chrome-stable_current_amd64.deb && rm ./google-chrome-stable_current_amd64.deb
@@ -22,9 +31,8 @@ WORKDIR /home/myuser
 ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
 RUN mkdir ${PLAYWRIGHT_BROWSERS_PATH}
 
-# Copy source code
-COPY package.json main.js chrome_test.js /home/myuser/
-COPY --chown=myuser:myuser start_xvfb_and_run_cmd.sh /home/myuser/
+# Copy source code and xvfb script
+COPY --chown=myuser:myuser package.json main.js chrome_test.js start_xvfb_and_run_cmd.sh /home/myuser/
 
 # Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
 ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome

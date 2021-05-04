@@ -1,4 +1,5 @@
 FROM ubuntu:focal
+ARG NODE_VERSION=14 
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Webkit"
 ENV DEBIAN_FRONTEND=noninteractive
@@ -40,7 +41,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gstreamer1.0-libav \
     && apt-get clean -y && apt-get autoremove -y
 
-
+# Install node
 RUN apt-get update && apt-get install -y curl && \
     curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
     apt-get install -y nodejs \
@@ -57,10 +58,8 @@ WORKDIR /home/myuser
 ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
 RUN mkdir ${PLAYWRIGHT_BROWSERS_PATH}
 
-# Copy source code
-COPY package.json main.js webkit_test.js /home/myuser/
-# Copy source code
-COPY --chown=myuser:myuser start_xvfb_and_run_cmd.sh /home/myuser/
+# Copy source code and xvfb script
+COPY --chown=myuser:myuser package.json main.js webkit_test.js start_xvfb_and_run_cmd.sh /home/myuser/
 
 # Tell Node.js this is a production environemnt
 ENV NODE_ENV=production

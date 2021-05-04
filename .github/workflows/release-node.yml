@@ -9,10 +9,6 @@ on:
       apify_version:
         description: 'Apify SDK version (e.g.: ^1.0.0)'
         required: true
-      node_version:
-        description: 'NodeJs version for image actor-node'
-        required: false
-        default: '14'
 
   repository_dispatch:
     types: [ build-images ]
@@ -20,7 +16,7 @@ on:
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
-  NODE_VERSION: ${{ github.event.client_payload.node_version || github.event.inputs.node_version || '14' }}
+  NODE_LATEST: 16
 
 jobs:
   # Build master images that are not dependent on existing builds.
@@ -29,6 +25,7 @@ jobs:
     strategy:
       matrix:
         image-name: [node]
+        node-version: [14, 15, 16]
     steps:
       -
         name: Checkout
@@ -55,33 +52,44 @@ jobs:
           retry_wait_seconds: 60 # wait between retries
           command: cd ${{ matrix.image-name }} && npm i --dry-run
       - 
-        name: Build image with node version and latest tag
+        name: Build image with latest tag
+        uses: docker/build-push-action@v2
+        if: ${{ env.RELEASE_TAG == 'latest' && matrix.node-version == env.NODE_LATEST }}
+        with:
+          context: ./${{ matrix.image-name }}
+          file: ./${{ matrix.image-name }}/Dockerfile
+          build-args: NODE_VERSION=${{ matrix.node-version }}
+          load: true
+          tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
+      - 
+        name: Build image with node version tag
         uses: docker/build-push-action@v2
         if: ${{ env.RELEASE_TAG == 'latest' }}
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
-          build-args: NODE_VERSION=${{ env.NODE_VERSION }}
+          build-args: NODE_VERSION=${{ matrix.node-version }}
           load: true
-          tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }},apify/actor-${{ matrix.image-name }}:${{ env.NODE_VERSION }}
+          tags: apify/actor-${{ matrix.image-name }}:${{ matrix.node-version }}
       -
         name: Build image with release tag
         uses: docker/build-push-action@v2
-        if: ${{ env.RELEASE_TAG != 'latest' }}
+        if: ${{ env.RELEASE_TAG != 'latest' && matrix.node-version == env.NODE_LATEST }}
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
-          build-args: NODE_VERSION=${{ env.NODE_VERSION }}
+          build-args: NODE_VERSION=${{ matrix.node-version }}
           load: true
-          tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
+          tags: apify/actor-${{ matrix.image-name }}:${{env.RELEASE_TAG}}-${{ env.RELEASE_TAG }}
  
       -
         name: Test image with release tag
+        if: ${{ matrix.node-version == env.NODE_LATEST }}
         run: docker run apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
       -
         name: Test image with node version tag
-        if: ${{ env.RELEASE_TAG == 'latest' }}
-        run: docker run apify/actor-${{ matrix.image-name }}:${{ env.NODE_VERSION }}
+        if: ${{ env.RELEASE_TAG == 'latest'}}
+        run: docker run apify/actor-${{ matrix.image-name }}:${{ matrix.node-version }}
       -
         name: Login to DockerHub
         uses: docker/login-action@v1
@@ -90,8 +98,9 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
         name: Push image with release tag
+        if: ${{ matrix.node-version == env.NODE_LATEST }}
         run: docker push apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
       -
         name: Push image with node version tag
         if: ${{ env.RELEASE_TAG == 'latest' }}
-        run: docker push apify/actor-${{ matrix.image-name }}:${{ env.NODE_VERSION }}
+        run: docker push apify/actor-${{ matrix.image-name }}:${{ matrix.node-version }}
