@@ -2,12 +2,12 @@
 // we keep this one here just for testing and clarification.
 
 console.log(
-`If you're seeing this text, it means the actor started the default "main.js" file instead
+    `If you're seeing this text, it means the actor started the default "main.js" file instead
 of your own source code file. You have two options how to fix this:
 1) Rename your source code file to "main.js"
 2) Define custom "package.json" and/or "Dockerfile" that will run your code your way
 
-For more information, see https://www.apify.com/docs/actor#custom-dockerfile
+For more information, see https://docs.apify.com/actors/development/source-code#custom-dockerfile
 `);
 console.log('Testing Docker image...');
 
