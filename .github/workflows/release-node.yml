@@ -42,7 +42,7 @@ jobs:
         with:
           result-encoding: string
           script: |
-             const script = require("../.github/scripts/prepare-image-tags.js");
+             const script = require("./.github/scripts/prepare-image-tags.js");
              return script()
       -
         name: Set up QEMU
