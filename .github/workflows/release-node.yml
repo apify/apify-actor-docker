@@ -56,7 +56,7 @@ jobs:
               tags.push(`${IMAGE_NAME}:${CURRENT_NODE}-${RELEASE_TAG}`);
 
               return tags.join(",");
-     -
+      -
         name: Checkout
         uses: actions/checkout@v2
       -
