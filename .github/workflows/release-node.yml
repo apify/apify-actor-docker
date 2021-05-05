@@ -19,7 +19,7 @@ env:
   NODE_LATEST: 16
 
 jobs:
-  # Build master images that are not dependent on existing builds.
+  # Build master images that are not dependent on existing builds.   
   build-main:
     runs-on: ubuntu-latest
     strategy:
@@ -28,17 +28,20 @@ jobs:
         node-version: [14, 15, 16]
     steps:
       - name: Prepare tags
-        id: prepare_tags
+        id: prepare-tags
         uses: actions/github-script@v4
         env:
           CURRENT_NODE: ${{ matrix.node-version }}
           LATEST_NODE: ${{ env.NODE_LATEST }}
           RELEASE_TAG: ${{ env.RELEASE_TAG }}
+          IMAGE_NAME: apify/actor-${{ matrix.image-name }}
         with:
+          result-encoding: string
           script: |
-              const { CURRENT_NODE, LATEST_NODE, RELEASE_TAG } = process.env
-
-              console.log(`Hello ${CURRENT_NODE} ${LATEST_NODE}, ${RELEASE_TAG}`)
+             const script = require('../scripts/node-tagging.js');
+             return script()
+      - name: Get result
+        run: echo "${{steps.prepare-tags.outputs.result}}"
       -
         name: Checkout
         uses: actions/checkout@v2
@@ -63,30 +66,9 @@ jobs:
           max_attempts: 3
           retry_wait_seconds: 60 # wait between retries
           command: cd ${{ matrix.image-name }} && npm i --dry-run
-      - 
-        name: Build image with latest tag
-        uses: docker/build-push-action@v2
-        if: ${{ env.RELEASE_TAG == 'latest' && matrix.node-version == env.NODE_LATEST }}
-        with:
-          context: ./${{ matrix.image-name }}
-          file: ./${{ matrix.image-name }}/Dockerfile
-          build-args: NODE_VERSION=${{ matrix.node-version }}
-          load: true
-          tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
-      - 
-        name: Build image with node version tag
-        uses: docker/build-push-action@v2
-        if: ${{ env.RELEASE_TAG == 'latest' }}
-        with:
-          context: ./${{ matrix.image-name }}
-          file: ./${{ matrix.image-name }}/Dockerfile
-          build-args: NODE_VERSION=${{ matrix.node-version }}
-          load: true
-          tags: apify/actor-${{ matrix.image-name }}:${{ matrix.node-version }}
       -
-        name: Build image with release tag
+        name: Build and tag image
         uses: docker/build-push-action@v2
-        if: ${{ env.RELEASE_TAG != 'latest' && matrix.node-version == env.NODE_LATEST }}
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
