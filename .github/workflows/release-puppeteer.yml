@@ -86,7 +86,7 @@ jobs:
           max_attempts: 3
           retry_wait_seconds: 60 # wait between retries
           command: cd ${{ matrix.image-name }} && npm i --dry-run
-       -
+      -
         name: Build and tag image
         uses: docker/build-push-action@v2
         with:
