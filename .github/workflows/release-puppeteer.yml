@@ -43,6 +43,7 @@ jobs:
           LATEST_NODE: ${{ env.NODE_LATEST }}
           RELEASE_TAG: ${{ env.RELEASE_TAG }}
           IMAGE_NAME: apify/actor-${{ matrix.image-name }}
+          FRAMEWORK_VERSION: ${{ env.PUPPETEER_VERSION }}
         with:
           result-encoding: string
           script: |
