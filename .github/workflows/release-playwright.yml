@@ -31,8 +31,11 @@ jobs:
         image-name: [node-playwright, node-playwright-chrome, node-playwright-firefox, node-playwright-webkit]
         node-version: [14, 15, 16]
     steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
       - 
-        name: Prepare tags
+        name: Prepare image tags
         id: prepare-tags
         uses: actions/github-script@v4
         env:
@@ -44,27 +47,8 @@ jobs:
         with:
           result-encoding: string
           script: |
-              const { CURRENT_NODE, LATEST_NODE, RELEASE_TAG, IMAGE_NAME, FRAMEWORK_VERSION } = process.env
-              const tags = [];
-
-              if (CURRENT_NODE === LATEST_NODE) {
-                tags.push(`${IMAGE_NAME}:${RELEASE_TAG}`);
-              }
-
-              if (RELEASE_TAG === "latest") {
-                // latest version
-                tags.push(`${IMAGE_NAME}:${CURRENT_NODE}-${FRAMEWORK_VERSION}`);
-
-                return tags.join(",");
-              }
-
-              // beta and other tags
-              tags.push(`${IMAGE_NAME}:${CURRENT_NODE}-${FRAMEWORK_VERSION}-${RELEASE_TAG}`);
-
-              return tags.join(",");
-      -
-        name: Checkout
-        uses: actions/checkout@v2
+             const script = require("./.github/scripts/prepare-image-tags.js");
+             return script()
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
