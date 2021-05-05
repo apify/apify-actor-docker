@@ -1,4 +1,4 @@
-name: Release puppeteer image
+name: Release puppeteer images
 
 on:
   workflow_dispatch:
@@ -31,6 +31,37 @@ jobs:
         image-name: [node-puppeteer-chrome]
         node-version: [14, 15, 16]
     steps:
+       - 
+        name: Prepare tags
+        id: prepare-tags
+        uses: actions/github-script@v4
+        env:
+          CURRENT_NODE: ${{ matrix.node-version }}
+          LATEST_NODE: ${{ env.NODE_LATEST }}
+          RELEASE_TAG: ${{ env.RELEASE_TAG }}
+          IMAGE_NAME: apify/actor-${{ matrix.image-name }}
+          FRAMEWORK_VERSION: ${{ env.PUPPETEER_VERSION }}
+        with:
+          result-encoding: string
+          script: |
+              const { CURRENT_NODE, LATEST_NODE, RELEASE_TAG, IMAGE_NAME, FRAMEWORK_VERSION } = process.env
+              const tags = [];
+
+              if (CURRENT_NODE === LATEST_NODE) {
+                tags.push(`${IMAGE_NAME}:${RELEASE_TAG}`);
+              }
+
+              if (RELEASE_TAG === "latest") {
+                // latest version
+                tags.push(`${IMAGE_NAME}:${CURRENT_NODE}-${FRAMEWORK_VERSION}`);
+
+                return tags.join(",");
+              }
+
+              // beta and other tags
+              tags.push(`${IMAGE_NAME}:${CURRENT_NODE}-${FRAMEWORK_VERSION}-${RELEASE_TAG}`);
+
+              return tags.join(",");
       -
         name: Checkout
         uses: actions/checkout@v2
@@ -55,38 +86,17 @@ jobs:
           max_attempts: 3
           retry_wait_seconds: 60 # wait between retries
           command: cd ${{ matrix.image-name }} && npm i --dry-run
-      - 
-        name: Build image with latest tag
+       -
+        name: Build and tag image
         uses: docker/build-push-action@v2
-        if: ${{ env.RELEASE_TAG == 'latest' && matrix.node-version == env.NODE_LATEST }}
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
           build-args: NODE_VERSION=${{ matrix.node-version }}
           load: true
-          tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
+          tags: ${{steps.prepare-tags.outputs.result}}
+ 
       -
-        name: Build image with puppeteer version and node version
-        id: docker_build
-        uses: docker/build-push-action@v2
-        if: ${{ env.RELEASE_TAG == 'latest' }}
-        with:
-          context: ./${{ matrix.image-name }}
-          file: ./${{ matrix.image-name }}/Dockerfile
-          load: true
-          build-args: NODE_VERSION=${{ matrix.node-version }}
-          tags: apify/actor-${{ matrix.image-name }}:${{ matrix.node-version }}-${{ env.PUPPETEER_VERSION }}
-      - 
-        name: Build image with release tag
-        uses: docker/build-push-action@v2
-        if: ${{ env.RELEASE_TAG != 'latest' && matrix.node-version == env.NODE_LATEST }}
-        with:
-          context: ./${{ matrix.image-name }}
-          file: ./${{ matrix.image-name }}/Dockerfile
-          build-args: NODE_VERSION=${{ matrix.node-version }}
-          load: true
-          tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
-      - 
         name: Test image with release tag
         if: ${{ matrix.node-version == env.NODE_LATEST }}
         run: docker run apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
@@ -94,6 +104,10 @@ jobs:
         name: Test image with node-puppeteer version tag
         if: ${{ env.RELEASE_TAG == 'latest' }}
         run: docker run apify/actor-${{ matrix.image-name }}:${{ matrix.node-version }}-${{ env.PUPPETEER_VERSION }}
+      - 
+        name: Test image with node-puppeteer version and release tag
+        if: ${{ env.RELEASE_TAG != 'latest' }}
+        run: docker run apify/actor-${{ matrix.image-name }}:${{ matrix.node-version }}-${{ env.PUPPETEER_VERSION }}-${{ env.RELEASE_TAG }}
       -
         name: Login to DockerHub
         uses: docker/login-action@v1
@@ -101,10 +115,5 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Push image with release tag
-        if: ${{ matrix.node-version == env.NODE_LATEST }}
-        run: docker push apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
-      -
-        name: Push image with puppeteer version tag
-        if: ${{ env.RELEASE_TAG == 'latest'  }}
-        run: docker push apify/actor-${{ matrix.image-name }}:${{ env.PUPPETEER_VERSION }}
+        name: Push images
+        run: docker push apify/actor-${{ matrix.image-name }} --all-tags
