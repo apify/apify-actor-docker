@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image-name: [node-test]
+        image-name: [node]
         node-version: [14, 15, 16]
     steps:
       - name: Prepare tags
