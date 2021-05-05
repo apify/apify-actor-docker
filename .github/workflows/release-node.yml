@@ -31,7 +31,7 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       - 
-        name: Prepare image tagsK
+        name: Prepare image tags
         id: prepare-tags
         uses: actions/github-script@v4
         env:
@@ -42,7 +42,7 @@ jobs:
         with:
           result-encoding: string
           script: |
-             const script = require("../.github/scripts/prepare-image-tags");
+             const script = require("../.github/scripts/prepare-image-tags.js");
              return script()
       -
         name: Set up QEMU
