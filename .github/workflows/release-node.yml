@@ -90,7 +90,7 @@ jobs:
           file: ./${{ matrix.image-name }}/Dockerfile
           build-args: NODE_VERSION=${{ matrix.node-version }}
           load: true
-          tags: apify/actor-${{ matrix.image-name }}:${{env.RELEASE_TAG}}-${{ env.RELEASE_TAG }}
+          tags: ${{steps.prepare-tags.outputs.result}}
  
       -
         name: Test image with release tag
@@ -101,16 +101,15 @@ jobs:
         if: ${{ env.RELEASE_TAG == 'latest'}}
         run: docker run apify/actor-${{ matrix.image-name }}:${{ matrix.node-version }}
       -
-        name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+        name: Test image with node version tag with release tag
+        if: ${{ env.RELEASE_TAG != 'latest'}}
+        run: docker run apify/actor-${{ matrix.image-name }}:${{ matrix.node-version }}-${{ env.RELEASE_TAG }}
+      # -
+      #   name: Login to DockerHub
+      #   uses: docker/login-action@v1
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Push image with release tag
-        if: ${{ matrix.node-version == env.NODE_LATEST }}
-        run: docker push apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
-      -
-        name: Push image with node version tag
-        if: ${{ env.RELEASE_TAG == 'latest' }}
-        run: docker push apify/actor-${{ matrix.image-name }}:${{ matrix.node-version }}
+        name: Push images
+        run: docker push apify/actor-${{ matrix.image-name }} --all-tags
