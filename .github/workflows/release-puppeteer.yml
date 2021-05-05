@@ -31,7 +31,7 @@ jobs:
         image-name: [node-puppeteer-chrome]
         node-version: [14, 15, 16]
     steps:
-       - 
+      - 
         name: Prepare tags
         id: prepare-tags
         uses: actions/github-script@v4
