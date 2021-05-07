@@ -8,16 +8,20 @@ module.exports = () => {
 
     if (RELEASE_TAG === "latest") {
         // latest version
-        const latestTagName = FRAMEWORK_VERSION ? `${IMAGE_NAME}:${CURRENT_NODE}-${FRAMEWORK_VERSION}` : `${IMAGE_NAME}:${CURRENT_NODE}`
-        
+        const latestTagName = FRAMEWORK_VERSION
+            ? `${IMAGE_NAME}:${CURRENT_NODE}-${FRAMEWORK_VERSION}`
+            : `${IMAGE_NAME}:${CURRENT_NODE}`
+
         tags.push(latestTagName);
 
-        return tags.join(",");
+    } else {
+        // beta and other tags
+        const otherTagName = FRAMEWORK_VERSION
+            ? `${IMAGE_NAME}:${CURRENT_NODE}-${FRAMEWORK_VERSION}-${RELEASE_TAG}`
+            : `${IMAGE_NAME}:${CURRENT_NODE}-${RELEASE_TAG}`
+
+        tags.push(otherTagName);
+
+        return { allTags: tags.join(","), firstTag: tags[0] };
     }
-
-    // beta and other tags
-    const otherTagName = FRAMEWORK_VERSION ? `${IMAGE_NAME}:${CURRENT_NODE}-${FRAMEWORK_VERSION}-${RELEASE_TAG}` : `${IMAGE_NAME}:${CURRENT_NODE}-${RELEASE_TAG}`
-    tags.push(otherTagName);
-
-    return tags.join(",");
 }

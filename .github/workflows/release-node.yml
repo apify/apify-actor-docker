@@ -40,10 +40,9 @@ jobs:
           RELEASE_TAG: ${{ env.RELEASE_TAG }}
           IMAGE_NAME: apify/actor-${{ matrix.image-name }}
         with:
-          result-encoding: string
           script: |
-             const script = require("./.github/scripts/prepare-image-tags.js");
-             return script()
+             const generateTags = require("./.github/scripts/prepare-image-tags.js");
+             return generateTags()
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -73,19 +72,11 @@ jobs:
           file: ./${{ matrix.image-name }}/Dockerfile
           build-args: NODE_VERSION=${{ matrix.node-version }}
           load: true
-          tags: ${{ steps.prepare-tags.outputs.result }}
-      -
-        name: Test image with release tag
-        if: ${{ matrix.node-version == env.NODE_LATEST }}
-        run: docker run apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
-      -
-        name: Test image with node version tag
-        if: ${{ env.RELEASE_TAG == 'latest'}}
-        run: docker run apify/actor-${{ matrix.image-name }}:${{ matrix.node-version }}
+          tags: ${{ steps.prepare-tags.outputs.result.allTags }}
       -
         name: Test image with node version tag with release tag
         if: ${{ env.RELEASE_TAG != 'latest'}}
-        run: docker run apify/actor-${{ matrix.image-name }}:${{ matrix.node-version }}-${{ env.RELEASE_TAG }}
+        run: docker run apify/actor-${{ matrix.image-name }}:${{ steps.prepare-tags.outputs.result.firstTag }}
       -
         name: Login to DockerHub
         uses: docker/login-action@v1
