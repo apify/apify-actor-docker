@@ -74,8 +74,7 @@ jobs:
           load: true
           tags: ${{ steps.prepare-tags.outputs.result.allTags }}
       -
-        name: Test image with node version tag with release tag
-        if: ${{ env.RELEASE_TAG != 'latest'}}
+        name: Test image
         run: docker run apify/actor-${{ matrix.image-name }}:${{ steps.prepare-tags.outputs.result.firstTag }}
       -
         name: Login to DockerHub

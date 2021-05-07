@@ -22,6 +22,8 @@ module.exports = () => {
 
         tags.push(otherTagName);
 
-        return { allTags: tags.join(","), firstTag: tags[0] };
     }
+
+    return { allTags: tags.join(","), firstTag: tags[0] };
+
 }
