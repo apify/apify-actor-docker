@@ -24,6 +24,6 @@ module.exports = () => {
 
     }
 
-    return { allTags: tags.join(","), firstTag: tags[0] };
+    return { allTags: tags.join(","), firstImageName: tags[0] };
 
 }

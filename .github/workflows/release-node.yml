@@ -75,7 +75,7 @@ jobs:
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
       -
         name: Test image
-        run: docker run apify/actor-${{ matrix.image-name }}:${{ fromJson(steps.prepare-tags.outputs.result).firstTag }}
+        run: docker run ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}
       -
         name: Login to DockerHub
         uses: docker/login-action@v1
