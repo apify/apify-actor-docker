@@ -1,4 +1,6 @@
-FROM node:14-buster-slim
+ARG NODE_VERSION=14 
+# Some dependecies would not work with strech which is base node js 14 image.
+FROM node:${NODE_VERSION}-buster-slim 
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Firefox"
 # Install Firefox dependencies
@@ -35,10 +37,8 @@ WORKDIR /home/myuser
 ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
 RUN mkdir ${PLAYWRIGHT_BROWSERS_PATH}
 
-# Copy source code
-COPY package.json main.js firefox_test.js /home/myuser/
-# Copy source code
-COPY --chown=myuser:myuser start_xvfb_and_run_cmd.sh /home/myuser/
+# Copy source code and xvfb script
+COPY --chown=myuser:myuser package.json main.js firefox_test.js start_xvfb_and_run_cmd.sh /home/myuser/
 
 # Tell Node.js this is a production environemnt
 ENV NODE_ENV=production

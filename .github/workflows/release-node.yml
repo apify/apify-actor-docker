@@ -1,4 +1,4 @@
-name: Release node image
+name: Release node images
 
 on:
   workflow_dispatch:
@@ -9,10 +9,6 @@ on:
       apify_version:
         description: 'Apify SDK version (e.g.: ^1.0.0)'
         required: true
-      node_version:
-        description: 'NodeJs version for image actor-node'
-        required: false
-        default: '14'
 
   repository_dispatch:
     types: [ build-images ]
@@ -20,19 +16,33 @@ on:
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
-  NODE_VERSION: ${{ github.event.client_payload.node_version || github.event.inputs.node_version || '14' }}
+  NODE_LATEST: 16
 
 jobs:
-  # Build master images that are not dependent on existing builds.
+  # Build master images that are not dependent on existing builds.   
   build-main:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         image-name: [node]
+        node-version: [14, 15, 16]
     steps:
       -
         name: Checkout
         uses: actions/checkout@v2
+      - 
+        name: Prepare image tags
+        id: prepare-tags
+        uses: actions/github-script@v4
+        env:
+          CURRENT_NODE: ${{ matrix.node-version }}
+          LATEST_NODE: ${{ env.NODE_LATEST }}
+          RELEASE_TAG: ${{ env.RELEASE_TAG }}
+          IMAGE_NAME: apify/actor-${{ matrix.image-name }}
+        with:
+          script: |
+             const generateTags = require("./.github/scripts/prepare-image-tags.js");
+             return generateTags()
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -54,34 +64,18 @@ jobs:
           max_attempts: 3
           retry_wait_seconds: 60 # wait between retries
           command: cd ${{ matrix.image-name }} && npm i --dry-run
-      - 
-        name: Build image with node version and latest tag
+      -
+        name: Build and tag image
         uses: docker/build-push-action@v2
-        if: ${{ env.RELEASE_TAG == 'latest' }}
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
-          build-args: NODE_VERSION=${{ env.NODE_VERSION }}
+          build-args: NODE_VERSION=${{ matrix.node-version }}
           load: true
-          tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }},apify/actor-${{ matrix.image-name }}:${{ env.NODE_VERSION }}
+          tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
       -
-        name: Build image with release tag
-        uses: docker/build-push-action@v2
-        if: ${{ env.RELEASE_TAG != 'latest' }}
-        with:
-          context: ./${{ matrix.image-name }}
-          file: ./${{ matrix.image-name }}/Dockerfile
-          build-args: NODE_VERSION=${{ env.NODE_VERSION }}
-          load: true
-          tags: apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
- 
-      -
-        name: Test image with release tag
-        run: docker run apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
-      -
-        name: Test image with node version tag
-        if: ${{ env.RELEASE_TAG == 'latest' }}
-        run: docker run apify/actor-${{ matrix.image-name }}:${{ env.NODE_VERSION }}
+        name: Test image
+        run: docker run ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}
       -
         name: Login to DockerHub
         uses: docker/login-action@v1
@@ -89,9 +83,5 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Push image with release tag
-        run: docker push apify/actor-${{ matrix.image-name }}:${{ env.RELEASE_TAG }}
-      -
-        name: Push image with node version tag
-        if: ${{ env.RELEASE_TAG == 'latest' }}
-        run: docker push apify/actor-${{ matrix.image-name }}:${{ env.NODE_VERSION }}
+        name: Push images
+        run: docker push apify/actor-${{ matrix.image-name }} --all-tags

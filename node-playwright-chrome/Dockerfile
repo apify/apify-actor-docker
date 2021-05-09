@@ -1,4 +1,6 @@
-FROM node:14-slim
+ARG NODE_VERSION=14
+# Use buster to be consistent across node versions.
+FROM node:${NODE_VERSION}-buster-slim
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Chrome"
 
@@ -12,7 +14,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
     && DEBIAN_FRONTEND=noninteractive apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y wget unzip \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y procps git google-chrome-stable libxss1 fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont xvfb \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y procps git google-chrome-stable libxss1 fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf xvfb \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
@@ -31,10 +33,8 @@ WORKDIR /home/myuser
 ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
 RUN mkdir ${PLAYWRIGHT_BROWSERS_PATH}
 
-# Copy source code
-COPY package.json main.js chrome_test.js /home/myuser/
-# Copy source code
-COPY --chown=myuser:myuser start_xvfb_and_run_cmd.sh /home/myuser/
+# Copy source code and xvfb script
+COPY --chown=myuser:myuser package.json main.js chrome_test.js start_xvfb_and_run_cmd.sh /home/myuser/
 
 # Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
 ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
