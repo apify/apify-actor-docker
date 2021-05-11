@@ -31,12 +31,13 @@ RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
 
 RUN mkdir -p /etc/opt/chrome/policies/managed && echo '{ "CommandLineFlagSecurityWarningsEnabled": false }' > /etc/opt/chrome/policies/managed/managed_policies.json
 # Run everything after as non-privileged user.
+RUN npm i npm@6 -g
 USER myuser
 WORKDIR /home/myuser
 
 # Copy source code and xvfb script
 COPY --chown=myuser:myuser package.json main.js puppeteer_chrome_test.js start_xvfb_and_run_cmd.sh /home/myuser/
-RUN chown -R root:root /home/myuser/
+
 # Uncomment to skip the chromium download when installing puppeteer. If you do,
 # you'll need to launch puppeteer with:
 #     browser.launch({executablePath: 'google-chrome'})
