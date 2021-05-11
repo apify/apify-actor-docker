@@ -51,6 +51,9 @@ RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser
 
+# Install npm 6 to be consistent accross versions.
+RUN npm i npm@6 -g
+
 # Run everything after as non-privileged user.
 USER myuser
 WORKDIR /home/myuser
