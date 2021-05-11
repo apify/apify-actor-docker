@@ -36,7 +36,7 @@ WORKDIR /home/myuser
 
 # Copy source code and xvfb script
 COPY --chown=myuser:myuser package.json main.js puppeteer_chrome_test.js start_xvfb_and_run_cmd.sh /home/myuser/
-
+RUN chown -R root:root /home/myuser/
 # Uncomment to skip the chromium download when installing puppeteer. If you do,
 # you'll need to launch puppeteer with:
 #     browser.launch({executablePath: 'google-chrome'})
