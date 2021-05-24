@@ -1,12 +1,9 @@
 # Node 14 as default
 
-ARG NODE_VERSION=14 
+ARG NODE_VERSION=14
 FROM node:${NODE_VERSION}-alpine
 
 LABEL maintainer="support@apify.com" Description="Base image for simple Apify actors"
-
-# Remove yarn, it's not needed
-RUN rm -rf /opt/yarn /usr/local/bin/yarn /usr/local/bin/yarnpkg
 
 # Create app directory
 RUN mkdir -p /usr/src/app
