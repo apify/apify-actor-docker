@@ -1,7 +1,9 @@
-ARG NODE_VERSION=14
 # We need to use Ubuntu because Debian 10 (what Node.js images use)
 # do not support glibc 2.29 and without it Firefox will not run.
 FROM ubuntu:focal
+
+# ARG must be after FROM, because FROM resets ARG.
+ARG NODE_VERSION=14
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Firefox"
 # Install Firefox dependencies + tools
