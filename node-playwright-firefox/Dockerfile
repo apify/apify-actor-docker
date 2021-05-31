@@ -1,30 +1,57 @@
-ARG NODE_VERSION=14 
-# Some dependecies would not work with strech which is base node js 14 image.
-FROM node:${NODE_VERSION}-buster-slim 
+ARG NODE_VERSION=14
+# We need to use Ubuntu because Debian 10 (what Node.js images use)
+# do not support glibc 2.29 and without it Firefox will not run.
+FROM ubuntu:focal
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Firefox"
-# Install Firefox dependencies
+# Install Firefox dependencies + tools
+# List of dependencies from here: https://github.com/microsoft/playwright/blob/master/src/nativeDeps.ts
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    fonts-noto-color-emoji \
-    libdbus-glib-1-2 \
-    libxt6 \
-    libgdk-pixbuf2.0-0 \
-    libxcomposite1 \
+    ffmpeg \
     libatk1.0-0 \
-    libatk-bridge2.0-0 \
+    libcairo-gobject2 \
+    libcairo2 \
+    libdbus-1-3 \
+    libdbus-glib-1-2 \
+    libfontconfig1 \
+    libfreetype6 \
+    libgdk-pixbuf2.0-0 \
+    libglib2.0-0 \
     libgtk-3-0 \
-    procps \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libpangoft2-1.0-0 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxcb-shm0 \
+    libxcb1 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxi6 \
+    libxrender1 \
+    libxt6 \
     xvfb \
-    git \
-    libpci3\
-    libegl1\
+    fonts-noto-color-emoji \
+    ttf-unifont \
+    # Found this in other images, not sure whether it's needed, it does not come from Playwright deps
+    procps \
+    # This is needed to remove an annoying error message when running headful.
     && mkdir -p /tmp/.X11-unix \
     && chmod 1777 /tmp/.X11-unix
 
-# Install ffmpeg to bring in audio and video codecs necessary for playing videos in Firefox.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg
+# Install Node.js
+RUN apt-get update && apt-get install -y curl && \
+    curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - && \
+    apt-get install -y nodejs \
+    && apt-get clean -y && apt-get autoremove -y
+
+# Feature-parity with Node.js base images.
+# From: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal
+RUN apt-get update && apt-get install -y --no-install-recommends git ssh && \
+    npm install -g yarn
 
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
@@ -73,7 +100,7 @@ ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD 1
 # We should you the autodisplay detection as suggested here: https://github.com/microsoft/playwright/issues/2728#issuecomment-678083619
 ENV DISPLAY=:99
 ENV XVFB_WHD=1280x720x16
-# Uncoment this line if you want to run browser in headfull mode by defautl.
+# Uncomment this line if you want to run browser in headful mode by default.
 # ENV APIFY_XVFB=1
 
 # NOTEs:
