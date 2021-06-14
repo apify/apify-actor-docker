@@ -14,7 +14,7 @@ on:
         required: true
 
   repository_dispatch:
-    types: [ build-images ]
+    types: [ build-node-images ]
 
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
@@ -46,7 +46,7 @@ jobs:
           FRAMEWORK_VERSION: ${{ env.PLAYWRIGHT_VERSION }}
         with:
           script: |
-             const generateTags = require("./.github/scripts/prepare-image-tags.js");
+             const generateTags = require("./.github/scripts/prepare-node-image-tags.js");
              return generateTags()
       -
         name: Set up QEMU
