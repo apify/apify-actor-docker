@@ -3,7 +3,7 @@
 FROM ubuntu:focal
 
 # ARG must be after FROM, because FROM resets ARG.
-ARG NODE_VERSION=14
+ARG NODE_VERSION=16
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Firefox"
 # Install Firefox dependencies + tools

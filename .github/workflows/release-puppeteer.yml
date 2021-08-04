@@ -20,7 +20,7 @@ env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   PUPPETEER_VERSION: ${{ github.event.inputs.puppeteer_version || github.event.client_payload.puppeteer_version }}
-  NODE_LATEST: 14
+  NODE_LATEST: 16
 
 jobs:
   # Build master images that are not dependent on existing builds.

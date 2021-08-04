@@ -1,5 +1,5 @@
 FROM ubuntu:focal
-ARG NODE_VERSION=14 
+ARG NODE_VERSION=16
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Webkit"
 ENV DEBIAN_FRONTEND=noninteractive

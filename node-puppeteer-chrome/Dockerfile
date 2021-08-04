@@ -1,5 +1,5 @@
 
-ARG NODE_VERSION=14
+ARG NODE_VERSION=16
 # Use buster to be consistent across node versions.
 FROM node:${NODE_VERSION}-buster-slim
 

@@ -1,5 +1,5 @@
 FROM mcr.microsoft.com/playwright:focal
-ARG NODE_VERSION=14 
+ARG NODE_VERSION=16
 
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using headless Chrome"
@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y curl && \
     curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - && \
     apt-get install -y nodejs \
     && apt-get clean -y && apt-get autoremove -y
-    
+
 # Install chrome
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -nv
 RUN apt install --fix-missing -yq ./google-chrome-stable_current_amd64.deb && rm ./google-chrome-stable_current_amd64.deb
