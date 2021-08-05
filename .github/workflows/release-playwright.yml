@@ -27,6 +27,9 @@ jobs:
   build-main:
     runs-on: ubuntu-latest
     strategy:
+      # By the time some build fails, other build can be already finished
+      # so fail-fast does not really prevent the publishing of all parallel builds
+      fail-fast: false
       matrix:
         image-name: [node-playwright, node-playwright-chrome, node-playwright-firefox, node-playwright-webkit]
         node-version: [14, 15, 16]
