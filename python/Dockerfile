@@ -19,6 +19,9 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 # Upgrade pip before installing anything else first
 RUN pip install --upgrade pip
 
+# Disable warnings about outdated pip
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+
 # Install the specified Python Client version
 ARG APIFY_CLIENT_VERSION
 RUN pip install apify_client~=${APIFY_CLIENT_VERSION}
