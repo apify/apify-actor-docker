@@ -1,7 +1,7 @@
 # Use the specified Python version, fallback to 3.7 as default
 
 ARG PYTHON_VERSION=3.7
-FROM python:${PYTHON_VERSION}-alpine
+FROM python:${PYTHON_VERSION}
 
 LABEL maintainer="support@apify.com" Description="Base image for simple Apify actors written in Python"
 
@@ -21,6 +21,9 @@ RUN pip install --upgrade pip
 
 # Disable warnings about outdated pip
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Preinstall the latest versions of setuptools and wheel for faster package installs
+RUN pip install --upgrade setuptools wheel
 
 # Install the specified Python Client version
 ARG APIFY_CLIENT_VERSION
