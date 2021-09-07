@@ -38,7 +38,7 @@ Apify.main(async () => {
     await testChrome({ headless: true })
 
     // Try to use full Chrome with XVFB
-    await testChrome({ headless: false })
+    await testChrome({ headless: false, args: [ '--disable-gpu' ] })
 
     // Test that "ps" command is available, sometimes it was missing in official Node builds
     await Apify.getMemoryInfo();
