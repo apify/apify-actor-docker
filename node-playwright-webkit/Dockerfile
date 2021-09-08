@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install WebKit dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libevdev \
+    libevdev2 \
     libwoff1 \
     libopus0 \
     libwebp6 \
