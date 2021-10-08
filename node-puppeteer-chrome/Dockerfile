@@ -20,8 +20,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
     && mkdir -p /tmp/.X11-unix \
-    && chmod 1777 /tmp/.X11-unix \
-    && rm -rf /opt/yarn /usr/local/bin/yarn /usr/local/bin/yarnpkg
+    && chmod 1777 /tmp/.X11-unix
 
 
 # Add user so we don't need --no-sandbox.

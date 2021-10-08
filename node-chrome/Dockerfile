@@ -15,8 +15,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y procps git google-chrome-stable libxss1 fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /src/*.deb \
-    && rm -rf /opt/yarn /usr/local/bin/yarn /usr/local/bin/yarnpkg
+    && rm -rf /src/*.deb
 
 
 # Add user so we don't need --no-sandbox.

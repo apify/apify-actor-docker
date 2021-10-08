@@ -19,8 +19,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
 RUN DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y wget \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y libfreetype6 libfontconfig1 procps sqlite3 --no-install-recommends \
  && rm -rf /var/lib/apt/lists/* \
- && rm -rf /src/*.deb \
- && rm -rf /opt/yarn /usr/local/bin/yarn /usr/local/bin/yarnpkg
+ && rm -rf /src/*.deb
 
 # Run everything after as non-privileged user to avoid warnings
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
