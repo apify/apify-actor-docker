@@ -1,5 +1,4 @@
 const { version: puppeteerVersion } = require('puppeteer/package.json');
-const fetch = require('node-fetch');
 
 const VERSION_REGEX = /([\d.?]+)/g;
 const chromeVersionDownloadUrl = version => `https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${version}_amd64.deb`;
@@ -57,6 +56,8 @@ async function downloadClosestChromeInstaller(browser, versionToCheck) {
 	// Get the first 3 parts of the version
 	const relevantPart = versionToCheck.split('.').slice(0, 3).join('.');
 	const page = await browser.newPage();
+	// Lazy load node-fetch here, since it won't be present outside the download process
+	const fetch = require('node-fetch');
 
 	/** @type {Buffer} */
 	let debBuffer;
