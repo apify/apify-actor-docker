@@ -44,7 +44,8 @@ ENV NODE_OPTIONS="--max_old_space_size=30000 --max-http-header-size=80000"
 RUN echo "Node.js version:" \
  && node --version \
  && echo "NPM version:" \
- && npm --version
+ && npm --version \
+ && npm config set update-notifier false
 
 # We're using CMD instead of ENTRYPOINT, to allow manual overriding
 CMD node test.js
