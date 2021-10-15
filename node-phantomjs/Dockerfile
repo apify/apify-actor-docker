@@ -45,7 +45,7 @@ RUN echo "Node.js version:" \
  && node --version \
  && echo "NPM version:" \
  && npm --version \
- && npm config set update-notifier false
+ && npm config --global set update-notifier false
 
 # We're using CMD instead of ENTRYPOINT, to allow manual overriding
 CMD node test.js
