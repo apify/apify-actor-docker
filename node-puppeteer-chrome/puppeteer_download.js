@@ -40,6 +40,7 @@ async function downloadLatestCompatibleChrome(browser) {
 
     try {
         await downloadLatestCompatibleChrome(browser);
+        console.log('Download completed!');
     } finally {
         await browser.close();
     }
