@@ -1,13 +1,12 @@
 const Apify = require('apify');
-const { version: puppeteerVersion } = require('puppeteer/package.json');
-
-const VERSION_REGEX = /([\d.?]+)/g;
+const { puppeteerVersion, VERSION_REGEX, areVersionsCompatible, fetchCompatibilityVersions } = require('./puppeteer_utils');
 
 const isV1 = typeof Apify.launchPlaywright === 'function';
 
 /*
  * This file tests whether Puppeteer is compatible with installed Chrome,
- * by parsing the "Releases per Chromium Version" section from https://github.com/puppeteer/puppeteer/blob/master/docs/api.md:
+ * by parsing the "Releases per Chromium Version" section from https://github.com/puppeteer/puppeteer/blob/master/docs/api.md
+ * Examples:
  * Chromium 77.0.3803.0 - [Puppeteer v1.18.1](https://github.com/GoogleChrome/puppeteer/blob/v1.18.0/docs/api.md)
  * Chromium 76.0.3803.0 - [Puppeteer v1.17.0](https://github.com/GoogleChrome/puppeteer/blob/v1.17.0/docs/api.md)
  * Chromium 75.0.3765.0 - [Puppeteer v1.15.0](https://github.com/GoogleChrome/puppeteer/blob/v1.15.0/docs/api.md)
@@ -15,42 +14,13 @@ const isV1 = typeof Apify.launchPlaywright === 'function';
  * Chromium 73.0.3679.0 - [Puppeteer v1.12.2](https://github.com/GoogleChrome/puppeteer/blob/v1.12.2/docs/api.md)
  */
 
-function parseCompatibilityVersions(text) {
-    const versionsText = text.substring(
-        text.indexOf('Releases per Chromium Version:'),
-        text.indexOf('* [All releases]')
-    );
-    const versions = versionsText.split('\n')
-        .filter(line => line.includes('* Chromium'))
-        .map(line => {
-            const vers = line.match(VERSION_REGEX);
-            return { chrome: vers[0], pptr: vers[1] }
-        });
-    if (versions.length < 5){
-        throw new Error('Cannot find and parse Puppeteer-Chromium versions from Markdown file.');
-    }
-    return versions;
-}
-
-function areVersionsCompatible(compatible, actual) {
-    const [compMajor, compMinor] = compatible.split('.').map(n => Number(n));
-    const [actualMajor, actualMinor] = actual.split('.').map(n => Number(n));
-    return actualMajor === compMajor && actualMinor >= compMinor;
-}
-
-function trimPatchVersion(version) {
-    return version.split('.').slice(0, 2).join('.');
-}
-
 const testCompatibility = async (browser) => {
     console.log('Puppeteer version: %s', puppeteerVersion);
 
     const chromeVersion = (await browser.version()).match(VERSION_REGEX)[0];
     console.log('Chrome version: %s', chromeVersion);
 
-    const page = await browser.newPage();
-    const apiResponse = await page.goto('https://raw.githubusercontent.com/GoogleChrome/puppeteer/main/docs/api.md');
-    const compatibilityVersions = parseCompatibilityVersions(await apiResponse.text());
+    const compatibilityVersions = await fetchCompatibilityVersions(browser);
     console.log('Puppeteer compatibility versions are:');
     console.log(compatibilityVersions);
 
@@ -94,9 +64,12 @@ const testPuppeteerChrome = async () => {
         ? { useChrome: true, launchOptions }
         : { useChrome: true, ...launchOptions };
     const browser = await Apify.launchPuppeteer(launchContext);
-    await testCompatibility(browser);
-    await testPageLoading(browser);
-    await browser.close();
+    try {
+        await testCompatibility(browser);
+        await testPageLoading(browser);
+    } finally {
+        await browser.close();
+    }
 };
 
 module.exports = testPuppeteerChrome;
