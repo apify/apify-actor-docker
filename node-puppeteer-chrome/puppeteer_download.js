@@ -23,13 +23,15 @@ async function downloadLatestCompatibleChrome(browser) {
         .map(v => v.chrome)
         .sort((a, b) => b.localeCompare(a))[0];
 
+    console.log(`Found compatible Chrome version ${compatibleChromeVersion} for Puppeteer ${puppeteerVersion}`);
+
     const buffer = await downloadClosestChromeInstaller(browser, compatibleChromeVersion);
     await writeFile('/tmp/chrome.deb', buffer);
 }
 
 (async () => {
-	console.log('Downloading the latest Chrome compatible with the version of Puppeteer that is installed');
-	// We need --no-sandbox, because even though the build is running on GitHub, the test is running in Docker.
+    console.log('Preparing to download the latest Chrome compatible with the version of Puppeteer that is installed');
+    // We need --no-sandbox, because even though the build is running on GitHub, the test is running in Docker.
     const launchOptions = { headless: true, args: ['--no-sandbox'] };
     const launchContext = isV1
         ? { launchOptions }
@@ -40,7 +42,7 @@ async function downloadLatestCompatibleChrome(browser) {
 
     try {
         await downloadLatestCompatibleChrome(browser);
-        console.log('Download completed!');
+        console.log('Download completed! File was saved in /tmp/chrome');
     } finally {
         await browser.close();
     }

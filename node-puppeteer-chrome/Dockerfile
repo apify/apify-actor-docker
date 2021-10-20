@@ -37,7 +37,7 @@ RUN npm --quiet set progress=false \
 RUN node ./puppeteer_download.js
 # Install it
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y /tmp/chrome.deb \
-    rm /tmp/chrome.deb
+    && rm /tmp/chrome.deb
 
 # Add user so we don't need --no-sandbox.
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \

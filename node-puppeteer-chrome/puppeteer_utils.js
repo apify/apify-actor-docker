@@ -40,11 +40,11 @@ function areVersionsCompatible(compatible, actual) {
  * @returns
  */
 async function fetchCompatibilityVersions(browser) {
-	const page = await browser.newPage();
+    const page = await browser.newPage();
     const apiResponse = await page.goto('https://raw.githubusercontent.com/GoogleChrome/puppeteer/main/docs/api.md');
     const compatibilityVersions = parseCompatibilityVersions(await apiResponse.text());
 
-	return compatibilityVersions;
+    return compatibilityVersions;
 }
 
 /**
@@ -53,48 +53,48 @@ async function fetchCompatibilityVersions(browser) {
  * @param {string} versionToCheck
  */
 async function downloadClosestChromeInstaller(browser, versionToCheck) {
-	// Get the first 3 parts of the version
-	const relevantPart = versionToCheck.split('.').slice(0, 3).join('.');
-	const page = await browser.newPage();
-	// Lazy load node-fetch here, since it won't be present outside the download process
-	const fetch = require('node-fetch');
+    // Get the first 3 parts of the version
+    const relevantPart = versionToCheck.split('.').slice(0, 3).join('.');
+    const page = await browser.newPage();
+    // Lazy load node-fetch here, since it won't be present outside the download process
+    const fetch = require('node-fetch');
 
-	/** @type {Buffer} */
-	let debBuffer;
-	let pageNumber = 1;
+    /** @type {Buffer} */
+    let debBuffer;
+    let pageNumber = 1;
 
-	do {
-		const response = await page.goto(`https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable?id=202706&page=${pageNumber}`);
-		const rawText = await response.text();
+    do {
+        const response = await page.goto(`https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable?id=202706&page=${pageNumber}`);
+        const rawText = await response.text();
 
-		// If this page doesn't include any versions, we went too far
-		if (!rawText.includes('Version:')) {
-			throw new Error('Could not find any valid version.');
-		}
+        // If this page doesn't include any versions, we went too far
+        if (!rawText.includes('Version:')) {
+            throw new Error('Could not find any valid version.');
+        }
 
-		// If this page doesn't include the relevant part, move on
-		if (!rawText.includes(relevantPart)) {
-			pageNumber++;
-			continue;
-		}
+        // If this page doesn't include the relevant part, move on
+        if (!rawText.includes(relevantPart)) {
+            pageNumber++;
+            continue;
+        }
 
-		// We found the page, extract the final version and save it
-		const rawMatches = rawText.match(VERSION_REGEX);
-		const validVersion = rawMatches.filter(item => item.startsWith(relevantPart)).sort()[0];
-		const downloadUrl = chromeVersionDownloadUrl(`${validVersion}-1`);
+        // We found the page, extract the final version and save it
+        const rawMatches = rawText.match(VERSION_REGEX);
+        const validVersion = rawMatches.filter(item => item.startsWith(relevantPart)).sort()[0];
+        const downloadUrl = chromeVersionDownloadUrl(`${validVersion}-1`);
 
-		const res = await fetch(downloadUrl);
-		debBuffer = await res.buffer();
-	} while (!debBuffer);
+        const res = await fetch(downloadUrl);
+        debBuffer = await res.buffer();
+    } while (!debBuffer);
 
-	return debBuffer;
+    return debBuffer;
 }
 
 module.exports = {
-	areVersionsCompatible,
-	downloadClosestChromeInstaller,
-	fetchCompatibilityVersions,
-	parseCompatibilityVersions,
-	puppeteerVersion,
-	VERSION_REGEX,
+    areVersionsCompatible,
+    downloadClosestChromeInstaller,
+    fetchCompatibilityVersions,
+    parseCompatibilityVersions,
+    puppeteerVersion,
+    VERSION_REGEX,
 }
