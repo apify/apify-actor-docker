@@ -49,16 +49,16 @@ ENV NODE_OPTIONS="--max_old_space_size=30000 --max-http-header-size=80000"
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
- && npm config --global set update-notifier false \
- && npm install --only=prod --no-optional --no-package-lock --prefer-online \
- && echo "Installed NPM packages:" \
- && (npm list || true) \
- && echo "Node.js version:" \
- && node --version \
- && echo "NPM version:" \
- && npm --version \
- && echo "Google Chrome version:" \
- && bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version"
+    && npm config set update-notifier false \
+    && npm install --only=prod --no-optional --no-package-lock --prefer-online \
+    && echo "Installed NPM packages:" \
+    && (npm list || true) \
+    && echo "Node.js version:" \
+    && node --version \
+    && echo "NPM version:" \
+    && npm --version \
+    && echo "Google Chrome version:" \
+    && bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version"
 
 # Set up xvfb
 
