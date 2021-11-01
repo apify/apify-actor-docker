@@ -67,6 +67,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     && mkdir -p /tmp/.X11-unix \
     && chmod 1777 /tmp/.X11-unix
 
+# Globally disable the update-notifier.
+RUN npm config --global set update-notifier false
+
 # Prepare to install the latest Chrome compatible
 RUN mkdir -p /tmp/chrome-install
 WORKDIR /tmp/chrome-install
@@ -74,7 +77,6 @@ COPY package.json puppeteer_*.js /tmp/chrome-install/
 
 # Install default dependencies
 RUN npm --quiet set progress=false \
-    && npm config --global set update-notifier false \
     && npm install --only=prod --no-optional --no-package-lock --prefer-online
 
 # Download the latest Chrome
@@ -117,7 +119,6 @@ ENV NODE_OPTIONS="--max_old_space_size=30000 --max-http-header-size=80000"
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
-    && npm config set update-notifier false \
     && npm install --only=prod --no-optional --no-package-lock --prefer-online \
     && echo "Installed NPM packages:" \
     && (npm list || true) \
