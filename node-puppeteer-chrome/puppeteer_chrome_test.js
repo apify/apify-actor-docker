@@ -20,7 +20,7 @@ const testCompatibility = async (browser) => {
     const chromeVersion = (await browser.version()).match(VERSION_REGEX)[0];
     console.log('Chrome version: %s', chromeVersion);
 
-    const compatibilityVersions = await fetchCompatibilityVersions(browser);
+    const compatibilityVersions = await fetchCompatibilityVersions();
     console.log('Puppeteer compatibility versions are:');
     console.log(compatibilityVersions);
 

@@ -1,3 +1,4 @@
+const { default: axios} = require('axios')
 const { version: puppeteerVersion } = require('puppeteer/package.json');
 
 const VERSION_REGEX = /([\d.?]+)/g;
@@ -35,37 +36,28 @@ function areVersionsCompatible(compatible, actual) {
     return actualMajor === compMajor && actualMinor >= compMinor;
 }
 
-/**
- * @param {import('puppeteer').Browser} browser
- * @returns
- */
-async function fetchCompatibilityVersions(browser) {
-    const page = await browser.newPage();
-    const apiResponse = await page.goto('https://raw.githubusercontent.com/GoogleChrome/puppeteer/main/docs/api.md');
-    const compatibilityVersions = parseCompatibilityVersions(await apiResponse.text());
+async function fetchCompatibilityVersions() {
+    const apiResponse = await axios.get('https://raw.githubusercontent.com/GoogleChrome/puppeteer/main/docs/api.md', { responseType: 'text' });
+    const compatibilityVersions = parseCompatibilityVersions(apiResponse.data);
 
     return compatibilityVersions;
 }
 
 /**
  * Downloads the closest version of Chrome available
- * @param {import('puppeteer').Browser} browser
  * @param {string} versionToCheck
  */
-async function downloadClosestChromeInstaller(browser, versionToCheck) {
+async function downloadClosestChromeInstaller(versionToCheck) {
     // Get the first 3 parts of the version
     const relevantPart = versionToCheck.split('.').slice(0, 3).join('.');
-    const page = await browser.newPage();
-    // Lazy load node-fetch here, since it won't be present outside the download process
-    const fetch = require('node-fetch');
 
     /** @type {Buffer} */
     let debBuffer;
     let pageNumber = 1;
 
     do {
-        const response = await page.goto(`https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable?id=202706&page=${pageNumber}`);
-        const rawText = await response.text();
+        const response = await axios.get(`https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable?id=202706&page=${pageNumber}`, { responseType: 'text' });
+        const rawText = response.data;
 
         // If this page doesn't include any versions, we went too far
         if (!rawText.includes('Version:')) {
@@ -83,8 +75,8 @@ async function downloadClosestChromeInstaller(browser, versionToCheck) {
         const validVersion = rawMatches.filter(item => item.startsWith(relevantPart)).sort()[0];
         const downloadUrl = chromeVersionDownloadUrl(`${validVersion}-1`);
 
-        const res = await fetch(downloadUrl);
-        debBuffer = await res.buffer();
+        const res = await axios.get(downloadUrl, { responseType: 'arraybuffer' });
+        debBuffer = res.data;
     } while (!debBuffer);
 
     return debBuffer;

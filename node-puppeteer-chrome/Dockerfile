@@ -8,14 +8,59 @@ LABEL maintainer="support@apify.com" Description="Base image for Apify actors us
 # This image was inspired by https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-in-docker
 
 # Install latest Chrome dev packages and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
-# Note: this also installs the necessary libs to make the bundled version of Chromium that Puppeteer installs, work.
+# Note: this also installs the necessary libs to make the bundled version of Chromium that Puppeteer installs work.
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg unzip ca-certificates --no-install-recommends \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | DEBIAN_FRONTEND=noninteractive apt-key add - \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
     && DEBIAN_FRONTEND=noninteractive apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y wget unzip \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y procps git libxss1 libxtst6 fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf xvfb \
+    && DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y unzip \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    fonts-freefont-ttf \
+    fonts-ipafont-gothic \
+    fonts-kacst \
+    fonts-liberation \
+    fonts-thai-tlwg \
+    fonts-wqy-zenhei \
+    git \
+    libappindicator3-1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libc6 \
+    libcairo2 \
+    libcups2 \
+    libdbus-1-3 \
+    libexpat1 \
+    libfontconfig1 \
+    libgbm1 \
+    libgcc1 \
+    libglib2.0-0 \
+    libgtk-3-0 \
+    libnspr4 \
+    libnss3 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libstdc++6 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxcb1 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxi6 \
+    libxrandr2 \
+    libxrender1 \
+    libxss1 \
+    libxss1 \
+    libxtst6 \
+    libxtst6 \
+    lsb-release \
+    procps \
+    xdg-utils \
+    xvfb \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
@@ -30,14 +75,14 @@ COPY package.json puppeteer_*.js /tmp/chrome-install/
 # Install default dependencies
 RUN npm --quiet set progress=false \
     && npm config --global set update-notifier false \
-    && npm install --only=prod --no-optional --no-package-lock --prefer-online \
-    && npm install --no-save node-fetch@2
+    && npm install --only=prod --no-optional --no-package-lock --prefer-online
 
 # Download the latest Chrome
 RUN node ./puppeteer_download.js
 # Install it
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y /tmp/chrome.deb \
-    && rm /tmp/chrome.deb
+    && rm /tmp/chrome.deb \
+    && rm -rf /tmp/chrome-install
 
 # Add user so we don't need --no-sandbox.
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
@@ -72,7 +117,7 @@ ENV NODE_OPTIONS="--max_old_space_size=30000 --max-http-header-size=80000"
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
-    && npm config --global set update-notifier false \
+    && npm config set update-notifier false \
     && npm install --only=prod --no-optional --no-package-lock --prefer-online \
     && echo "Installed NPM packages:" \
     && (npm list || true) \

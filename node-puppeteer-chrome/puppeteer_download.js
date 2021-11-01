@@ -1,14 +1,8 @@
-const Apify = require('apify');
 const { writeFile } = require('fs/promises');
 const { fetchCompatibilityVersions, puppeteerVersion, areVersionsCompatible, downloadClosestChromeInstaller } = require('./puppeteer_utils');
 
-const isV1 = typeof Apify.launchPlaywright === 'function';
-
-/**
- * @param {import('puppeteer').Browser} browser
- */
-async function downloadLatestCompatibleChrome(browser) {
-    const compatibilities = await fetchCompatibilityVersions(browser);
+async function downloadLatestCompatibleChrome() {
+    const compatibilities = await fetchCompatibilityVersions();
 
     const matchedCompatibilityVersions = compatibilities.filter(cv => {
         return areVersionsCompatible(cv.pptr, puppeteerVersion);
@@ -25,25 +19,18 @@ async function downloadLatestCompatibleChrome(browser) {
 
     console.log(`Found compatible Chrome version ${compatibleChromeVersion} for Puppeteer ${puppeteerVersion}`);
 
-    const buffer = await downloadClosestChromeInstaller(browser, compatibleChromeVersion);
+    const buffer = await downloadClosestChromeInstaller(compatibleChromeVersion);
     await writeFile('/tmp/chrome.deb', buffer);
 }
 
 (async () => {
     console.log('Preparing to download the latest Chrome compatible with the version of Puppeteer that is installed');
-    // We need --no-sandbox, because even though the build is running on GitHub, the test is running in Docker.
-    const launchOptions = { headless: true, args: ['--no-sandbox'] };
-    const launchContext = isV1
-        ? { launchOptions }
-        : { ...launchOptions };
-
-    /** @type {import('puppeteer').Browser} */
-    const browser = await Apify.launchPuppeteer(launchContext);
 
     try {
-        await downloadLatestCompatibleChrome(browser);
+        await downloadLatestCompatibleChrome();
         console.log('Download completed! File was saved in /tmp/chrome');
-    } finally {
-        await browser.close();
+    } catch (err) {
+        console.error('Failed to download the latest Chrome', err);
+        process.exitCode = 1;
     }
 })();
