@@ -3,13 +3,15 @@ const { fetchCompatibilityVersions, puppeteerVersion, areVersionsCompatible, dow
 
 async function downloadLatestCompatibleChrome() {
     const compatibilities = await fetchCompatibilityVersions();
+    let warnInCaseOfNoMajorVersionFound = false;
 
-    const matchedCompatibilityVersions = compatibilities.filter(cv => {
+    let matchedCompatibilityVersions = compatibilities.filter(cv => {
         return areVersionsCompatible(cv.pptr, puppeteerVersion);
     });
 
     if (!matchedCompatibilityVersions.length) {
-        throw new Error(`Puppeteer Chrome download failed: puppeteer version "${puppeteerVersion}" not found`);
+        warnInCaseOfNoMajorVersionFound = true;
+        matchedCompatibilityVersions = compatibilities.slice(0, 1);
     }
 
     // Get the latest chrome version
@@ -17,7 +19,11 @@ async function downloadLatestCompatibleChrome() {
         .map(v => v.chrome)
         .sort((a, b) => b.localeCompare(a))[0];
 
-    console.log(`Found compatible Chrome version ${compatibleChromeVersion} for Puppeteer ${puppeteerVersion}`);
+    if (warnInCaseOfNoMajorVersionFound) {
+        console.warn(`!!! For Puppeteer ${puppeteerVersion} there was no defined version of Chrome supported. !!!`);
+        console.warn(`This script will download the latest compatible Chrome version that was mentioned for Puppeteer ${matchedCompatibilityVersions[0].pptr} instead.`);
+    }
+    console.log(`Finding the closest Chrome version to "${compatibleChromeVersion}" for Puppeteer ${puppeteerVersion}`);
 
     const buffer = await downloadClosestChromeInstaller(compatibleChromeVersion);
     await writeFile('/tmp/chrome.deb', buffer);

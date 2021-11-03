@@ -73,6 +73,9 @@ async function downloadClosestChromeInstaller(versionToCheck) {
         // We found the page, extract the final version and save it
         const rawMatches = rawText.match(VERSION_REGEX);
         const validVersion = rawMatches.filter(item => item.startsWith(relevantPart)).sort()[0];
+
+        console.log(`Found version ${validVersion}, downloading...`);
+
         const downloadUrl = chromeVersionDownloadUrl(`${validVersion}-1`);
 
         const res = await axios.get(downloadUrl, { responseType: 'arraybuffer' });
