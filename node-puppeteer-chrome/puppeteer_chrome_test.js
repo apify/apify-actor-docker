@@ -20,25 +20,30 @@ const testCompatibility = async (browser) => {
     const chromeVersion = (await browser.version()).match(VERSION_REGEX)[0];
     console.log('Chrome version: %s', chromeVersion);
 
-    const compatibilityVersions = await fetchCompatibilityVersions(browser);
+    const compatibilityVersions = await fetchCompatibilityVersions();
     console.log('Puppeteer compatibility versions are:');
     console.log(compatibilityVersions);
+
+    let warnInCaseOfNoMajorVersionFound = false;
 
     // The list is only updated on Chrome releases, not Puppeteer releases, so e.g.
     // when support for Chrome 83 comes with Puppeteer 3.1.0, 3.2.0 will not be listed.
     // We must therefore check if we have Puppeteer >= the latest entry and if that's
     // the case, then it supports the latest entry of Chrome.
-    const matchedCompatibilityVersions = compatibilityVersions.filter(cv => {
+    let matchedCompatibilityVersions = compatibilityVersions.filter(cv => {
         return areVersionsCompatible(cv.pptr, puppeteerVersion);
     });
 
     if (!matchedCompatibilityVersions.length) {
-        throw new Error(`Puppeteer+Chrome test failed: puppeteer version "${puppeteerVersion}" not found`);
+        matchedCompatibilityVersions = compatibilityVersions.slice(0, 1);
+        console.warn(`!!! For Puppeteer ${puppeteerVersion} there was no defined version of Chrome supported. !!!`);
+        console.warn(`This script will check the latest compatible Chrome version that was mentioned for Puppeteer ${matchedCompatibilityVersions[0].pptr} instead.`);
     }
+
     const chromeVersionsCompatibleWithPuppeteer = matchedCompatibilityVersions.map(v => v.chrome);
     const isCompatible = chromeVersionsCompatibleWithPuppeteer.some(chromeVersionCompatibleWithPuppeteer => {
         return areVersionsCompatible(chromeVersionCompatibleWithPuppeteer, chromeVersion)
-    })
+    });
 
     if (!isCompatible) {
         throw new Error(`Puppeteer+Chrome test failed: puppeteer version "${puppeteerVersion}" is not compatible with Chrome version ${chromeVersion}, it's compatible with versions ${chromeVersionsCompatibleWithPuppeteer}`);

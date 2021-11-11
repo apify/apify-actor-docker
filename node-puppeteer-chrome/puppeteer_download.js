@@ -1,21 +1,17 @@
-const Apify = require('apify');
 const { writeFile } = require('fs/promises');
 const { fetchCompatibilityVersions, puppeteerVersion, areVersionsCompatible, downloadClosestChromeInstaller } = require('./puppeteer_utils');
 
-const isV1 = typeof Apify.launchPlaywright === 'function';
+async function downloadLatestCompatibleChrome() {
+    const compatibilities = await fetchCompatibilityVersions();
+    let warnInCaseOfNoMajorVersionFound = false;
 
-/**
- * @param {import('puppeteer').Browser} browser
- */
-async function downloadLatestCompatibleChrome(browser) {
-    const compatibilities = await fetchCompatibilityVersions(browser);
-
-    const matchedCompatibilityVersions = compatibilities.filter(cv => {
+    let matchedCompatibilityVersions = compatibilities.filter(cv => {
         return areVersionsCompatible(cv.pptr, puppeteerVersion);
     });
 
     if (!matchedCompatibilityVersions.length) {
-        throw new Error(`Puppeteer Chrome download failed: puppeteer version "${puppeteerVersion}" not found`);
+        warnInCaseOfNoMajorVersionFound = true;
+        matchedCompatibilityVersions = compatibilities.slice(0, 1);
     }
 
     // Get the latest chrome version
@@ -23,27 +19,24 @@ async function downloadLatestCompatibleChrome(browser) {
         .map(v => v.chrome)
         .sort((a, b) => b.localeCompare(a))[0];
 
-    console.log(`Found compatible Chrome version ${compatibleChromeVersion} for Puppeteer ${puppeteerVersion}`);
+    if (warnInCaseOfNoMajorVersionFound) {
+        console.warn(`!!! For Puppeteer ${puppeteerVersion} there was no defined version of Chrome supported. !!!`);
+        console.warn(`This script will download the latest compatible Chrome version that was mentioned for Puppeteer ${matchedCompatibilityVersions[0].pptr} instead.`);
+    }
+    console.log(`Finding the closest Chrome version to "${compatibleChromeVersion}" for Puppeteer ${puppeteerVersion}`);
 
-    const buffer = await downloadClosestChromeInstaller(browser, compatibleChromeVersion);
+    const buffer = await downloadClosestChromeInstaller(compatibleChromeVersion);
     await writeFile('/tmp/chrome.deb', buffer);
 }
 
 (async () => {
     console.log('Preparing to download the latest Chrome compatible with the version of Puppeteer that is installed');
-    // We need --no-sandbox, because even though the build is running on GitHub, the test is running in Docker.
-    const launchOptions = { headless: true, args: ['--no-sandbox'] };
-    const launchContext = isV1
-        ? { launchOptions }
-        : { ...launchOptions };
-
-    /** @type {import('puppeteer').Browser} */
-    const browser = await Apify.launchPuppeteer(launchContext);
 
     try {
-        await downloadLatestCompatibleChrome(browser);
+        await downloadLatestCompatibleChrome();
         console.log('Download completed! File was saved in /tmp/chrome');
-    } finally {
-        await browser.close();
+    } catch (err) {
+        console.error('Failed to download the latest Chrome', err);
+        process.exitCode = 1;
     }
 })();
