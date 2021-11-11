@@ -53,7 +53,7 @@ RUN npm --quiet set progress=false \
     && npm config --global set update-notifier false \
     && npm install --only=prod --no-optional --no-package-lock --prefer-online \
     && echo "Installed NPM packages:" \
-    && (npm list || true) \
+    && (npm list --only=prod --no-optional || true) \
     && echo "Node.js version:" \
     && node --version \
     && echo "NPM version:" \

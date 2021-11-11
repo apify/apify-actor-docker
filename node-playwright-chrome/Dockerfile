@@ -54,7 +54,7 @@ ENV NODE_OPTIONS="--max_old_space_size=30000 --max-http-header-size=80000"
 RUN npm --quiet set progress=false \
     && npm install --only=prod --no-optional --no-package-lock --prefer-online \
     && echo "Installed NPM packages:" \
-    && (npm list || true) \
+    && (npm list --only=prod --no-optional || true) \
     && echo "Node.js version:" \
     && node --version \
     && echo "NPM version:" \
