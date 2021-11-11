@@ -16,7 +16,7 @@ on:
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_CLIENT_VERSION: ${{ github.event.inputs.apify_client_version || github.event.client_payload.apify_client_version }}
-  LATEST_PYTHON: 3.9
+  LATEST_PYTHON: "3.9"
 
 jobs:
   # Build master images that are not dependent on existing builds.
@@ -25,7 +25,7 @@ jobs:
     strategy:
       matrix:
         image-name: [python]
-        python-version: [3.7, 3.8, 3.9]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
     steps:
       -
         name: Checkout
