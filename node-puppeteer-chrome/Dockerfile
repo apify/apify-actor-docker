@@ -8,10 +8,7 @@ LABEL maintainer="support@apify.com" Description="Base image for Apify actors us
 # This image was inspired by https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-in-docker
 
 # Disable chrome auto updates, based on https://support.google.com/chrome/a/answer/9052345
-RUN mkdir -p /etc/default \
-    && echo 'repo_add_once=false' > /etc/default/google-chrome \
-    && mkdir -p /etc/opt/chrome/policies \
-    && echo '{ "ComponentUpdatesEnabled": "false" }' > /etc/opt/chrome/policies/managed
+RUN mkdir -p /etc/default && echo 'repo_add_once=false' > /etc/default/google-chrome
 
 # Install latest Chrome dev packages and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
 # Note: this also installs the necessary libs to make the bundled version of Chromium that Puppeteer installs work.
@@ -97,7 +94,9 @@ RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser
 
-RUN mkdir -p /etc/opt/chrome/policies/managed && echo '{ "CommandLineFlagSecurityWarningsEnabled": false }' > /etc/opt/chrome/policies/managed/managed_policies.json
+RUN mkdir -p /etc/opt/chrome/policies/managed \
+    && echo '{ "CommandLineFlagSecurityWarningsEnabled": false }' > /etc/opt/chrome/policies/managed/managed_policies.json \
+    && echo '{ "ComponentUpdatesEnabled": "false" }' > /etc/opt/chrome/policies/managed/component_update.json
 
 # Run everything after as non-privileged user.
 USER myuser

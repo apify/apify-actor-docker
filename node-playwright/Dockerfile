@@ -17,10 +17,7 @@ RUN apt-get update && apt-get install -y curl && \
     && apt-get clean -y && apt-get autoremove -y
 
 # Disable chrome auto updates, based on https://support.google.com/chrome/a/answer/9052345
-RUN mkdir -p /etc/default \
-    && echo 'repo_add_once=false' > /etc/default/google-chrome \
-    && mkdir -p /etc/opt/chrome/policies \
-    && echo '{ "ComponentUpdatesEnabled": "false" }' > /etc/opt/chrome/policies/managed
+RUN mkdir -p /etc/default && echo 'repo_add_once=false' > /etc/default/google-chrome
 
 # Install chrome
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -nv
@@ -30,6 +27,10 @@ RUN apt install --fix-missing -yq ./google-chrome-stable_current_amd64.deb && rm
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser
+
+RUN mkdir -p /etc/opt/chrome/policies/managed \
+    && echo '{ "CommandLineFlagSecurityWarningsEnabled": false }' > /etc/opt/chrome/policies/managed/managed_policies.json \
+    && echo '{ "ComponentUpdatesEnabled": "false" }' > /etc/opt/chrome/policies/managed/component_update.json
 
 # Globally disable the update-notifier.
 RUN npm config --global set update-notifier false
