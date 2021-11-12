@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y curl && \
     && apt-get clean -y && apt-get autoremove -y
 
 # Disable chrome auto updates, based on https://support.google.com/chrome/a/answer/9052345
-RUN echo 'repo_add_once=false' > /etc/default/google-chrome
+RUN echo 'repo_add_once=false' > /etc/default/google-chrome \
     && echo '{ "ComponentUpdatesEnabled": "false" }' > /etc/opt/chrome/policies/managed
 
 # Install chrome
