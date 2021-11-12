@@ -5,7 +5,9 @@ LABEL maintainer="support@apify.com" Description="Base image for Apify actors us
 # This image was inspired by https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-in-docker
 
 # Disable chrome auto updates, based on https://support.google.com/chrome/a/answer/9052345
-RUN echo 'repo_add_once=false' > /etc/default/google-chrome \
+RUN mkdir -p /etc/default \
+    && echo 'repo_add_once=false' > /etc/default/google-chrome \
+    && mkdir -p /etc/opt/chrome/policies \
     && echo '{ "ComponentUpdatesEnabled": "false" }' > /etc/opt/chrome/policies/managed
 
 # Install latest Chrome dev packages and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
