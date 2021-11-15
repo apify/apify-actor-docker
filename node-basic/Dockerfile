@@ -1,5 +1,5 @@
-# Node 12
-FROM node:12.18-alpine
+ARG NODE_VERSION=16
+FROM node:${NODE_VERSION}-alpine
 
 LABEL maintainer="support@apify.com" Description="Base image for simple Apify actors"
 

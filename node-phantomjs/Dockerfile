@@ -1,4 +1,5 @@
-FROM node:12.18-slim
+ARG NODE_VERSION=16
+FROM node:${NODE_VERSION}-alpine
 
 # First, download PhantomJS and necessary libraries, these change rarely
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \

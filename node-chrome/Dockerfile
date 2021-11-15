@@ -1,4 +1,5 @@
-FROM node:12.18-slim
+ARG NODE_VERSION=16
+FROM node:${NODE_VERSION}-alpine
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using headless Chrome"
 
