@@ -45,11 +45,13 @@ async function fetchCompatibilityVersions() {
 
 /**
  * Downloads the closest version of Chrome available
- * @param {string} versionToCheck
+ * @param {string[]} versionToCheck
  */
 async function downloadClosestChromeInstaller(versionToCheck) {
     // Get the first 3 parts of the version
-    const relevantPart = versionToCheck.split('.').slice(0, 3).join('.');
+    const relevantParts = versionToCheck.map(item => item.split('.').slice(0, 3).join('.'));
+
+    const versionsThatDoNotExistYet = new Set();
 
     /** @type {Buffer} */
     let debBuffer;
@@ -64,22 +66,34 @@ async function downloadClosestChromeInstaller(versionToCheck) {
             throw new Error('Could not find any valid version.');
         }
 
-        // If this page doesn't include the relevant part, move on
-        if (!rawText.includes(relevantPart)) {
-            pageNumber++;
-            continue;
+        for (const relevantPart of relevantParts) {
+            // If this page doesn't include the relevant version or we already couldn't find it, try the next one
+            if (!rawText.includes(relevantPart) || versionsThatDoNotExistYet.has(relevantPart)) {
+                continue;
+            }
+
+            // We found the page, extract the final version and save it
+            const rawMatches = rawText.match(VERSION_REGEX);
+            const foundVersion = rawMatches.filter(item => item.startsWith(relevantPart)).sort()[0];
+
+            console.log(`Attempting to download Chrome installer for version ${foundVersion}`);
+
+            const downloadUrl = chromeVersionDownloadUrl(`${foundVersion}-1`);
+
+            try {
+                const res = await axios.get(downloadUrl, { responseType: 'arraybuffer' });
+                console.log(`Downloaded version ${foundVersion} that is compatible with Puppeteer ${puppeteerVersion}`);
+                debBuffer = res.data;
+                break;
+            } catch {
+                // Ignore errors
+                console.warn(`Couldn't find or download Chrome stable with version ${foundVersion}`);
+                versionsThatDoNotExistYet.add(relevantPart);
+            }
         }
 
-        // We found the page, extract the final version and save it
-        const rawMatches = rawText.match(VERSION_REGEX);
-        const validVersion = rawMatches.filter(item => item.startsWith(relevantPart)).sort()[0];
-
-        console.log(`Found version ${validVersion}, downloading...`);
-
-        const downloadUrl = chromeVersionDownloadUrl(`${validVersion}-1`);
-
-        const res = await axios.get(downloadUrl, { responseType: 'arraybuffer' });
-        debBuffer = res.data;
+        // Increment the page number at the end
+        pageNumber++;
     } while (!debBuffer);
 
     return debBuffer;
