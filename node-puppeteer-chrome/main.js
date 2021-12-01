@@ -2,7 +2,7 @@
 // we keep this one here just for testing and clarification.
 
 console.log(
-`If you're seeing this text, it means the actor started the default "main.js" file instead
+    `If you're seeing this text, it means the actor started the default "main.js" file instead
 of your own source code file. You have two options how to fix this:
 1) Rename your source code file to "main.js"
 2) Define custom "package.json" and/or "Dockerfile" that will run your code your way
@@ -20,8 +20,8 @@ Apify.main(async () => {
     // First, try to open Chromium to see all dependencies are correctly installed
     console.log('Testing Puppeteer with Chromium');
     // We need --no-sandbox, because even though the build is running on GitHub, the test is running in Docker.
-    const launchOptions = { headless: true, args: ['--no-sandbox'] }
-    const launchContext = isV1 ? { launchOptions } : launchOptions
+    const launchOptions = { headless: true, args: ['--no-sandbox'] };
+    const launchContext = isV1 ? { launchOptions } : launchOptions;
     const browser1 = await Apify.launchPuppeteer(launchContext);
     const page1 = await browser1.newPage();
     await page1.goto('http://www.example.com');
