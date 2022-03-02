@@ -1,14 +1,13 @@
-# We need to use Ubuntu because Debian 10 (what Node.js images use)
-# do not support glibc 2.29 and without it Firefox will not run.
-FROM ubuntu:focal
-
-# ARG must be after FROM, because FROM resets ARG.
 ARG NODE_VERSION=16
+# Use buster to be consistent across node versions.
+FROM node:${NODE_VERSION}-buster-slim
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Firefox"
 # Install Firefox dependencies + tools
 # List of dependencies from here: https://github.com/microsoft/playwright/blob/master/src/nativeDeps.ts
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN DEBIAN_FRONTEND=noninteractive apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    # Update from https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/utils/nativeDeps.ts#L270
     ffmpeg \
     libatk1.0-0 \
     libcairo-gobject2 \
@@ -35,25 +34,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxi6 \
     libxrender1 \
     libxt6 \
+    libxtst6 \
+    # Update from https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/utils/nativeDeps.ts#L229
     xvfb \
     fonts-noto-color-emoji \
     ttf-unifont \
+    libfontconfig \
+    libfreetype6 \
+    xfonts-cyrillic \
+    xfonts-scalable \
+    fonts-liberation \
+    fonts-ipafont-gothic \
+    fonts-wqy-zenhei \
+    fonts-tlwg-loma-otf \
     # Found this in other images, not sure whether it's needed, it does not come from Playwright deps
     procps \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /src/*.deb \
     # This is needed to remove an annoying error message when running headful.
     && mkdir -p /tmp/.X11-unix \
     && chmod 1777 /tmp/.X11-unix
-
-# Install Node.js
-RUN apt-get update && apt-get install -y curl && \
-    curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - && \
-    apt-get install -y nodejs \
-    && apt-get clean -y && apt-get autoremove -y
-
-# Feature-parity with Node.js base images.
-# From: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal
-RUN apt-get update && apt-get install -y --no-install-recommends git ssh && \
-    npm install -g yarn
 
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \

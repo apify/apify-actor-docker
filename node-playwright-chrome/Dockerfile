@@ -17,13 +17,73 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
     && DEBIAN_FRONTEND=noninteractive apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y wget unzip \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y procps git google-chrome-stable libxss1 fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf xvfb \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    git \
+    google-chrome-stable \
+    # Update from https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/utils/nativeDeps.ts#L243
+    libappindicator3-1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libc6 \
+    libcairo2 \
+    libcups2 \
+    libdbus-1-3 \
+    libexpat1 \
+    libgbm1 \
+    libgcc1 \
+    libglib2.0-0 \
+    libgtk-3-0 \
+    libnspr4 \
+    libnss3 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libstdc++6 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxcb1 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxi6 \
+    libxrandr2 \
+    libxrender1 \
+    libxss1 \
+    libxss1 \
+    libxtst6 \
+    libxtst6 \
+    lsb-release \
+    procps \
+    xdg-utils \
+    # Update from https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/utils/nativeDeps.ts#L229
+    xvfb \
+    fonts-noto-color-emoji \
+    ttf-unifont \
+    libfontconfig \
+    libfreetype6 \
+    xfonts-cyrillic \
+    xfonts-scalable \
+    fonts-liberation \
+    fonts-ipafont-gothic \
+    fonts-wqy-zenhei \
+    fonts-tlwg-loma-otf \
+    # Extras
+    fonts-freefont-ttf \
+    fonts-kacst \
+    fonts-thai-tlwg \
+    fonts-wqy-zenhei \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
     && mkdir -p /tmp/.X11-unix \
     && chmod 1777 /tmp/.X11-unix
 
+# Globally disable the update-notifier.
+RUN npm config --global set update-notifier false
+
+# Add user so we don't need --no-sandbox.
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser
@@ -31,9 +91,6 @@ RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
 RUN mkdir -p /etc/opt/chrome/policies/managed \
     && echo '{ "CommandLineFlagSecurityWarningsEnabled": false }' > /etc/opt/chrome/policies/managed/managed_policies.json \
     && echo '{ "ComponentUpdatesEnabled": "false" }' > /etc/opt/chrome/policies/managed/component_update.json
-
-# Globally disable the update-notifier.
-RUN npm config --global set update-notifier false
 
 # Run everything after as non-privileged user.
 USER myuser
@@ -80,7 +137,7 @@ RUN mv ./node_modules/playwright-chromium ./node_modules/playwright && rm -rf ./
 # Prevent installing of browsers by future `npm install`.
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD 1
 
-#Maybe we can consider changing it to 1920x1080x24. However I guess it should not have any effect.
+# Maybe we can consider changing it to 1920x1080x24. However I guess it should not have any effect.
 
 # Set up xvfb
 
