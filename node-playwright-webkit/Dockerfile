@@ -6,47 +6,83 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install WebKit dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libevdev2 \
-    libwoff1 \
-    libopus0 \
-    libwebp6 \
-    libwebpdemux2 \
-    libenchant1c2a \
-    libgudev-1.0-0 \
-    libsecret-1-0 \
-    libhyphen0 \
-    libgdk-pixbuf2.0-0 \
-    libegl1 \
-    libnotify4 \
-    libxslt1.1 \
-    libevent-2.1-7 \
-    libgles2 \
-    libxcomposite1 \
-    libatk1.0-0 \
+    git \
+    procps \
+    # Update from https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/utils/nativeDeps.ts#L229
+    xvfb \
+    fonts-noto-color-emoji \
+    ttf-unifont \
+    libfontconfig \
+    libfreetype6 \
+    xfonts-cyrillic \
+    xfonts-scalable \
+    fonts-liberation \
+    fonts-ipafont-gothic \
+    fonts-wqy-zenhei \
+    fonts-tlwg-loma-otf \
+    # Update from https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/utils/nativeDeps.ts#L299
+    gstreamer1.0-libav \
+    gstreamer1.0-plugins-bad \
+    gstreamer1.0-plugins-base \
+    gstreamer1.0-plugins-good \
     libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libcairo2 \
+    libegl1 \
+    libenchant1c2a \
     libepoxy0 \
+    libevdev2 \
+    libfontconfig1 \
+    libfreetype6 \
+    libgdk-pixbuf2.0-0 \
+    libgl1 \
+    libgles2 \
+    libglib2.0-0 \
+    libgstreamer-gl1.0-0 \
+    libgstreamer1.0-0 \
     libgtk-3-0 \
     libharfbuzz-icu0 \
-    procps \
-    xvfb \
-    git \
+    libharfbuzz0b \
+    libhyphen0 \
+    libicu66 \
+    libjpeg-turbo8 \
+    libnotify4 \
+    libopenjp2-7 \
+    libopus0 \
+    libpango-1.0-0 \
+    libpng16-16 \
+    libsecret-1-0 \
+    libsoup2.4-1 \
+    libvpx6 \
+    libwayland-client0 \
+    libwayland-egl1 \
+    libwayland-server0 \
+    libwebp6 \
+    libwebpdemux2 \
+    libwoff1 \
+    libx11-6 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxkbcommon0 \
+    libxml2 \
+    libxslt1.1 \
     && apt-get clean -y && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /src/*.deb \
+    # This is needed to remove an annoying error message when running headful.
     && mkdir -p /tmp/.X11-unix \
     && chmod 1777 /tmp/.X11-unix
-
-# Install gstreamer and plugins to support video playback in WebKit.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgstreamer-gl1.0-0 \
-    libgstreamer-plugins-bad1.0-0 \
-    gstreamer1.0-plugins-good \
-    gstreamer1.0-libav \
-    && apt-get clean -y && apt-get autoremove -y
 
 # Install node
 RUN apt-get update && apt-get install -y curl && \
     curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - && \
     apt-get install -y nodejs \
     && apt-get clean -y && apt-get autoremove -y
+
+# Feature-parity with Node.js base images.
+# From: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal
+RUN apt-get update && apt-get install -y --no-install-recommends git ssh && \
+    npm install -g yarn
 
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
