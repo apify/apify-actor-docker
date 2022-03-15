@@ -15,11 +15,14 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg unzip ca-certificates --no-install-recommends \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | DEBIAN_FRONTEND=noninteractive apt-key add - \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+    && sh -c 'echo "deb http://ftp.us.debian.org/debian buster main non-free" >> /etc/apt/sources.list.d/fonts.list' \
     && DEBIAN_FRONTEND=noninteractive apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y wget unzip \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     git \
     google-chrome-stable \
+    # Found this in other images, not sure whether it's needed, it does not come from Playwright deps
+    procps \
     # Extras
     fonts-freefont-ttf \
     fonts-kacst \
@@ -35,7 +38,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
 RUN npm config --global set update-notifier false
 
 # Install all required playwright dependencies for chrome and chromium
-RUN npx playwright install-deps chrome chromium
+RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npx playwright install-deps chrome chromium
 
 # Add user so we don't need --no-sandbox.
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \

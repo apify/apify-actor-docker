@@ -4,8 +4,8 @@ FROM node:${NODE_VERSION}-buster-slim
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Firefox"
 # Install Firefox dependencies + tools
-# List of dependencies from here: https://github.com/microsoft/playwright/blob/master/src/nativeDeps.ts
-RUN DEBIAN_FRONTEND=noninteractive apt-get update \
+RUN sh -c 'echo "deb http://ftp.us.debian.org/debian buster main non-free" >> /etc/apt/sources.list.d/fonts.list' \
+    && DEBIAN_FRONTEND=noninteractive apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     # Found this in other images, not sure whether it's needed, it does not come from Playwright deps
     procps \
@@ -22,8 +22,8 @@ RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
 # Globally disable the update-notifier.
 RUN npm config --global set update-notifier false
 
-# Install all required playwright dependencies for chrome and chromium
-RUN npx playwright install-deps firefox
+# Install all required playwright dependencies for firefox
+RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npx playwright install-deps firefox
 
 # Run everything after as non-privileged user.
 USER myuser

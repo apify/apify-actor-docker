@@ -5,7 +5,8 @@ LABEL maintainer="support@apify.com" Description="Base image for Apify actors us
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install WebKit dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
     git \
     procps \
     && apt-get clean -y && apt-get autoremove -y \
@@ -34,7 +35,7 @@ RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
 RUN npm config --global set update-notifier false
 
 # Install all required playwright dependencies for chrome and chromium
-RUN npx playwright install-deps webkit
+RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npx playwright install-deps webkit
 
 # Run everything after as non-privileged user.
 USER myuser

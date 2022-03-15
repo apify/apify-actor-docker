@@ -58,7 +58,7 @@ jobs:
         name: Set Dependency Versions
         run: |
           cd ${{ matrix.image-name }}
-          node ../.github/scripts/set-dependency-versions.js
+          node ../.github/scripts/set-dependency-versions.js ${{ github.event_name == 'pull_request' }}
       -
         # It seems that it takes at least two minutes before a newly published version
         # becomes available in the NPM registry. We wait before starting the image builds.
