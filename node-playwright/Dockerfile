@@ -34,9 +34,6 @@ RUN mkdir -p /etc/opt/chrome/policies/managed \
 # Globally disable the update-notifier.
 RUN npm config --global set update-notifier false
 
-# Install all required playwright dependencies
-RUN npx playwright install-deps
-
 # Run everything after as non-privileged user.
 USER myuser
 WORKDIR /home/myuser
