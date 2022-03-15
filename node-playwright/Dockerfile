@@ -1,7 +1,6 @@
 FROM mcr.microsoft.com/playwright:focal
 ARG NODE_VERSION=16
 
-
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using headless Chrome"
 
 # Install libs
@@ -34,6 +33,9 @@ RUN mkdir -p /etc/opt/chrome/policies/managed \
 
 # Globally disable the update-notifier.
 RUN npm config --global set update-notifier false
+
+# Install all required playwright dependencies
+RUN npx playwright install-deps
 
 # Run everything after as non-privileged user.
 USER myuser

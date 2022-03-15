@@ -8,64 +8,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     procps \
-    # Update from https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/utils/nativeDeps.ts#L229
-    xvfb \
-    fonts-noto-color-emoji \
-    ttf-unifont \
-    libfontconfig \
-    libfreetype6 \
-    xfonts-cyrillic \
-    xfonts-scalable \
-    fonts-liberation \
-    fonts-ipafont-gothic \
-    fonts-wqy-zenhei \
-    fonts-tlwg-loma-otf \
-    # Update from https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/utils/nativeDeps.ts#L299
-    gstreamer1.0-libav \
-    gstreamer1.0-plugins-bad \
-    gstreamer1.0-plugins-base \
-    gstreamer1.0-plugins-good \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libcairo2 \
-    libegl1 \
-    libenchant1c2a \
-    libepoxy0 \
-    libevdev2 \
-    libfontconfig1 \
-    libfreetype6 \
-    libgdk-pixbuf2.0-0 \
-    libgl1 \
-    libgles2 \
-    libglib2.0-0 \
-    libgstreamer-gl1.0-0 \
-    libgstreamer1.0-0 \
-    libgtk-3-0 \
-    libharfbuzz-icu0 \
-    libharfbuzz0b \
-    libhyphen0 \
-    libicu66 \
-    libjpeg-turbo8 \
-    libnotify4 \
-    libopenjp2-7 \
-    libopus0 \
-    libpango-1.0-0 \
-    libpng16-16 \
-    libsecret-1-0 \
-    libsoup2.4-1 \
-    libvpx6 \
-    libwayland-client0 \
-    libwayland-egl1 \
-    libwayland-server0 \
-    libwebp6 \
-    libwebpdemux2 \
-    libwoff1 \
-    libx11-6 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxkbcommon0 \
-    libxml2 \
-    libxslt1.1 \
     && apt-get clean -y && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
@@ -90,6 +32,9 @@ RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
 
 # Globally disable the update-notifier.
 RUN npm config --global set update-notifier false
+
+# Install all required playwright dependencies for chrome and chromium
+RUN npx playwright install-deps webkit
 
 # Run everything after as non-privileged user.
 USER myuser
