@@ -35,7 +35,7 @@ RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
 RUN npm config --global set update-notifier false
 
 # Install all required playwright dependencies for chrome and chromium
-RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npx --ignore-scripts playwright install-deps webkit
+RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm_config_ignore_scripts=1 npx playwright install-deps webkit
 
 # Run everything after as non-privileged user.
 USER myuser
