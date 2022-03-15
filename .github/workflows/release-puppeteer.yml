@@ -1,4 +1,4 @@
-name: Release puppeteer images
+name: Release/test puppeteer images
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ on:
   pull_request:
 
 env:
-  RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
+  RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag || 'CI_TEST' }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   PUPPETEER_VERSION: ${{ github.event.inputs.puppeteer_version || github.event.client_payload.puppeteer_version }}
   NODE_LATEST: 16

@@ -1,4 +1,4 @@
-name: Release node images
+name: Release/test node images
 
 on:
   workflow_dispatch:
@@ -16,7 +16,7 @@ on:
   pull_request:
 
 env:
-  RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
+  RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag || 'CI_TEST' }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   NODE_LATEST: 16
 
