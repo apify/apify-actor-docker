@@ -15,60 +15,14 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg unzip ca-certificates --no-install-recommends \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | DEBIAN_FRONTEND=noninteractive apt-key add - \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+    && sh -c 'echo "deb http://ftp.us.debian.org/debian buster main non-free" >> /etc/apt/sources.list.d/fonts.list' \
     && DEBIAN_FRONTEND=noninteractive apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y wget unzip \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     git \
     google-chrome-stable \
-    # Update from https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/utils/nativeDeps.ts#L243
-    libappindicator3-1 \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libc6 \
-    libcairo2 \
-    libcups2 \
-    libdbus-1-3 \
-    libexpat1 \
-    libgbm1 \
-    libgcc1 \
-    libglib2.0-0 \
-    libgtk-3-0 \
-    libnspr4 \
-    libnss3 \
-    libpango-1.0-0 \
-    libpangocairo-1.0-0 \
-    libstdc++6 \
-    libx11-6 \
-    libx11-xcb1 \
-    libxcb1 \
-    libxcomposite1 \
-    libxcursor1 \
-    libxdamage1 \
-    libxext6 \
-    libxfixes3 \
-    libxi6 \
-    libxrandr2 \
-    libxrender1 \
-    libxss1 \
-    libxss1 \
-    libxtst6 \
-    libxtst6 \
-    lsb-release \
+    # Found this in other images, not sure whether it's needed, it does not come from Playwright deps
     procps \
-    xdg-utils \
-    # Update from https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/utils/nativeDeps.ts#L229
-    xvfb \
-    fonts-noto-color-emoji \
-    ttf-unifont \
-    libfontconfig \
-    libfreetype6 \
-    xfonts-cyrillic \
-    xfonts-scalable \
-    fonts-liberation \
-    fonts-ipafont-gothic \
-    fonts-wqy-zenhei \
-    fonts-tlwg-loma-otf \
     # Extras
     fonts-freefont-ttf \
     fonts-kacst \
@@ -82,6 +36,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
 
 # Globally disable the update-notifier.
 RUN npm config --global set update-notifier false
+
+# Install all required playwright dependencies for chrome and chromium
+RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm_config_ignore_scripts=1 npx playwright install-deps chrome chromium
 
 # Add user so we don't need --no-sandbox.
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \

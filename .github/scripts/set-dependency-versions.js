@@ -2,13 +2,21 @@ const fs = require('fs');
 
 const PACKAGE_JSON_PATH = './package.json';
 
-const DEPENDENCY_VERSIONS = {
+// Pull request runs of this script will have an argument passed as true (see Set Dependency Versions steps)
+const DEPENDENCY_VERSIONS = process.argv[process.argv.length - 1] === 'true' ?  {
+    'apify': 'beta',
+    'puppeteer': 'latest',
+    'playwright': 'latest',
+    'playwright-chromium': 'latest',
+    'playwright-firefox': 'latest',
+    'playwright-webkit': 'latest',
+} : {
     'apify': process.env.APIFY_VERSION,
     'puppeteer': process.env.PUPPETEER_VERSION,
-    'playwright': process.env.PLAYWRIGHT_VERSION || '1.7.1',
-    'playwright-chromium': process.env.PLAYWRIGHT_VERSION || '1.7.1',
-    'playwright-firefox': process.env.PLAYWRIGHT_VERSION || '1.7.1',
-    'playwright-webkit': process.env.PLAYWRIGHT_VERSION || '1.7.1',
+    'playwright': process.env.PLAYWRIGHT_VERSION || 'latest',
+    'playwright-chromium': process.env.PLAYWRIGHT_VERSION || 'latest',
+    'playwright-firefox': process.env.PLAYWRIGHT_VERSION || 'latest',
+    'playwright-webkit': process.env.PLAYWRIGHT_VERSION || 'latest',
 }
 
 const pkg = readPackageJson(PACKAGE_JSON_PATH);

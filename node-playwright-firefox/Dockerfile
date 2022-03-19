@@ -4,49 +4,9 @@ FROM node:${NODE_VERSION}-buster-slim
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Firefox"
 # Install Firefox dependencies + tools
-# List of dependencies from here: https://github.com/microsoft/playwright/blob/master/src/nativeDeps.ts
-RUN DEBIAN_FRONTEND=noninteractive apt-get update \
+RUN sh -c 'echo "deb http://ftp.us.debian.org/debian buster main non-free" >> /etc/apt/sources.list.d/fonts.list' \
+    && DEBIAN_FRONTEND=noninteractive apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    # Update from https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/utils/nativeDeps.ts#L270
-    ffmpeg \
-    libatk1.0-0 \
-    libcairo-gobject2 \
-    libcairo2 \
-    libdbus-1-3 \
-    libdbus-glib-1-2 \
-    libfontconfig1 \
-    libfreetype6 \
-    libgdk-pixbuf2.0-0 \
-    libglib2.0-0 \
-    libgtk-3-0 \
-    libpango-1.0-0 \
-    libpangocairo-1.0-0 \
-    libpangoft2-1.0-0 \
-    libx11-6 \
-    libx11-xcb1 \
-    libxcb-shm0 \
-    libxcb1 \
-    libxcomposite1 \
-    libxcursor1 \
-    libxdamage1 \
-    libxext6 \
-    libxfixes3 \
-    libxi6 \
-    libxrender1 \
-    libxt6 \
-    libxtst6 \
-    # Update from https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/utils/nativeDeps.ts#L229
-    xvfb \
-    fonts-noto-color-emoji \
-    ttf-unifont \
-    libfontconfig \
-    libfreetype6 \
-    xfonts-cyrillic \
-    xfonts-scalable \
-    fonts-liberation \
-    fonts-ipafont-gothic \
-    fonts-wqy-zenhei \
-    fonts-tlwg-loma-otf \
     # Found this in other images, not sure whether it's needed, it does not come from Playwright deps
     procps \
     && rm -rf /var/lib/apt/lists/* \
@@ -61,6 +21,9 @@ RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
 
 # Globally disable the update-notifier.
 RUN npm config --global set update-notifier false
+
+# Install all required playwright dependencies for firefox
+RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm_config_ignore_scripts=1 npx playwright install-deps firefox
 
 # Run everything after as non-privileged user.
 USER myuser

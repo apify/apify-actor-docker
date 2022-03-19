@@ -1,7 +1,6 @@
 FROM mcr.microsoft.com/playwright:focal
 ARG NODE_VERSION=16
 
-
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using headless Chrome"
 
 # Install libs

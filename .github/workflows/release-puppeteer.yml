@@ -1,4 +1,4 @@
-name: Release puppeteer images
+name: Release/test puppeteer images
 
 on:
   workflow_dispatch:
@@ -16,8 +16,10 @@ on:
   repository_dispatch:
     types: [ build-node-images ]
 
+  pull_request:
+
 env:
-  RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
+  RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag || 'CI_TEST' }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   PUPPETEER_VERSION: ${{ github.event.inputs.puppeteer_version || github.event.client_payload.puppeteer_version }}
   NODE_LATEST: 16
@@ -61,7 +63,7 @@ jobs:
         name: Set Dependency Versions
         run: |
           cd ${{ matrix.image-name }}
-          node ../.github/scripts/set-dependency-versions.js
+          node ../.github/scripts/set-dependency-versions.js ${{ github.event_name == 'pull_request' }}
       -
         # It seems that it takes at least two minutes before a newly published version
         # becomes available in the NPM registry. We wait before starting the image builds.
@@ -86,10 +88,12 @@ jobs:
         run: docker run ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}
       -
         name: Login to DockerHub
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
         name: Push images
+        if: github.event_name != 'pull_request'
         run: docker push apify/actor-${{ matrix.image-name }} --all-tags
