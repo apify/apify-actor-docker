@@ -8,12 +8,7 @@ RUN sh -c 'echo "deb http://ftp.us.debian.org/debian buster main non-free" >> /e
     && DEBIAN_FRONTEND=noninteractive apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     # Found this in other images, not sure whether it's needed, it does not come from Playwright deps
-    procps \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /src/*.deb \
-    # This is needed to remove an annoying error message when running headful.
-    && mkdir -p /tmp/.X11-unix \
-    && chmod 1777 /tmp/.X11-unix
+    procps
 
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
@@ -23,7 +18,54 @@ RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
 RUN npm config --global set update-notifier false
 
 # Install all required playwright dependencies for firefox
-RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm_config_ignore_scripts=1 npx playwright install-deps firefox
+# Keep updated from https://github.com/microsoft/playwright/blob/a06b06b82bb6b2d550f12e8b18af298f23a08828/packages/playwright-core/src/server/registry/nativeDeps.ts#L229
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    xvfb \
+    fonts-noto-color-emoji \
+    ttf-unifont \
+    libfontconfig \
+    libfreetype6 \
+    xfonts-cyrillic \
+    xfonts-scalable \
+    fonts-liberation \
+    fonts-ipafont-gothic \
+    fonts-wqy-zenhei \
+    fonts-tlwg-loma-otf \
+    ttf-ubuntu-font-family \
+    ffmpeg \
+    libatk1.0-0 \
+    libcairo-gobject2 \
+    libcairo2 \
+    libdbus-1-3 \
+    libdbus-glib-1-2 \
+    libfontconfig1 \
+    libfreetype6 \
+    libgdk-pixbuf2.0-0 \
+    libglib2.0-0 \
+    libgtk-3-0 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libpangoft2-1.0-0 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxcb-shm0 \
+    libxcb1 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxi6 \
+    libxrender1 \
+    libxt6 \
+    libxtst6
+
+# Cleanup time
+RUN rm -rf /var/lib/apt/lists/* \
+    && rm -rf /src/*.deb \
+    # This is needed to remove an annoying error message when running headful.
+    && mkdir -p /tmp/.X11-unix \
+    && chmod 1777 /tmp/.X11-unix
 
 # Run everything after as non-privileged user.
 USER myuser
