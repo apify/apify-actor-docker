@@ -1,7 +1,7 @@
 
 ARG NODE_VERSION=16
 # Use buster to be consistent across node versions.
-FROM node:${NODE_VERSION}-buster-slim
+FROM node:${NODE_VERSION}-bullseye-slim
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using headless Chrome"
 

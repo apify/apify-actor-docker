@@ -1,6 +1,6 @@
 ARG NODE_VERSION=16
 # Use buster to be consistent across node versions.
-FROM node:${NODE_VERSION}-buster-slim
+FROM node:${NODE_VERSION}-bullseye-slim
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Chrome"
 
@@ -36,9 +36,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
 
 # Globally disable the update-notifier.
 RUN npm config --global set update-notifier false
-
-# Install all required playwright dependencies for chrome and chromium
-RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm_config_ignore_scripts=1 npx playwright install-deps chrome chromium
 
 # Add user so we don't need --no-sandbox.
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
