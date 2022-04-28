@@ -12,7 +12,7 @@ RUN mkdir -p /etc/default && echo 'repo_add_once=false' > /etc/default/google-ch
 # Install latest Chrome dev packages and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
 # Note: this also installs the necessary libs to make the bundled version of Chromium that Puppeteer installs, work.
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg unzip ca-certificates --no-install-recommends \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg unzip ca-certificates xvfb --no-install-recommends \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | DEBIAN_FRONTEND=noninteractive apt-key add - \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
     && sh -c 'echo "deb http://ftp.us.debian.org/debian buster main non-free" >> /etc/apt/sources.list.d/fonts.list' \

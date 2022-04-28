@@ -7,6 +7,7 @@ LABEL maintainer="support@apify.com" Description="Base image for Apify actors us
 RUN sh -c 'echo "deb http://ftp.us.debian.org/debian buster main non-free" >> /etc/apt/sources.list.d/fonts.list' \
     && DEBIAN_FRONTEND=noninteractive apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    xvfb \
     # Found this in other images, not sure whether it's needed, it does not come from Playwright deps
     procps \
     && rm -rf /var/lib/apt/lists/* \
