@@ -15,7 +15,14 @@ async function downloadLatestCompatibleChrome() {
     // Get all supported Chrome version
     const compatibleChromeVersion = matchedCompatibilityVersions
         .map((v) => v.chrome)
-        .sort((a, b) => b.localeCompare(a));
+        .sort((a, b) => {
+            const [majorA, minorA] = a.split('.').map((v) => Number(v));
+            const [majorB, minorB] = b.split('.').map((v) => Number(v));
+
+            if (majorB > majorA) return 1;
+            if (minorB > minorA) return 1;
+            return b.localeCompare(a);
+        });
 
     console.warn(`Attempting to find a Chrome installer for versions: ${compatibleChromeVersion.join(', ')}`);
 
