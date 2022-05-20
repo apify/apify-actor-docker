@@ -3,6 +3,9 @@ FROM node:${NODE_VERSION}-alpine
 
 LABEL maintainer="support@apify.com" Description="Base image for simple Apify actors"
 
+# Globally disable the update-notifier.
+RUN npm config --global set update-notifier false
+
 # Create app directory
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
