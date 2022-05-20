@@ -16,12 +16,13 @@ async function downloadLatestCompatibleChrome() {
     const compatibleChromeVersion = matchedCompatibilityVersions
         .map((v) => v.chrome)
         .sort((a, b) => {
-            const [majorA, minorA] = a.split('.').map((v) => Number(v));
-            const [majorB, minorB] = b.split('.').map((v) => Number(v));
+            const [majorA, _, minorA, patchA] = a.split('.').map((v) => Number(v));
+            const [majorB, __, minorB, patchB] = b.split('.').map((v) => Number(v));
 
-            if (majorB > majorA) return 1;
-            if (minorB > minorA) return 1;
-            return b.localeCompare(a);
+            const versionANumber = majorA * 10_000 + minorA * 100 + patchA;
+            const versionBNumber = majorB * 10_000 + minorB * 100 + patchB;
+
+            return versionBNumber - versionANumber;
         });
 
     console.warn(`Attempting to find a Chrome installer for versions: ${compatibleChromeVersion.join(', ')}`);
