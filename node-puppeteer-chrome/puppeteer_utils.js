@@ -50,6 +50,7 @@ async function fetchCompatibilityVersions() {
 async function downloadClosestChromeInstaller(versionToCheck) {
     // Get the first 3 parts of the version
     const relevantParts = versionToCheck.map(item => item.split('.').slice(0, 3).join('.'));
+    const searchParts = versionToCheck.map(item => item.split('.').slice(0, 2).join('.'));
 
     const versionsThatDoNotExistYet = new Set();
 
@@ -66,7 +67,7 @@ async function downloadClosestChromeInstaller(versionToCheck) {
             throw new Error('Could not find any valid version.');
         }
 
-        for (const relevantPart of relevantParts) {
+        for (const relevantPart of searchParts) {
             // If this page doesn't include the relevant version or we already couldn't find it, try the next one
             if (!rawText.includes(relevantPart) || versionsThatDoNotExistYet.has(relevantPart)) {
                 continue;
@@ -74,7 +75,13 @@ async function downloadClosestChromeInstaller(versionToCheck) {
 
             // We found the page, extract the final version and save it
             const rawMatches = rawText.match(VERSION_REGEX);
-            const foundVersion = rawMatches.filter(item => item.startsWith(relevantPart)).sort()[0];
+            const foundWebsiteVersion = rawMatches.filter(item => item.startsWith(relevantPart)).sort()[0];
+            const foundVersion = relevantParts.find(item => {
+                const [itemMajor, _, itemMinor] = item.split('.').map(n => Number(n));
+                const [foundMajor, __, foundMinor] = foundWebsiteVersion.split('.').map(n => Number(n));
+
+                return itemMajor === foundMajor && itemMinor >= foundMinor;
+            }) ?? foundWebsiteVersion;
 
             console.log(`Attempting to download Chrome installer for version ${foundVersion}`);
 
