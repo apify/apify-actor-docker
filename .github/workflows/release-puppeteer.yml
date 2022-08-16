@@ -38,7 +38,7 @@ jobs:
       fail-fast: false
       matrix:
         image-name: [node-puppeteer-chrome]
-        node-version: [14, 15, 16, 18]
+        node-version: [16, 18]
     steps:
       -
         name: Checkout
