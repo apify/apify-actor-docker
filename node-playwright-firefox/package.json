@@ -8,6 +8,7 @@
     },
     "dependencies": {
         "apify": "APIFY_VERSION",
+        "crawlee": "CRAWLEE_VERSION",
         "playwright-firefox": "PLAYWRIGHT_VERSION"
     },
     "repository": {}

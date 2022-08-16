@@ -1,8 +1,8 @@
-const { default: axios} = require('axios')
+const { default: axios } = require('axios');
 const { version: puppeteerVersion } = require('puppeteer/package.json');
 
 const VERSION_REGEX = /([\d.?]+)/g;
-const chromeVersionDownloadUrl = version => `https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${version}_amd64.deb`;
+const chromeVersionDownloadUrl = (version) => `https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${version}_amd64.deb`;
 
 /**
  * @param {string} text
@@ -11,15 +11,15 @@ const chromeVersionDownloadUrl = version => `https://dl.google.com/linux/chrome/
 function parseCompatibilityVersions(text) {
     const versionsText = text.substring(
         text.indexOf('Releases per Chromium Version:'),
-        text.indexOf('* [All releases]')
+        text.indexOf('* [All releases]'),
     );
     const versions = versionsText.split('\n')
-        .filter(line => line.includes('* Chromium'))
-        .map(line => {
+        .filter((line) => line.includes('* Chromium'))
+        .map((line) => {
             const vers = line.match(VERSION_REGEX);
-            return { chrome: vers[0], pptr: vers[1] }
+            return { chrome: vers[0], pptr: vers[1] };
         });
-    if (versions.length < 5){
+    if (versions.length < 5) {
         throw new Error('Cannot find and parse Puppeteer-Chromium versions from Markdown file.');
     }
     return versions;
@@ -31,8 +31,8 @@ function parseCompatibilityVersions(text) {
  * @returns {boolean}
  */
 function areVersionsCompatible(compatible, actual) {
-    const [compMajor, compMinor] = compatible.split('.').map(n => Number(n));
-    const [actualMajor, actualMinor] = actual.split('.').map(n => Number(n));
+    const [compMajor, compMinor] = compatible.split('.').map((n) => Number(n));
+    const [actualMajor, actualMinor] = actual.split('.').map((n) => Number(n));
     return actualMajor === compMajor && actualMinor >= compMinor;
 }
 
@@ -49,7 +49,7 @@ async function fetchCompatibilityVersions() {
  */
 async function downloadClosestChromeInstaller(versionToCheck) {
     // Get the first 3 parts of the version
-    const relevantParts = versionToCheck.map(item => item.split('.').slice(0, 3).join('.'));
+    const relevantParts = versionToCheck.map((item) => item.split('.').slice(0, 3).join('.'));
 
     const versionsThatDoNotExistYet = new Set();
 
@@ -74,7 +74,7 @@ async function downloadClosestChromeInstaller(versionToCheck) {
 
             // We found the page, extract the final version and save it
             const rawMatches = rawText.match(VERSION_REGEX);
-            const foundVersion = rawMatches.filter(item => item.startsWith(relevantPart)).sort()[0];
+            const foundVersion = rawMatches.filter((item) => item.startsWith(relevantPart)).sort()[0];
 
             console.log(`Attempting to download Chrome installer for version ${foundVersion}`);
 
@@ -106,4 +106,4 @@ module.exports = {
     parseCompatibilityVersions,
     puppeteerVersion,
     VERSION_REGEX,
-}
+};

@@ -11,37 +11,34 @@ For more information, see https://docs.apify.com/actors/development/source-code#
 `);
 console.log('Testing Docker image...');
 
-const Apify = require('apify');
-const playwright = require("playwright")
+const { Actor } = require('apify');
+const { launchPlaywright, getMemoryInfo } = require('crawlee');
+const playwright = require('playwright');
 const { testChrome, testPageLoading } = require('./chrome_test');
 
+Actor.main(async () => {
+    const browsers = ['webkit', 'firefox', 'chromium'];
+    const promisesHeadless = browsers.map(async (browserName) => {
+        const browser = await launchPlaywright({ launcher: playwright[browserName] });
+        return testPageLoading(browser);
+    });
 
-
-Apify.main(async () => {
-    const browsers = ["webkit", "firefox", "chromium"]
-    const promisesHeadless = browsers.map(async browserName => {
-        const browser = await Apify.launchPlaywright({ launcher: playwright[browserName] })
-        return testPageLoading(browser)
-
-    })
-
-    const promisesHeadful = browsers.map(async browserName => {
-        const browser = await Apify.launchPlaywright({ launcher: playwright[browserName], launchOptions: { headless: false } })
-        return testPageLoading(browser)
-
-    })
+    const promisesHeadful = browsers.map(async (browserName) => {
+        const browser = await launchPlaywright({ launcher: playwright[browserName], launchOptions: { headless: false } });
+        return testPageLoading(browser);
+    });
 
     await Promise.all(promisesHeadless);
     await Promise.all(promisesHeadful);
 
     // Try to use full Chrome headless
-    await testChrome({ headless: true })
+    await testChrome({ headless: true });
 
     // Try to use full Chrome with XVFB
-    await testChrome({ headless: false, args: [ '--disable-gpu' ] })
+    await testChrome({ headless: false, args: ['--disable-gpu'] });
 
     // Test that "ps" command is available, sometimes it was missing in official Node builds
-    await Apify.getMemoryInfo();
+    await getMemoryInfo();
 
     console.log('All tests passed!');
 });

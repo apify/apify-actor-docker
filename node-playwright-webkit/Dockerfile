@@ -10,9 +10,6 @@ RUN apt-get update \
     git \
     procps \
     xvfb \
-    && apt-get clean -y && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /src/*.deb \
     # This is needed to remove an annoying error message when running headful.
     && mkdir -p /tmp/.X11-unix \
     && chmod 1777 /tmp/.X11-unix
@@ -37,6 +34,11 @@ RUN npm config --global set update-notifier false
 
 # Install all required playwright dependencies for webkit
 RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm_config_ignore_scripts=1 npx playwright install-deps webkit
+
+# Cleanup apt caches
+RUN apt-get clean -y && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /src/*.deb
 
 # Run everything after as non-privileged user.
 USER myuser

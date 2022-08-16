@@ -1,6 +1,6 @@
-const Apify = require('apify');
+const { launchPlaywright } = require('crawlee');
 
-const testPageLoading = async browser => {
+const testPageLoading = async (browser) => {
     const page = await browser.newPage();
     await page.goto('http://www.example.com');
     const pageTitle = await page.title();
@@ -11,13 +11,13 @@ const testPageLoading = async browser => {
 
 const testWebkit = async (launchOptions) => {
     const launchContext = {
-         launcher: require("playwright").webkit,
-         launchOptions,
-         }
+        launcher: require('playwright').webkit,
+        launchOptions,
+    };
 
     console.log(`Testing Playwright with Webkit`, launchOptions);
 
-    const browser = await Apify.launchPlaywright(launchContext);
+    const browser = await launchPlaywright(launchContext);
 
     await testPageLoading(browser);
     await browser.close();

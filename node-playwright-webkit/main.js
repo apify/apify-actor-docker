@@ -11,22 +11,23 @@ For more information, see https://docs.apify.com/actors/development/source-code#
 `);
 console.log('Testing Docker image...');
 
-const Apify = require('apify');
+const { Actor } = require('apify');
+const { getMemoryInfo } = require('crawlee');
 const testWebkit = require('./webkit_test');
 
-Apify.main(async () => {
+Actor.main(async () => {
     // Sanity test browsers.
 
     // Try to use full Webkit headless
-    await testWebkit({ headless: true })
+    await testWebkit({ headless: true });
 
     // Try to use full Webkit with XVFB
-    await testWebkit({ headless: false })
-    
+    await testWebkit({ headless: false });
+
     // Try to use playwright default
-    await testWebkit({ executablePath: undefined })
-    await testWebkit({ executablePath: process.env.APIFY_DEFAULT_BROWSER_PATH })
+    await testWebkit({ executablePath: undefined });
+    await testWebkit({ executablePath: process.env.APIFY_DEFAULT_BROWSER_PATH });
 
     // Test that "ps" command is available, sometimes it was missing in official Node builds
-    await Apify.getMemoryInfo();
+    await getMemoryInfo();
 });

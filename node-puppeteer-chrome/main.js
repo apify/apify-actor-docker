@@ -11,18 +11,16 @@ For more information, see https://docs.apify.com/actors/development/source-code#
 `);
 console.log('Testing Docker image...');
 
-const Apify = require('apify');
+const { Actor } = require('apify');
+const { launchPuppeteer, getMemoryInfo } = require('crawlee');
 const testPuppeteerChrome = require('./puppeteer_chrome_test');
 
-const isV1 = typeof Apify.launchPlaywright === 'function';
-
-Apify.main(async () => {
+Actor.main(async () => {
     // First, try to open Chromium to see all dependencies are correctly installed
     console.log('Testing Puppeteer with Chromium');
     // We need --no-sandbox, because even though the build is running on GitHub, the test is running in Docker.
     const launchOptions = { headless: true, args: ['--no-sandbox'] };
-    const launchContext = isV1 ? { launchOptions } : launchOptions;
-    const browser1 = await Apify.launchPuppeteer(launchContext);
+    const browser1 = await launchPuppeteer({ launchOptions });
     const page1 = await browser1.newPage();
     await page1.goto('http://www.example.com');
     const pageTitle1 = await page1.title();
@@ -35,7 +33,7 @@ Apify.main(async () => {
     await testPuppeteerChrome();
 
     // Test that "ps" command is available, sometimes it was missing in official Node builds
-    await Apify.getMemoryInfo();
+    await getMemoryInfo();
 
     console.log('... test PASSED');
 });
