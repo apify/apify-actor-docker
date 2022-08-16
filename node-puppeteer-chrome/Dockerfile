@@ -26,25 +26,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     fonts-thai-tlwg \
     fonts-wqy-zenhei \
     git \
-    # Extracted from unmet dependency log in run https://github.com/apify/apify-actor-docker/runs/7860053048?check_suite_focus=true
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libatspi2.0-0 \
-    libcairo2 \
-    libcups2 \
-    libdbus-1-3 \
-    libgbm1 \
-    libglib2.0-0 \
-    libgtk-3-0 \
-    libnspr4 \
-    libnss3 \
-    libpango-1.0-0 \
-    libxcomposite1 \
-    libxkbcommon0 \
-    libxrandr2 \
-    libu2f-udev \
-    # End of extracted from error log
     libxss1 \
     lsb-release \
     procps \
@@ -58,6 +39,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
 
 # Globally disable the update-notifier.
 RUN npm config --global set update-notifier false
+
+# Install the required dependencies of chrome..by using playwright's useful CLI
+RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm_config_ignore_scripts=1 npx playwright install-deps chrome
 
 # Prepare to install the latest Chrome compatible
 RUN mkdir -p /tmp/chrome-install

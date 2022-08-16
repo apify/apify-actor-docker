@@ -31,8 +31,8 @@ function parseCompatibilityVersions(text) {
  * @returns {boolean}
  */
 function areVersionsCompatible(compatible, actual) {
-    const [compMajor, compMinor] = compatible.split('.').map((n) => Number(n));
-    const [actualMajor, actualMinor] = actual.split('.').map((n) => Number(n));
+    const [compMajor, , compMinor] = compatible.split('.').map((n) => Number(n));
+    const [actualMajor, , actualMinor] = actual.split('.').map((n) => Number(n));
     return actualMajor === compMajor && actualMinor >= compMinor;
 }
 
@@ -48,10 +48,41 @@ async function fetchCompatibilityVersions() {
  * @param {string[]} versionToCheck
  */
 async function downloadClosestChromeInstaller(versionToCheck) {
-    // Get the first 3 parts of the version
-    const relevantParts = versionToCheck.map((item) => item.split('.').slice(0, 3).join('.'));
+    function* checkBodyForVersion(body) {
+        for (const supportedVersion of versionToCheck) {
+            // If the body includes the exact version, we can return it and try to download it
+            if (body.includes(supportedVersion)) {
+                yield supportedVersion;
+            }
 
-    const versionsThatDoNotExistYet = new Set();
+            const [supportedMajor, , supportedBuild] = supportedVersion.split('.').map((n) => Number(n));
+
+            // We extract all the versions on the page, and check if major matches the version we want, and if the build number is >= to the one we need
+            const versions = body.match(VERSION_REGEX);
+
+            if (versions) {
+                for (const entry of versions) {
+                    // Skip any entry that doesn't have a dot
+                    if (!entry.includes('.')) {
+                        continue;
+                    }
+
+                    const versionSplit = entry.split('.').map((n) => Number(n));
+
+                    // Chromium version have 4 parts to the version
+                    if (versionSplit.length < 4) {
+                        continue;
+                    }
+
+                    const [major, , build] = versionSplit;
+
+                    if (major === supportedMajor && build >= supportedBuild) {
+                        yield entry;
+                    }
+                }
+            }
+        }
+    }
 
     /** @type {Buffer} */
     let debBuffer;
@@ -66,29 +97,19 @@ async function downloadClosestChromeInstaller(versionToCheck) {
             throw new Error('Could not find any valid version.');
         }
 
-        for (const relevantPart of relevantParts) {
-            // If this page doesn't include the relevant version or we already couldn't find it, try the next one
-            if (!rawText.includes(relevantPart) || versionsThatDoNotExistYet.has(relevantPart)) {
-                continue;
-            }
+        for (const versionToTry of checkBodyForVersion(rawText)) {
+            console.log(`Attempting to download Chrome installer for version ${versionToTry}`);
 
-            // We found the page, extract the final version and save it
-            const rawMatches = rawText.match(VERSION_REGEX);
-            const foundVersion = rawMatches.filter((item) => item.startsWith(relevantPart)).sort()[0];
-
-            console.log(`Attempting to download Chrome installer for version ${foundVersion}`);
-
-            const downloadUrl = chromeVersionDownloadUrl(`${foundVersion}-1`);
+            const downloadUrl = chromeVersionDownloadUrl(`${versionToTry}-1`);
 
             try {
                 const res = await axios.get(downloadUrl, { responseType: 'arraybuffer' });
-                console.log(`Downloaded version ${foundVersion} that is compatible with Puppeteer ${puppeteerVersion}`);
+                console.log(`Downloaded version ${versionToTry} that is compatible with Puppeteer ${puppeteerVersion}`);
                 debBuffer = res.data;
                 break;
             } catch {
                 // Ignore errors
-                console.warn(`Couldn't find or download Chrome stable with version ${foundVersion}`);
-                versionsThatDoNotExistYet.add(relevantPart);
+                console.warn(`Couldn't find or download Chrome stable with version ${versionToTry}`);
             }
         }
 
