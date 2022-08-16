@@ -10,11 +10,11 @@ const chromeVersionDownloadUrl = (version) => `https://dl.google.com/linux/chrom
  */
 function parseCompatibilityVersions(text) {
     const versionsText = text.substring(
-        text.indexOf('Releases per Chromium Version:'),
-        text.indexOf('* [All releases]'),
+        text.indexOf('<!-- version-start -->'),
+        text.indexOf('<!-- version-end -->'),
     );
     const versions = versionsText.split('\n')
-        .filter((line) => line.includes('* Chromium'))
+        .filter((line) => line.includes('- Chromium'))
         .map((line) => {
             const vers = line.match(VERSION_REGEX);
             return { chrome: vers[0], pptr: vers[1] };
@@ -37,7 +37,7 @@ function areVersionsCompatible(compatible, actual) {
 }
 
 async function fetchCompatibilityVersions() {
-    const apiResponse = await axios.get('https://raw.githubusercontent.com/GoogleChrome/puppeteer/main/docs/api.md', { responseType: 'text' });
+    const apiResponse = await axios.get('https://raw.githubusercontent.com/puppeteer/puppeteer/main/docs/chromium-support.md', { responseType: 'text' });
     const compatibilityVersions = parseCompatibilityVersions(apiResponse.data);
 
     return compatibilityVersions;
