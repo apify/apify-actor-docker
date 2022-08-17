@@ -9,7 +9,8 @@
     "dependencies": {
         "apify": "APIFY_VERSION",
         "crawlee": "CRAWLEE_VERSION",
-        "playwright-firefox": "PLAYWRIGHT_VERSION"
+        "playwright-firefox": "PLAYWRIGHT_VERSION",
+        "typescript": "^4.7.4"
     },
     "repository": {}
 }
