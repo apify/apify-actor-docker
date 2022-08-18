@@ -11,11 +11,12 @@ For more information, see https://docs.apify.com/actors/development/source-code#
 `);
 console.log('Testing Docker image...');
 
-const Apify = require('apify');
+const { Actor } = require('apify');
+const { getMemoryInfo } = require('crawlee');
 
-Apify.main(async () => {
+Actor.main(async () => {
     // Test that "ps" command is available, sometimes it was missing in official Node builds
-    await Apify.getMemoryInfo();
+    await getMemoryInfo();
 
     console.log('... test PASSED');
 });

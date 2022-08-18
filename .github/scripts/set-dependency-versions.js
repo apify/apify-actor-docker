@@ -4,7 +4,8 @@ const PACKAGE_JSON_PATH = './package.json';
 
 // Pull request runs of this script will have an argument passed as true (see Set Dependency Versions steps)
 const DEPENDENCY_VERSIONS = process.argv[process.argv.length - 1] === 'true' ?  {
-    'apify': 'beta',
+    'apify': 'next',
+    'crawlee': 'next',
     'puppeteer': 'latest',
     'playwright': 'latest',
     'playwright-chromium': 'latest',
@@ -12,6 +13,7 @@ const DEPENDENCY_VERSIONS = process.argv[process.argv.length - 1] === 'true' ?  
     'playwright-webkit': 'latest',
 } : {
     'apify': process.env.APIFY_VERSION,
+    'crawlee': process.env.CRAWLEE_VERSION,
     'puppeteer': process.env.PUPPETEER_VERSION,
     'playwright': process.env.PLAYWRIGHT_VERSION || 'latest',
     'playwright-chromium': process.env.PLAYWRIGHT_VERSION || 'latest',

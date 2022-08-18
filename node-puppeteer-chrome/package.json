@@ -8,7 +8,9 @@
     },
     "dependencies": {
         "apify": "APIFY_VERSION",
-        "puppeteer": "PUPPETEER_VERSION"
+        "crawlee": "CRAWLEE_VERSION",
+        "puppeteer": "PUPPETEER_VERSION",
+        "typescript": "^4.7.4"
     },
     "repository": {}
 }

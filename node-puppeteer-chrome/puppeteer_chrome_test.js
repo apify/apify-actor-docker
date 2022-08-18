@@ -1,7 +1,5 @@
-const Apify = require('apify');
+const { launchPuppeteer } = require('crawlee');
 const { puppeteerVersion, VERSION_REGEX, areVersionsCompatible, fetchCompatibilityVersions } = require('./puppeteer_utils');
-
-const isV1 = typeof Apify.launchPlaywright === 'function';
 
 /*
  * This file tests whether Puppeteer is compatible with installed Chrome,
@@ -68,10 +66,9 @@ const testPuppeteerChrome = async () => {
     console.log('Testing Puppeteer with full Chrome');
     // We need --no-sandbox, because even though the build is running on GitHub, the test is running in Docker.
     const launchOptions = { headless: true, args: ['--no-sandbox'] };
-    const launchContext = isV1
-        ? { useChrome: true, launchOptions }
-        : { useChrome: true, ...launchOptions };
-    const browser = await Apify.launchPuppeteer(launchContext);
+    const launchContext = { useChrome: true, launchOptions };
+
+    const browser = await launchPuppeteer(launchContext);
     try {
         await testCompatibility(browser);
         await testPageLoading(browser);

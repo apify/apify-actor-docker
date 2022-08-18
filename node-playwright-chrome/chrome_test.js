@@ -1,6 +1,6 @@
-const Apify = require('apify');
+const { launchPlaywright } = require('crawlee');
 
-const testPageLoading = async browser => {
+const testPageLoading = async (browser) => {
     const page = await browser.newPage();
     await page.goto('http://www.example.com');
     const pageTitle = await page.title();
@@ -10,15 +10,16 @@ const testPageLoading = async browser => {
 };
 
 const testChrome = async (launchOptions) => {
-    const launchContext = { useChrome: true, launchOptions }
-
+    const launchContext = { useChrome: true, launchOptions };
 
     console.log(`Testing Playwright with Chrome`, launchContext);
 
-    const browser = await Apify.launchPlaywright(launchContext);
+    const browser = await launchPlaywright(launchContext);
 
     await testPageLoading(browser);
     await browser.close();
 };
 
-module.exports = testChrome;
+module.exports = {
+    testChrome,
+};

@@ -8,7 +8,9 @@
     },
     "dependencies": {
         "apify": "APIFY_VERSION",
-        "playwright-chromium": "PLAYWRIGHT_VERSION"
+        "crawlee": "CRAWLEE_VERSION",
+        "playwright-chromium": "PLAYWRIGHT_VERSION",
+        "typescript": "^4.7.4"
     },
     "repository": {}
 }

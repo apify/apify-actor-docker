@@ -13,13 +13,18 @@ async function downloadLatestCompatibleChrome() {
     });
 
     // Get all supported Chrome version
-    const compatibleChromeVersion = matchedCompatibilityVersions
+    const compatibleChromeVersions = matchedCompatibilityVersions
         .map((v) => v.chrome)
-        .sort((a, b) => b.localeCompare(a));
+        .sort((a, b) => {
+            const [majorA] = a.split('.');
+            const [majorB] = b.split('.');
 
-    console.warn(`Attempting to find a Chrome installer for versions: ${compatibleChromeVersion.join(', ')}`);
+            return Number(majorB) - Number(majorA);
+        });
 
-    const buffer = await downloadClosestChromeInstaller(compatibleChromeVersion);
+    console.warn(`Attempting to find a Chrome installer for versions: ${compatibleChromeVersions.join(', ')}`);
+
+    const buffer = await downloadClosestChromeInstaller(compatibleChromeVersions);
     await writeFile('/tmp/chrome.deb', buffer);
 }
 
