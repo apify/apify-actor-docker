@@ -9,6 +9,9 @@ on:
       apify_version:
         description: 'Apify SDK version (e.g.: ^1.0.0)'
         required: true
+      crawlee_version:
+        description: 'Crawlee version (e.g.: ^1.0.0)'
+        required: true
 
   repository_dispatch:
     types: [ build-node-images ]
