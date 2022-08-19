@@ -80,8 +80,8 @@ jobs:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
           build-args: NODE_VERSION=${{ matrix.node-version }}
+          load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
-          platforms: linux/amd64,linux/arm64
       -
         name: Test image
         run: docker run ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}
@@ -93,6 +93,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Push images
+        name: Build and Push images (amd64 + arm64)
         if: github.event_name != 'pull_request'
-        run: docker push apify/actor-${{ matrix.image-name }} --all-tags
+        uses: docker/build-push-action@v2
+        with:
+          context: ./${{ matrix.image-name }}
+          file: ./${{ matrix.image-name }}/Dockerfile
+          build-args: NODE_VERSION=${{ matrix.node-version }}
+          push: true
+          tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
+          platforms: linux/amd64,linux/arm64
