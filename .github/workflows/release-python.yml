@@ -78,6 +78,7 @@ jobs:
             APIFY_CLIENT_VERSION=${{ env.APIFY_CLIENT_VERSION }}
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
+          platforms: linux/amd64,linux/arm64
       -
         name: Test image
         run: docker run ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}
