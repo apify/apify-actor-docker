@@ -85,7 +85,6 @@ jobs:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
           build-args: NODE_VERSION=${{ matrix.node-version }}
-          load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
           platforms: linux/amd64,linux/arm64
       -

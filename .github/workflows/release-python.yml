@@ -76,7 +76,6 @@ jobs:
           build-args: |
             PYTHON_VERSION=${{ matrix.python-version }}
             APIFY_CLIENT_VERSION=${{ env.APIFY_CLIENT_VERSION }}
-          load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
           platforms: linux/amd64,linux/arm64
       -
