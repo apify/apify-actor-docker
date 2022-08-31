@@ -106,7 +106,7 @@ RUN npm --quiet set progress=false \
 
 # Set up xvfb
 ENV DISPLAY=:99
-ENV XVFB_WHD=1280x720x16
+ENV XVFB_WHD=1920x1080x24+32
 
 # NOTEs:
 # - This needs to be compatible with CLI.

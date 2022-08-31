@@ -69,7 +69,7 @@ ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD 1
 
 # We should you the autodisplay detection as suggested here: https://github.com/microsoft/playwright/issues/2728#issuecomment-678083619
 ENV DISPLAY=:99
-ENV XVFB_WHD=1280x720x16
+ENV XVFB_WHD=1920x1080x24+32
 # Uncomment this line if you want to run browser in headful mode by default.
 # ENV APIFY_XVFB=1
 
