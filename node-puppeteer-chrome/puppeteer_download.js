@@ -1,5 +1,5 @@
 const { writeFile } = require('fs/promises');
-const { fetchCompatibilityVersions, puppeteerVersion, areVersionsCompatible, downloadClosestChromeInstaller } = require('./puppeteer_utils');
+const { fetchCompatibilityVersions, puppeteerVersion, arePuppeteerVersionsCompatible, downloadClosestChromeInstaller } = require('./puppeteer_utils');
 
 const puppeteerMajor = Number(puppeteerVersion.split('.')[0]);
 
@@ -9,7 +9,7 @@ async function downloadLatestCompatibleChrome() {
     const matchedCompatibilityVersions = compatibilities.filter((cv) => {
         const cvMajor = Number(cv.pptr.split('.')[0]);
 
-        return areVersionsCompatible(cv.pptr, puppeteerVersion) || (puppeteerMajor >= cvMajor && puppeteerMajor - cvMajor <= 2);
+        return arePuppeteerVersionsCompatible(cv.pptr, puppeteerVersion) || (puppeteerMajor >= cvMajor && puppeteerMajor - cvMajor <= 2);
     });
 
     // Get all supported Chrome version

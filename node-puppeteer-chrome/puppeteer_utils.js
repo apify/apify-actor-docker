@@ -30,7 +30,18 @@ function parseCompatibilityVersions(text) {
  * @param {string} actual
  * @returns {boolean}
  */
-function areVersionsCompatible(compatible, actual) {
+function arePuppeteerVersionsCompatible(compatible, actual) {
+    const [compMajor, compMinor] = compatible.split('.').map((n) => Number(n));
+    const [actualMajor, actualMinor] = actual.split('.').map((n) => Number(n));
+    return actualMajor === compMajor && actualMinor >= compMinor;
+}
+
+/**
+ * @param {string} compatible
+ * @param {string} actual
+ * @returns {boolean}
+ */
+function areChromeVersionsCompatible(compatible, actual) {
     const [compMajor, , compMinor] = compatible.split('.').map((n) => Number(n));
     const [actualMajor, , actualMinor] = actual.split('.').map((n) => Number(n));
     return actualMajor === compMajor && actualMinor >= compMinor;
@@ -121,7 +132,8 @@ async function downloadClosestChromeInstaller(versionToCheck) {
 }
 
 module.exports = {
-    areVersionsCompatible,
+    arePuppeteerVersionsCompatible,
+    areChromeVersionsCompatible,
     downloadClosestChromeInstaller,
     fetchCompatibilityVersions,
     parseCompatibilityVersions,
