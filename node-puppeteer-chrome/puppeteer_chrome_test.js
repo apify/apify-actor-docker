@@ -1,5 +1,5 @@
 const { launchPuppeteer } = require('crawlee');
-const { puppeteerVersion, VERSION_REGEX, areVersionsCompatible, fetchCompatibilityVersions } = require('./puppeteer_utils');
+const { puppeteerVersion, VERSION_REGEX, arePuppeteerVersionsCompatible, fetchCompatibilityVersions, areChromeVersionsCompatible } = require('./puppeteer_utils');
 
 /*
  * This file tests whether Puppeteer is compatible with installed Chrome,
@@ -27,7 +27,7 @@ const testCompatibility = async (browser) => {
     // We must therefore check if we have Puppeteer >= the latest entry and if that's
     // the case, then it supports the latest entry of Chrome.
     let matchedCompatibilityVersions = compatibilityVersions.filter((cv) => {
-        return areVersionsCompatible(cv.pptr, puppeteerVersion);
+        return arePuppeteerVersionsCompatible(cv.pptr, puppeteerVersion);
     });
 
     if (!matchedCompatibilityVersions.length) {
@@ -35,7 +35,7 @@ const testCompatibility = async (browser) => {
             const cvMajor = Number(cv.pptr.split('.')[0]);
             const puppeteerMajor = Number(puppeteerVersion.split('.')[0]);
 
-            return areVersionsCompatible(cv.pptr, puppeteerVersion) || (puppeteerMajor >= cvMajor && puppeteerMajor - cvMajor <= 2);
+            return arePuppeteerVersionsCompatible(cv.pptr, puppeteerVersion) || (puppeteerMajor >= cvMajor && puppeteerMajor - cvMajor <= 2);
         });
         console.warn(`!!! For Puppeteer ${puppeteerVersion} there was no defined version of Chrome supported. !!!`);
         console.warn(`As such, we'll ensure that the installed Chrome matches one of these versions: ${matchedCompatibilityVersions.map(({ chrome }) => chrome).join(', ')}`);
@@ -43,7 +43,7 @@ const testCompatibility = async (browser) => {
 
     const chromeVersionsCompatibleWithPuppeteer = matchedCompatibilityVersions.map((v) => v.chrome);
     const isCompatible = chromeVersionsCompatibleWithPuppeteer.some((chromeVersionCompatibleWithPuppeteer) => {
-        return areVersionsCompatible(chromeVersionCompatibleWithPuppeteer, chromeVersion);
+        return areChromeVersionsCompatible(chromeVersionCompatibleWithPuppeteer, chromeVersion);
     });
 
     if (!isCompatible) {

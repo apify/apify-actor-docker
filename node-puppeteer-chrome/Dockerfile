@@ -15,7 +15,8 @@ RUN mkdir -p /etc/default && echo 'repo_add_once=false' > /etc/default/google-ch
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg unzip ca-certificates --no-install-recommends \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | DEBIAN_FRONTEND=noninteractive apt-key add - \
-    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+    && sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+    && sh -c 'echo "deb http://ftp.us.debian.org/debian bullseye main non-free" >> /etc/apt/sources.list.d/fonts.list' \
     && DEBIAN_FRONTEND=noninteractive apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y unzip \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y \
