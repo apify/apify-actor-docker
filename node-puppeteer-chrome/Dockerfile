@@ -54,7 +54,7 @@ RUN npm --quiet set progress=false \
     && npm install --only=prod --no-optional --no-package-lock --prefer-online
 
 # Download the latest Chrome
-RUN node ./puppeteer_download.js
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O /tmp/chrome.deb
 # Install it
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y /tmp/chrome.deb \
     && rm /tmp/chrome.deb \
