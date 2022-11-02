@@ -1,6 +1,6 @@
-# Use the specified Python version, fallback to 3.7 as default
+# Use the specified Python version, fallback to 3.8 as default
 
-ARG PYTHON_VERSION=3.7
+ARG PYTHON_VERSION=3.8
 FROM python:${PYTHON_VERSION}
 
 LABEL maintainer="support@apify.com" Description="Base image for simple Apify actors written in Python"
