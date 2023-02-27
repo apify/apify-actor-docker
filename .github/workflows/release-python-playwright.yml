@@ -1,4 +1,4 @@
-name: Release/test playwright images
+name: Release python playwright images
 
 on:
   workflow_dispatch:
