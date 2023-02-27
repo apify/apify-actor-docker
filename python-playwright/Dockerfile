@@ -49,12 +49,11 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 # Install the specified Apify SDK version and Python Playwright version
-ARG APIFY_CLIENT_VERSION
-RUN pip install apify_client~=${APIFY_CLIENT_VERSION} playwright~=${PLAYWRIGHT_VERSION}
+ARG PLAYWRIGHT_VERSION=1.30.0
+ARG APIFY_VERSION=0.1.0
+RUN pip install apify~=${APIFY_VERSION} playwright~=${PLAYWRIGHT_VERSION}
 
 # Next, copy the remaining files and directories with the source code.
-# Since we do this after installing the dependencies, quick build will be really fast
-# for most source file changes.
 COPY . ./
 
 # Set up xvfb
