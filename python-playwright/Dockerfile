@@ -7,6 +7,7 @@ LABEL maintainer="support@apify.com" Description="Base image for simple Apify ac
 
 # Playwright image comes with latest Python version, so we need to install the one we want.
 ARG PYTHON_VERSION=3.8
+
 # Use pyenv to install the specified Python version
 ENV PYENV_ROOT /root/.pyenv
 ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
@@ -14,6 +15,7 @@ ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential libssl-dev zlib1g-dev \
         libbz2-dev libreadline-dev libsqlite3-dev curl \
         libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+
 # Install specified Python version
 RUN set -ex \
     && curl https://pyenv.run | bash \
@@ -46,11 +48,9 @@ RUN pip install --upgrade setuptools wheel
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-# Second, copy just requirements.txt into the actor image,
-# since it should be the only file that affects the dependency install in the next step,
-# in order to speed up the build
-COPY requirements.txt ./
-RUN pip install -r requirements.txt
+# Install the specified Apify SDK version and Python Playwright version
+ARG APIFY_CLIENT_VERSION
+RUN pip install apify_client~=${APIFY_CLIENT_VERSION} playwright~=${PLAYWRIGHT_VERSION}
 
 # Next, copy the remaining files and directories with the source code.
 # Since we do this after installing the dependencies, quick build will be really fast
@@ -69,4 +69,4 @@ ENV XVFB_WHD=1920x1080x24+32
 # NOTEs:
 # - This needs to be compatible with CLI.
 # - Using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD ./start_xvfb_and_run_cmd.sh && python3 main.py
+CMD ./start_xvfb_and_run_cmd.sh && python3 -m src

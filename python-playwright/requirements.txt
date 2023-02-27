@@ -1,2 +1,0 @@
-apify==APIFY_VERSION
-playwright==PLAYWRIGHT_VERSION
