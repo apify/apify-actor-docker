@@ -1,6 +1,5 @@
 # Use the specified Python version and Playwright version
 ARG PLAYWRIGHT_VERSION=1.30.0
-
 FROM mcr.microsoft.com/playwright/python:v${PLAYWRIGHT_VERSION}-focal
 
 LABEL maintainer="support@apify.com" Description="Base image for simple Apify actors written in Python using playwright"
