@@ -48,6 +48,7 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 # Install the specified Apify SDK version and Python Playwright version
+ARG PLAYWRIGHT_VERSION=1.30.0
 ARG APIFY_VERSION=0.1.0
 RUN pip install apify~=${APIFY_VERSION} playwright~=${PLAYWRIGHT_VERSION}
 
