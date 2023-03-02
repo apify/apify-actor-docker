@@ -1,6 +1,5 @@
 # Use the specified Python version and Playwright version
-ENV DEFAULT_PLAYWRIGHT_VERSION=1.30.0
-ARG PLAYWRIGHT_VERSION=DEFAULT_PLAYWRIGHT_VERSION
+ARG PLAYWRIGHT_VERSION=1.30.0
 FROM mcr.microsoft.com/playwright/python:v${PLAYWRIGHT_VERSION}-focal
 
 LABEL maintainer="support@apify.com" Description="Base image for simple Apify actors written in Python using playwright"
@@ -49,7 +48,6 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 # Install the specified Apify SDK version and Python Playwright version
-ARG PLAYWRIGHT_VERSION=DEFAULT_PLAYWRIGHT_VERSION
 ARG APIFY_VERSION=0.1.0
 RUN pip install apify~=${APIFY_VERSION} playwright~=${PLAYWRIGHT_VERSION}
 
