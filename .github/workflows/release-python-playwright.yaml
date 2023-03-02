@@ -91,10 +91,12 @@ jobs:
         run: docker run ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}
       -
         name: Login to DockerHub
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
         name: Push images
+        if: github.event_name != 'pull_request'
         run: docker push apify/actor-${{ matrix.image-name }} --all-tags

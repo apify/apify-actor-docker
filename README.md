@@ -32,7 +32,7 @@ You need access to the organization and rights to create a new repository.
 After, you need to follow these steps:
 
 1. Create a new folder with the same name as the package you want to create without the prefix `actor-`. 
-For image `apify/actor-node`, create folder `name`.
+For image `apify/actor-node`, create folder `node`.
 
 2. Create a source of the image in that folder. Remember to create a test that is runnable using docker run to be able to test in the image in CI/CD.
 
