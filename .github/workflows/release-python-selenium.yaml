@@ -1,0 +1,96 @@
+name: Release python selenium images
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Tag for the images (e.g.: beta)'
+        required: true
+      apify_version:
+        description: 'Apify SDK version (e.g.: 0.2.0)'
+        required: true
+
+  repository_dispatch:
+    types: [ build-python-images ]
+
+  pull_request:
+
+env:
+  RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag || 'CI_TEST' }}
+  APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version || '0.2.0' }}
+  LATEST_PYTHON: "3.11"
+
+jobs:
+  # Build master images that are not dependent on existing builds.
+  build-main:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image-name: [python-selenium]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      -
+        name: Update pip
+        run: python -m pip install --upgrade pip
+      -
+        # It seems that it takes a few minutes before a newly published version
+        # becomes available in the PyPI registry. We wait before starting the image builds.
+        name: Wait For Package Registry
+        uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 2 # timeout for a single attempt
+          max_attempts: 3
+          retry_wait_seconds: 60 # wait between retries
+          command: pip install apify~=${{ env.APIFY_VERSION }}
+      -
+        name: Prepare image tags
+        id: prepare-tags
+        uses: actions/github-script@v4
+        env:
+          CURRENT_PYTHON: ${{ matrix.python-version }}
+          LATEST_PYTHON: ${{ env.LATEST_PYTHON }}
+          RELEASE_TAG: ${{ env.RELEASE_TAG }}
+          IMAGE_NAME: apify/actor-${{ matrix.image-name }}
+        with:
+          script: |
+             const generateTags = require("./.github/scripts/prepare-python-image-tags.js");
+             return generateTags()
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      -
+        name: Build and tag image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./${{ matrix.image-name }}
+          file: ./${{ matrix.image-name }}/Dockerfile
+          build-args: |
+            PYTHON_VERSION=${{ matrix.python-version }}
+            APIFY_VERSION=${{ env.APIFY_VERSION }}
+          load: true
+          tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
+      -
+        name: Test image
+        run: docker run ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}
+      -
+        name: Login to DockerHub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Push images
+        if: github.event_name != 'pull_request'
+        run: docker push apify/actor-${{ matrix.image-name }} --all-tags
