@@ -1,10 +1,8 @@
-#!/usr/bin/env python3
-
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium import webdriver
 
-if __name__ == '__main__':
+def main():
     print('Testing Docker image...')
 
     print('Testing Chrome...')

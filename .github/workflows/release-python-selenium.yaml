@@ -1,4 +1,4 @@
-name: Release python selenium images
+name: Release Python + Selenium images
 
 on:
   workflow_dispatch:
