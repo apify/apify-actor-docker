@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium import webdriver
 
@@ -8,7 +8,7 @@ if __name__ == '__main__':
     print('Testing Docker image...')
 
     print('Testing Chrome...')
-    chrome_options = Options()
+    chrome_options = ChromeOptions()
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
