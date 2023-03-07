@@ -1,4 +1,4 @@
-name: Release Python images
+name: Release Python basic images
 
 on:
   workflow_dispatch:
@@ -6,8 +6,8 @@ on:
       release_tag:
         description: 'Tag for the images (e.g.: "latest" or "beta")'
         required: true
-      apify_client_version:
-        description: 'Apify Client for Python version (e.g.: 1.0.0)'
+      apify_version:
+        description: 'Apify SDK for Python version (e.g.: 1.0.0)'
         required: true
 
   repository_dispatch:
@@ -15,7 +15,7 @@ on:
 
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
-  APIFY_CLIENT_VERSION: ${{ github.event.inputs.apify_client_version || github.event.client_payload.apify_client_version }}
+  APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   LATEST_PYTHON: "3.11"
 
 jobs:
@@ -47,7 +47,7 @@ jobs:
           timeout_minutes: 2 # timeout for a single attempt
           max_attempts: 3
           retry_wait_seconds: 60 # wait between retries
-          command: pip install apify_client~=${{ env.APIFY_CLIENT_VERSION }}
+          command: pip install apify~=${{ env.apify_version }}
       -
         name: Prepare image tags
         id: prepare-tags
@@ -75,7 +75,7 @@ jobs:
           file: ./${{ matrix.image-name }}/Dockerfile
           build-args: |
             PYTHON_VERSION=${{ matrix.python-version }}
-            APIFY_CLIENT_VERSION=${{ env.APIFY_CLIENT_VERSION }}
+            APIFY_VERSION=${{ env.APIFY_VERSION }}
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
       -

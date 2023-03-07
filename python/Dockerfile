@@ -1,6 +1,5 @@
-# Use the specified Python version, fallback to 3.8 as default
-
-ARG PYTHON_VERSION=3.8
+# Use the specified Python version
+ARG PYTHON_VERSION
 FROM python:${PYTHON_VERSION}
 
 LABEL maintainer="support@apify.com" Description="Base image for simple Apify actors written in Python"
@@ -25,16 +24,16 @@ RUN pip install --upgrade pip
 # Preinstall the latest versions of setuptools and wheel for faster package installs
 RUN pip install --upgrade setuptools wheel
 
-# Install the specified Python Client version
-ARG APIFY_CLIENT_VERSION
-RUN pip install apify_client~=${APIFY_CLIENT_VERSION}
+# Install the specified Apify SDK for Python version
+ARG APIFY_VERSION
+RUN pip install apify~=${APIFY_VERSION}
 
 # Create app directory
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 # Copy the dummy source code to the image
-COPY main.py ./
+COPY . .
 
 # Set default startup command, using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD python3 main.py
+CMD python3 -m src

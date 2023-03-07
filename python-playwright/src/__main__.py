@@ -2,4 +2,8 @@ import asyncio
 
 from .main import main
 
-asyncio.run(main())
+try:
+    asyncio.run(main())
+except Exception:
+    print('Test failed!')
+    raise

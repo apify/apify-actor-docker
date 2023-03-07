@@ -1,27 +1,8 @@
-# Use the specified Python version and Playwright version
-ARG PLAYWRIGHT_VERSION=1.30.0
-FROM mcr.microsoft.com/playwright/python:v${PLAYWRIGHT_VERSION}-focal
+# Use the specified Python version
+ARG PYTHON_VERSION
+FROM python:${PYTHON_VERSION}
 
 LABEL maintainer="support@apify.com" Description="Base image for simple Apify actors written in Python using playwright"
-
-# Playwright image comes with latest Python version, so we need to install the one we want.
-ARG PYTHON_VERSION=3.8
-
-# Use pyenv to install the specified Python version
-ENV PYENV_ROOT /root/.pyenv
-ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
-# Set of all dependencies needed for pyenv to work on Ubuntu
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential libssl-dev zlib1g-dev \
-        libbz2-dev libreadline-dev libsqlite3-dev curl \
-        libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
-
-# Install specified Python version
-RUN set -ex \
-    && curl https://pyenv.run | bash \
-    && pyenv update \
-    && pyenv install $PYTHON_VERSION \
-    && pyenv global $PYTHON_VERSION \
-    && pyenv rehash
 
 # Don't store bytecode, the Python app will be only run once
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -48,9 +29,11 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 # Install the specified Apify SDK version and Python Playwright version
-ARG PLAYWRIGHT_VERSION=1.30.0
-ARG APIFY_VERSION=0.1.0
+ARG APIFY_VERSION
+ARG PLAYWRIGHT_VERSION
 RUN pip install apify~=${APIFY_VERSION} playwright~=${PLAYWRIGHT_VERSION}
+RUN playwright install-deps
+RUN playwright install
 
 # Next, copy the remaining files and directories with the source code.
 COPY . ./
