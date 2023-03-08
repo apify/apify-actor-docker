@@ -42,8 +42,8 @@ jobs:
       -
         name: Check if inputs are set correctly
         run: |
-          if [[ -z "$RELEASE_TAG" ]]; then { echo "RELEASE_TAG input is empty!" >&2; exit 1 }; fi
-          if [[ -z "$APIFY_VERSION" ]]; then { echo "APIFY_VERSION input is empty!" >&2; exit 1 }; fi
+          if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG input is empty!" >&2; exit 1; fi
+          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION input is empty!" >&2; exit 1; fi
       -
         name: Checkout
         uses: actions/checkout@v2
