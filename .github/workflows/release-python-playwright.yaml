@@ -19,8 +19,8 @@ on:
   pull_request:
 
 env:
-  RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag || 'CI_TEST' }}
-  APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version || '0.2.0' }}
+  RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
+  APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   PLAYWRIGHT_VERSION: ${{ github.event.inputs.playwright_version || github.event.client_payload.playwright_version || '1.31.1' }}
   LATEST_PYTHON: "3.11"
 
@@ -33,6 +33,17 @@ jobs:
         image-name: [python-playwright]
         python-version: ["3.8", "3.9", "3.10", "3.11"]
     steps:
+      -
+        name: Set default inputs if event is pull request
+        if: github.event_name == 'pull_request'
+        run: |
+          if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=CI_TEST" >> $GITHUB_ENV; fi
+          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=0.2.0" >> $GITHUB_ENV; fi
+      -
+        name: Check if inputs are set correctly
+        run: |
+          if [[ -z "$RELEASE_TAG" ]]; then { echo "RELEASE_TAG input is empty!" >&2; exit 1 }; fi
+          if [[ -z "$APIFY_VERSION" ]]; then { echo "APIFY_VERSION input is empty!" >&2; exit 1 }; fi
       -
         name: Checkout
         uses: actions/checkout@v2
