@@ -58,7 +58,7 @@ jobs:
           timeout_minutes: 2 # timeout for a single attempt
           max_attempts: 3
           retry_wait_seconds: 60 # wait between retries
-          command: pip install apify~=${{ env.apify_version }}
+          command: pip install apify~=$APIFY_VERSION
       -
         name: Prepare image tags
         id: prepare-tags
