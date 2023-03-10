@@ -5,9 +5,8 @@ FROM python:${PYTHON_VERSION}
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors written in Python using Selenium"
 
 # Install firefox and gecko driver
-RUN apt-get update                             \
- && apt-get install -y --no-install-recommends \
-    ca-certificates curl firefox-esr           \
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates curl firefox-esr \
  && curl -L https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz | tar xz -C /usr/local/bin
 
 # Install google chrome
@@ -21,8 +20,8 @@ RUN apt-get install -yqq unzip
 RUN wget -O /tmp/chromedriver.zip http://chromedriver.storage.googleapis.com/`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE`/chromedriver_linux64.zip
 RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
 
-# Set display port to avoid crash
-ENV DISPLAY=:99
+# Install XVFB
+RUN apt-get install -y xvfb
 
 # Don't store bytecode, the Python app will be only run once
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -55,5 +54,11 @@ WORKDIR /usr/src/app
 # Copy the dummy source code to the image
 COPY . .
 
-# Set default startup command, using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD python3 -m src
+# Set up XVFB
+# We should use the autodisplay detection as suggested here: https://github.com/microsoft/playwright/issues/2728#issuecomment-678083619
+ENV DISPLAY=:99
+ENV XVFB_WHD=1920x1080x24+32
+
+# NOTE: This needs to be compatible with how Apify CLI launches actors
+ENTRYPOINT ["./start_xvfb_and_run_cmd.sh"]
+CMD ["python3", "-m", "src"]
