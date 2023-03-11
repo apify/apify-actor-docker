@@ -38,8 +38,7 @@ RUN playwright install
 # Next, copy the remaining files and directories with the source code.
 COPY . ./
 
-# Set up xvfb
-
+# Set up XVFB
 # We should use the autodisplay detection as suggested here: https://github.com/microsoft/playwright/issues/2728#issuecomment-678083619
 ENV DISPLAY=:99
 ENV XVFB_WHD=1920x1080x24+32
