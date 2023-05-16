@@ -13,7 +13,16 @@ RUN apt-get purge -yq nodejs
 RUN apt-get update && apt-get install -y curl && \
     curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - && \
     apt-get install -y nodejs \
+    # The following packages are needed for the intermediate certificates to work in Firefox.
+    ca-certificates \
+    jq \
+    wget \
+    p11-kit \
     && apt-get clean -y && apt-get autoremove -y
+
+COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
+RUN chmod +x ./register_intermediate_certs.sh \
+    && ./register_intermediate_certs.sh
 
 # Disable chrome auto updates, based on https://support.google.com/chrome/a/answer/9052345
 RUN mkdir -p /etc/default && echo 'repo_add_once=false' > /etc/default/google-chrome
@@ -67,6 +76,10 @@ RUN npm --quiet set progress=false \
     && npm --version \
     && echo "Google Chrome version:" \
     && bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version"
+
+# Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
+RUN rm $PLAYWRIGHT_BROWSERS_PATH/firefox-*/firefox/libnssckbi.so
+RUN ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so $(ls -d $PLAYWRIGHT_BROWSERS_PATH/firefox-*)/firefox/libnssckbi.so
 
 # Set up xvfb
 
