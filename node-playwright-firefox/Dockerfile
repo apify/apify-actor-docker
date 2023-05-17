@@ -8,7 +8,16 @@ RUN sh -c 'echo "deb http://ftp.us.debian.org/debian bullseye main non-free" >> 
     && DEBIAN_FRONTEND=noninteractive apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     # Found this in other images, not sure whether it's needed, it does not come from Playwright deps
-    procps
+    procps \
+    # The following packages are needed for the intermediate certificates to work in Firefox.
+    ca-certificates \
+    jq \
+    wget \
+    p11-kit
+
+COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
+RUN chmod +x ./register_intermediate_certs.sh \
+    && ./register_intermediate_certs.sh
 
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
@@ -66,6 +75,10 @@ RUN mv ./node_modules/playwright-firefox ./node_modules/playwright && rm -rf ./n
 
 # Prevent installing of browsers by future `npm install`.
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD 1
+
+# Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
+RUN rm $PLAYWRIGHT_BROWSERS_PATH/firefox-*/firefox/libnssckbi.so
+RUN ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so $(ls -d $PLAYWRIGHT_BROWSERS_PATH/firefox-*)/firefox/libnssckbi.so
 
 # We should you the autodisplay detection as suggested here: https://github.com/microsoft/playwright/issues/2728#issuecomment-678083619
 ENV DISPLAY=:99
