@@ -32,7 +32,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=CI_TEST" >> $GITHUB_ENV; fi
-          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=0.2.0" >> $GITHUB_ENV; fi
+          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=1.1.0" >> $GITHUB_ENV; fi
       -
         name: Check if inputs are set correctly
         run: |
