@@ -85,8 +85,8 @@ jobs:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
           build-args:
-            NODE_VERSION=${{ matrix.node-version }}
-            PLAYWRIGHT_VERSION=${{ env.PLAYWRIGHT_VERSION }}
+            - NODE_VERSION=${{ matrix.node-version }}
+            - PLAYWRIGHT_VERSION=${{ env.PLAYWRIGHT_VERSION }}
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
       -
