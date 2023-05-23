@@ -25,14 +25,14 @@ RUN rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
     # This is needed to remove an annoying error message when running headful.
     && mkdir -p /tmp/.X11-unix \
-    && chmod 1777 /tmp/.X11-unix
+    && chmod 1777 /tmp/.X11-unix \
+    && rm -rf /root/.npm
 
 # Run everything after as non-privileged user.
 USER myuser
 WORKDIR /home/myuser
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
-RUN mkdir ${PLAYWRIGHT_BROWSERS_PATH}
 
 # Copy source code and xvfb script
 COPY --chown=myuser:myuser package.json main.js firefox_test.js start_xvfb_and_run_cmd.sh /home/myuser/

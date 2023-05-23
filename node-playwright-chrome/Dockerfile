@@ -28,14 +28,13 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     fonts-kacst \
     fonts-thai-tlwg \
     fonts-wqy-zenhei \
-    --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /src/*.deb \
-    && mkdir -p /tmp/.X11-unix \
-    && chmod 1777 /tmp/.X11-unix
+    --no-install-recommends
 
 # Globally disable the update-notifier.
 RUN npm config --global set update-notifier false
+
+# Install all required playwright dependencies for chrome/chromium
+RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm_config_ignore_scripts=1 npx playwright install-deps chrome
 
 # Add user so we don't need --no-sandbox.
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
@@ -46,12 +45,19 @@ RUN mkdir -p /etc/opt/chrome/policies/managed \
     && echo '{ "CommandLineFlagSecurityWarningsEnabled": false }' > /etc/opt/chrome/policies/managed/managed_policies.json \
     && echo '{ "ComponentUpdatesEnabled": "false" }' > /etc/opt/chrome/policies/managed/component_update.json
 
+# Cleanup time
+RUN rm -rf /var/lib/apt/lists/* \
+    && rm -rf /src/*.deb \
+    # This is needed to remove an annoying error message when running headful.
+    && mkdir -p /tmp/.X11-unix \
+    && chmod 1777 /tmp/.X11-unix \
+    && rm -rf /root/.npm
+
 # Run everything after as non-privileged user.
 USER myuser
 WORKDIR /home/myuser
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
-RUN mkdir ${PLAYWRIGHT_BROWSERS_PATH}
 
 # Copy source code and xvfb script
 COPY --chown=myuser:myuser package.json main.js chrome_test.js start_xvfb_and_run_cmd.sh /home/myuser/

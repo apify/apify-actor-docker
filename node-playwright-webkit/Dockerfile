@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:jammy
 ARG NODE_VERSION=16
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Webkit"
@@ -38,14 +38,14 @@ RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm_config_ignore_scripts=1 npx playwrigh
 # Cleanup apt caches
 RUN apt-get clean -y && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /src/*.deb
+    && rm -rf /src/*.deb \
+    && rm -rf /root/.npm
 
 # Run everything after as non-privileged user.
 USER myuser
 WORKDIR /home/myuser
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
-RUN mkdir ${PLAYWRIGHT_BROWSERS_PATH}
 
 # Copy source code and xvfb script
 COPY --chown=myuser:myuser package.json main.js webkit_test.js start_xvfb_and_run_cmd.sh /home/myuser/
