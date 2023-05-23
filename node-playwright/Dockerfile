@@ -1,5 +1,5 @@
-ARG PLAYWRIGHT_VERSION=1.33.0
-FROM mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}-jammy
+ARG PLAYWRIGHT_VERSION=
+FROM mcr.microsoft.com/playwright:${PLAYWRIGHT_VERSION}jammy
 
 ARG NODE_VERSION=16
 

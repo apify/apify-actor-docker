@@ -25,7 +25,7 @@ env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag || 'CI_TEST' }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   CRAWLEE_VERSION: ${{ github.event.inputs.crawlee_version || github.event.client_payload.crawlee_version }}
-  PLAYWRIGHT_VERSION: ${{ github.event.inputs.playwright_version || github.event.client_payload.playwright_version || 'latest' }}
+  PLAYWRIGHT_VERSION: ${{ github.event.inputs.playwright_version || github.event.client_payload.playwright_version }}
   NODE_LATEST: 16
 
 jobs:
@@ -84,9 +84,8 @@ jobs:
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
-          build-args:
-            - NODE_VERSION=${{ matrix.node-version }}
-            - PLAYWRIGHT_VERSION=${{ env.PLAYWRIGHT_VERSION }}
+          # For some reason build-args doesn't want to be a list, so we manually make it one
+          build-args: NODE_VERSION=${{ matrix.node-version }} --build-arg PLAYWRIGHT_VERSION=${{ github.event_name != 'pull_request' && format('v{0}-', env.PLAYWRIGHT_VERSION) }}
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
       -
