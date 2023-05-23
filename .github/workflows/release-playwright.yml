@@ -59,26 +59,6 @@ jobs:
              return generateTags()
 
       -
-        name: Prepare build args
-        id: prepare-build-args
-        uses: actions/github-script@v4
-        env:
-          NODE_VERSION: ${{ matrix.node-version }}
-          PLAYWRIGHT_VERSION: ${{ env.PLAYWRIGHT_VERSION }}
-        with:
-          script: |
-            if (process.env.PLAYWRIGHT_VERSION) {
-              return [
-                `NODE_VERSION=${process.env.NODE_VERSION}`,
-                `PLAYWRIGHT_VERSION="v${process.env.PLAYWRIGHT_VERSION}-"`,
-              ]
-            }
-
-            return [
-              `NODE_VERSION=${process.env.NODE_VERSION}`,
-            ]
-
-      -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       -
@@ -101,12 +81,12 @@ jobs:
           command: cd ${{ matrix.image-name }} && npm i --dry-run
       -
         name: Build and tag image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
           # For some reason build-args doesn't want to be a list, so we manually make it one
-          build-args: ${{ fromJson(steps.prepare-build-args.outputs.result) }}
+          build-args: NODE_VERSION=${{ matrix.node-version }},PLAYWRIGHT_VERSION=${{ github.event_name != 'pull_request' && format('v{0}-', env.PLAYWRIGHT_VERSION) }}
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
       -
