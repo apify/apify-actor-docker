@@ -1,17 +1,19 @@
-name: Release Python basic images
+name: Release Python + Selenium images
 
 on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Tag for the images (e.g.: "latest" or "beta")'
+        description: 'Tag for the images (e.g.: beta)'
         required: true
       apify_version:
-        description: 'Apify SDK for Python version (e.g.: 1.0.0)'
+        description: 'Apify SDK version (e.g.: 0.2.0)'
         required: true
 
   repository_dispatch:
     types: [ build-python-images ]
+
+  pull_request:
 
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
@@ -24,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image-name: [python]
+        image-name: [python-selenium]
         python-version: ["3.8", "3.9", "3.10", "3.11"]
     steps:
       -

@@ -1,21 +1,27 @@
-name: Release Python basic images
+name: Release Python + Playwright images
 
 on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Tag for the images (e.g.: "latest" or "beta")'
+        description: 'Tag for the images (e.g.: beta)'
         required: true
       apify_version:
-        description: 'Apify SDK for Python version (e.g.: 1.0.0)'
+        description: 'Apify SDK version (e.g.: 1.0.0)'
+        required: true
+      playwright_version:
+        description: 'Playwright version (e.g.: 1.31.0)'
         required: true
 
   repository_dispatch:
     types: [ build-python-images ]
 
+  pull_request:
+
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
+  PLAYWRIGHT_VERSION: ${{ github.event.inputs.playwright_version || github.event.client_payload.playwright_version || '1.31.1' }}
   LATEST_PYTHON: "3.11"
 
 jobs:
@@ -24,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image-name: [python]
+        image-name: [python-playwright]
         python-version: ["3.8", "3.9", "3.10", "3.11"]
     steps:
       -
@@ -66,6 +72,7 @@ jobs:
         env:
           CURRENT_PYTHON: ${{ matrix.python-version }}
           LATEST_PYTHON: ${{ env.LATEST_PYTHON }}
+          FRAMEWORK_VERSION: ${{ env.PLAYWRIGHT_VERSION }}
           RELEASE_TAG: ${{ env.RELEASE_TAG }}
           IMAGE_NAME: apify/actor-${{ matrix.image-name }}
         with:
@@ -87,6 +94,7 @@ jobs:
           build-args: |
             PYTHON_VERSION=${{ matrix.python-version }}
             APIFY_VERSION=${{ env.APIFY_VERSION }}
+            PLAYWRIGHT_VERSION=${{ env.PLAYWRIGHT_VERSION }}
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
       -
