@@ -33,8 +33,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     xdg-utils \
     xvfb \
     --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /src/*.deb \
     && mkdir -p /tmp/.X11-unix \
     && chmod 1777 /tmp/.X11-unix
 
@@ -47,11 +45,6 @@ RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm_config_ignore_scripts=1 npx playwrigh
 # Prepare to install the latest Chrome compatible
 RUN mkdir -p /tmp/chrome-install
 WORKDIR /tmp/chrome-install
-COPY package.json puppeteer_*.js /tmp/chrome-install/
-
-# Install default dependencies
-RUN npm --quiet set progress=false \
-    && npm install --only=prod --no-optional --no-package-lock --prefer-online
 
 # Download the latest Chrome
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O /tmp/chrome.deb
@@ -68,6 +61,11 @@ RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
 RUN mkdir -p /etc/opt/chrome/policies/managed \
     && echo '{ "CommandLineFlagSecurityWarningsEnabled": false }' > /etc/opt/chrome/policies/managed/managed_policies.json \
     && echo '{ "ComponentUpdatesEnabled": "false" }' > /etc/opt/chrome/policies/managed/component_update.json
+
+# Cleanup
+RUN rm -rf /var/lib/apt/lists/* \
+    && rm -rf /src/*.deb \
+    && rm -rf /root/.npm
 
 # Run everything after as non-privileged user.
 USER myuser
