@@ -1,4 +1,6 @@
-FROM mcr.microsoft.com/playwright:focal
+ARG PLAYWRIGHT_VERSION=1.33.0
+FROM mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}-jammy
+
 ARG NODE_VERSION=16
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using headless Chrome"
@@ -34,12 +36,14 @@ RUN mkdir -p /etc/opt/chrome/policies/managed \
 # Globally disable the update-notifier.
 RUN npm config --global set update-notifier false
 
+# Move ms-playwright to user folder
+RUN mv /ms-playwright /home/myuser/pw-browsers
+
 # Run everything after as non-privileged user.
 USER myuser
 WORKDIR /home/myuser
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
-RUN mkdir ${PLAYWRIGHT_BROWSERS_PATH}
 
 # Copy source code and xvfb script
 COPY --chown=myuser:myuser package.json main.js chrome_test.js start_xvfb_and_run_cmd.sh /home/myuser/

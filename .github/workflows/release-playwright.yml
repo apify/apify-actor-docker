@@ -13,7 +13,7 @@ on:
         description: 'Crawlee version (e.g.: ^1.0.0)'
         required: true
       playwright_version:
-        description: 'Playwright version (e.g.: 1.7.1)'
+        description: 'Playwright version (e.g.: 1.7.1) (must not be semver range)'
         required: true
 
   repository_dispatch:
@@ -84,7 +84,7 @@ jobs:
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
-          build-args: NODE_VERSION=${{ matrix.node-version }}
+          build-args: NODE_VERSION=${{ matrix.node-version }} PLAYWRIGHT_VERSION=${{ env.PLAYWRIGHT_VERSION }}
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
       -
