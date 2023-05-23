@@ -25,7 +25,7 @@ env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag || 'CI_TEST' }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   CRAWLEE_VERSION: ${{ github.event.inputs.crawlee_version || github.event.client_payload.crawlee_version }}
-  PLAYWRIGHT_VERSION: ${{ github.event.inputs.playwright_version || github.event.client_payload.playwright_version }}
+  PLAYWRIGHT_VERSION: ${{ github.event.inputs.playwright_version || github.event.client_payload.playwright_version || 'latest' }}
   NODE_LATEST: 16
 
 jobs:
