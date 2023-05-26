@@ -10,36 +10,33 @@ RUN apt-get update \
     git \
     procps \
     xvfb \
-    # This is needed to remove an annoying error message when running headful.
-    && mkdir -p /tmp/.X11-unix \
-    && chmod 1777 /tmp/.X11-unix
-
-# Install node
-RUN apt-get update && apt-get install -y curl && \
-    curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - && \
-    apt-get install -y nodejs \
-    && apt-get clean -y && apt-get autoremove -y
-
-# Feature-parity with Node.js base images.
-# From: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal
-RUN apt-get update && apt-get install -y --no-install-recommends git ssh && \
-    npm install -g yarn
-
-RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
+    # Install node
+    && apt-get update && apt-get install -y curl \
+    && curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
+    && apt-get install -y nodejs \
+    # Feature-parity with Node.js base images.
+    # From: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal
+    && apt-get update && apt-get install -y --no-install-recommends git ssh \
+    && npm install -g yarn \
+    \
+    # Add user so we don't need --no-sandbox.
+    && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
-    && chown -R myuser:myuser /home/myuser
-
-# Globally disable the update-notifier.
-RUN npm config --global set update-notifier false
-
-# Install all required playwright dependencies for webkit
-RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm_config_ignore_scripts=1 npx playwright install-deps webkit
-
-# Cleanup apt caches
-RUN apt-get clean -y && apt-get autoremove -y \
+    && chown -R myuser:myuser /home/myuser \
+    # Globally disable the update-notifier.
+    && npm config --global set update-notifier false \
+    \
+    # Install all required playwright dependencies for webkit
+    && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm_config_ignore_scripts=1 npx playwright install-deps webkit \
+    \
+    # Cleanup time
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
-    && rm -rf /root/.npm
+    && apt-get clean -y && apt-get autoremove -y \
+    && rm -rf /root/.npm \
+    \
+    # This is needed to remove an annoying error message when running headful.
+    && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
 
 # Run everything after as non-privileged user.
 USER myuser
@@ -67,15 +64,13 @@ RUN npm --quiet set progress=false \
     && echo "Node.js version:" \
     && node --version \
     && echo "NPM version:" \
-    && npm --version
-
-# symlink the webkit binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
-RUN ln -s ${PLAYWRIGHT_BROWSERS_PATH}/webkit-*/minibrowser-gtk/MiniBrowser ${PLAYWRIGHT_BROWSERS_PATH}/
+    && npm --version \
+    # symlink the webkit binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
+    && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/webkit-*/minibrowser-gtk/MiniBrowser ${PLAYWRIGHT_BROWSERS_PATH}/ \
+    # Playwright allows donwloading only one browser through separate package with same export. So we rename it to just playwright.
+    && mv ./node_modules/playwright-webkit ./node_modules/playwright && rm -rf ./node_modules/playwright-webkit
 
 ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/MiniBrowser
-
-# Playwright allows donwloading only one browser through separate package with same export. So we rename it to just playwright.
-RUN mv ./node_modules/playwright-webkit ./node_modules/playwright && rm -rf ./node_modules/playwright-webkit
 
 # Prevent installing of browsers by future `npm install`.
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD 1

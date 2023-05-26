@@ -3,39 +3,44 @@ ARG NODE_VERSION=16
 FROM node:${NODE_VERSION}-bullseye-slim
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Firefox"
+ENV DEBIAN_FRONTEND=noninteractive
+
+COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
+
 # Install Firefox dependencies + tools
 RUN sh -c 'echo "deb http://ftp.us.debian.org/debian bullseye main non-free" >> /etc/apt/sources.list.d/fonts.list' \
-    && DEBIAN_FRONTEND=noninteractive apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
     # Found this in other images, not sure whether it's needed, it does not come from Playwright deps
     procps \
     # The following packages are needed for the intermediate certificates to work in Firefox.
     ca-certificates \
     jq \
     wget \
-    p11-kit
-
-COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
-RUN chmod +x ./register_intermediate_certs.sh \
-    && ./register_intermediate_certs.sh
-
-RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
+    p11-kit \
+    \
+    # Register cerificates
+    && chmod +x ./register_intermediate_certs.sh \
+    && ./register_intermediate_certs.sh \
+    \
+    # Add user so we don't need --no-sandbox.
+    && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
-    && chown -R myuser:myuser /home/myuser
-
-# Globally disable the update-notifier.
-RUN npm config --global set update-notifier false
-
-# Install all required playwright dependencies for firefox
-RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm_config_ignore_scripts=1 npx playwright install-deps firefox
-
-# Cleanup time
-RUN rm -rf /var/lib/apt/lists/* \
+    && chown -R myuser:myuser /home/myuser \
+    \
+    # Globally disable the update-notifier.
+    && npm config --global set update-notifier false \
+    \
+    # Install all required playwright dependencies for firefox
+    && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm_config_ignore_scripts=1 npx playwright install-deps firefox \
+    \
+    # Cleanup time
+    && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
+    && apt-get clean -y && apt-get autoremove -y \
+    && rm -rf /root/.npm \
     # This is needed to remove an annoying error message when running headful.
-    && mkdir -p /tmp/.X11-unix \
-    && chmod 1777 /tmp/.X11-unix \
-    && rm -rf /root/.npm
+    && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
 
 # Run everything after as non-privileged user.
 USER myuser
@@ -63,22 +68,22 @@ RUN npm --quiet set progress=false \
     && echo "Node.js version:" \
     && node --version \
     && echo "NPM version:" \
-    && npm --version
-
-# symlink the firefox binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
-RUN ln -s ${PLAYWRIGHT_BROWSERS_PATH}/firefox-*/firefox/firefox ${PLAYWRIGHT_BROWSERS_PATH}/
+    && npm --version \
+    \
+    # symlink the firefox binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
+    && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/firefox-*/firefox/firefox ${PLAYWRIGHT_BROWSERS_PATH}/ \
+    \
+    # Playwright allows donwloading only one browser through separate package with same export. So we rename it to just playwright.
+    && mv ./node_modules/playwright-firefox ./node_modules/playwright && rm -rf ./node_modules/playwright-firefox \
+    \
+    # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
+    && rm $PLAYWRIGHT_BROWSERS_PATH/firefox-*/firefox/libnssckbi.so \
+    && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so $(ls -d $PLAYWRIGHT_BROWSERS_PATH/firefox-*)/firefox/libnssckbi.so
 
 ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/firefox
 
-# Playwright allows donwloading only one browser through separate package with same export. So we rename it to just playwright.
-RUN mv ./node_modules/playwright-firefox ./node_modules/playwright && rm -rf ./node_modules/playwright-firefox
-
 # Prevent installing of browsers by future `npm install`.
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD 1
-
-# Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
-RUN rm $PLAYWRIGHT_BROWSERS_PATH/firefox-*/firefox/libnssckbi.so
-RUN ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so $(ls -d $PLAYWRIGHT_BROWSERS_PATH/firefox-*)/firefox/libnssckbi.so
 
 # We should you the autodisplay detection as suggested here: https://github.com/microsoft/playwright/issues/2728#issuecomment-678083619
 ENV DISPLAY=:99
