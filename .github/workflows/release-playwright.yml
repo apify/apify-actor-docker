@@ -13,7 +13,7 @@ on:
         description: 'Crawlee version (e.g.: ^1.0.0)'
         required: true
       playwright_version:
-        description: 'Playwright version (e.g.: 1.7.1)'
+        description: 'Playwright version (e.g.: 1.7.1) (must not be semver range)'
         required: true
 
   repository_dispatch:
@@ -57,6 +57,7 @@ jobs:
           script: |
              const generateTags = require("./.github/scripts/prepare-node-image-tags.js");
              return generateTags()
+
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -84,7 +85,10 @@ jobs:
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
-          build-args: NODE_VERSION=${{ matrix.node-version }}
+          # For some reason build-args doesn't want to be a list, so we manually make it one
+          build-args: |
+            NODE_VERSION=${{ matrix.node-version }}
+            PLAYWRIGHT_VERSION=${{ (github.event_name != 'pull_request' && format('v{0}-', env.PLAYWRIGHT_VERSION)) || '' }}
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
       -

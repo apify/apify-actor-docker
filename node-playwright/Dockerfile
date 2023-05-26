@@ -1,54 +1,65 @@
-FROM mcr.microsoft.com/playwright:focal
+ARG PLAYWRIGHT_VERSION=
+FROM mcr.microsoft.com/playwright:${PLAYWRIGHT_VERSION}jammy
+
 ARG NODE_VERSION=16
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using headless Chrome"
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Copy the script for registering intermediate certificates.
+COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
 
 # Install libs
-RUN apt-get update
-RUN apt-get install --fix-missing -yq --no-install-recommends procps xvfb wget && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
-# Uninstall system NodeJs
-RUN apt-get purge -yq nodejs
-
-# Install node
-RUN apt-get update && apt-get install -y curl && \
-    curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - && \
-    apt-get install -y nodejs \
+RUN apt-get update \
+    && apt-get install --fix-missing -yq --no-install-recommends procps xvfb wget \
+    && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix \
+    # Uninstall system NodeJs
+    && apt-get purge -yq nodejs \
+    # Install node
+    && apt-get update && apt-get install -y curl \
+    && curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
+    && apt-get install -y nodejs \
     # The following packages are needed for the intermediate certificates to work in Firefox.
     ca-certificates \
     jq \
     wget \
     p11-kit \
-    && apt-get clean -y && apt-get autoremove -y
-
-COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
-RUN chmod +x ./register_intermediate_certs.sh \
-    && ./register_intermediate_certs.sh
-
-# Disable chrome auto updates, based on https://support.google.com/chrome/a/answer/9052345
-RUN mkdir -p /etc/default && echo 'repo_add_once=false' > /etc/default/google-chrome
-
-# Install chrome
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -nv
-RUN apt install --fix-missing -yq ./google-chrome-stable_current_amd64.deb && rm ./google-chrome-stable_current_amd64.deb
-
-# Add user so we don't need --no-sandbox.
-RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
+    # Register cerificates
+    && chmod +x ./register_intermediate_certs.sh \
+    && ./register_intermediate_certs.sh \
+    # Disable chrome auto updates, based on https://support.google.com/chrome/a/answer/9052345
+    && mkdir -p /etc/default && echo 'repo_add_once=false' > /etc/default/google-chrome \
+    # Install chrome
+    && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -nv \
+    && apt install --fix-missing -yq ./google-chrome-stable_current_amd64.deb && rm ./google-chrome-stable_current_amd64.deb \
+    \
+    # Add user so we don't need --no-sandbox.
+    && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
-    && chown -R myuser:myuser /home/myuser
-
-RUN mkdir -p /etc/opt/chrome/policies/managed \
+    && chown -R myuser:myuser /home/myuser \
+    \
+    && mkdir -p /etc/opt/chrome/policies/managed \
     && echo '{ "CommandLineFlagSecurityWarningsEnabled": false }' > /etc/opt/chrome/policies/managed/managed_policies.json \
-    && echo '{ "ComponentUpdatesEnabled": "false" }' > /etc/opt/chrome/policies/managed/component_update.json
-
-# Globally disable the update-notifier.
-RUN npm config --global set update-notifier false
+    && echo '{ "ComponentUpdatesEnabled": false }' > /etc/opt/chrome/policies/managed/component_update.json \
+    \
+    # Globally disable the update-notifier.
+    && npm config --global set update-notifier false \
+    \
+    # Move ms-playwright to user folder
+    && mv /ms-playwright /home/myuser/pw-browsers \
+    \
+    # Final cleanup
+    # Cleanup time
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /src/*.deb \
+    && apt-get clean -y && apt-get autoremove -y \
+    && rm -rf /root/.npm
 
 # Run everything after as non-privileged user.
 USER myuser
 WORKDIR /home/myuser
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
-RUN mkdir ${PLAYWRIGHT_BROWSERS_PATH}
 
 # Copy source code and xvfb script
 COPY --chown=myuser:myuser package.json main.js chrome_test.js start_xvfb_and_run_cmd.sh /home/myuser/
@@ -75,11 +86,10 @@ RUN npm --quiet set progress=false \
     && echo "NPM version:" \
     && npm --version \
     && echo "Google Chrome version:" \
-    && bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version"
-
-# Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
-RUN rm $PLAYWRIGHT_BROWSERS_PATH/firefox-*/firefox/libnssckbi.so
-RUN ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so $(ls -d $PLAYWRIGHT_BROWSERS_PATH/firefox-*)/firefox/libnssckbi.so
+    && bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version" \
+    # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
+    && rm $PLAYWRIGHT_BROWSERS_PATH/firefox-*/firefox/libnssckbi.so \
+    && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so $(ls -d $PLAYWRIGHT_BROWSERS_PATH/firefox-*)/firefox/libnssckbi.so
 
 # Set up xvfb
 
