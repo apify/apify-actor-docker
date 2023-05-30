@@ -22,7 +22,7 @@ env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag || 'CI_TEST' }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   CRAWLEE_VERSION: ${{ github.event.inputs.crawlee_version || github.event.client_payload.crawlee_version }}
-  NODE_LATEST: 16
+  NODE_LATEST: 18
 
 jobs:
   # Build master images that are not dependent on existing builds.
@@ -34,7 +34,7 @@ jobs:
       fail-fast: false
       matrix:
         image-name: [node]
-        node-version: [16, 18]
+        node-version: [16, 18, 20]
     steps:
       -
         name: Checkout
