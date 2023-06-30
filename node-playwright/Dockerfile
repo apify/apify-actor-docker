@@ -45,9 +45,6 @@ RUN apt-get update \
     # Globally disable the update-notifier.
     && npm config --global set update-notifier false \
     \
-    # Move ms-playwright to user folder
-    && mv /ms-playwright /home/myuser/pw-browsers \
-    \
     # Final cleanup
     # Cleanup time
     && rm -rf /var/lib/apt/lists/* \
@@ -59,7 +56,8 @@ RUN apt-get update \
 USER myuser
 WORKDIR /home/myuser
 
-ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
+# Point playwright to the preincluded browsers - moving browsers around increases the image size a *lot*
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 # Copy source code and xvfb script
 COPY --chown=myuser:myuser package.json main.js chrome_test.js start_xvfb_and_run_cmd.sh /home/myuser/

@@ -1,6 +1,6 @@
 # Use the specified Python version
 ARG PYTHON_VERSION
-FROM python:${PYTHON_VERSION}
+FROM python:${PYTHON_VERSION}-bullseye
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors written in Python using Selenium"
 
