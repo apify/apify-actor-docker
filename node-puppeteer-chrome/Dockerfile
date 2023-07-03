@@ -4,22 +4,20 @@ ARG NODE_VERSION=16
 FROM node:${NODE_VERSION}-bullseye-slim
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors using headless Chrome"
+ENV DEBIAN_FRONTEND=noninteractive
 
 # This image was inspired by https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-in-docker
 
-# Disable chrome auto updates, based on https://support.google.com/chrome/a/answer/9052345
-RUN mkdir -p /etc/default && echo 'repo_add_once=false' > /etc/default/google-chrome
-
 # Install latest Chrome dev packages and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
 # Note: this also installs the necessary libs to make the bundled version of Chromium that Puppeteer installs work.
-RUN DEBIAN_FRONTEND=noninteractive apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg unzip ca-certificates --no-install-recommends \
-    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | DEBIAN_FRONTEND=noninteractive apt-key add - \
+RUN apt-get update \
+    && apt-get install -y wget gnupg unzip ca-certificates --no-install-recommends \
+    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
     && sh -c 'echo "deb http://ftp.us.debian.org/debian bullseye main non-free" >> /etc/apt/sources.list.d/fonts.list' \
-    && DEBIAN_FRONTEND=noninteractive apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y unzip \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    && apt-get update \
+    && apt-get purge --auto-remove -y unzip \
+    && apt-get install -y \
     fonts-freefont-ttf \
     fonts-ipafont-gothic \
     fonts-kacst \
@@ -33,41 +31,29 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     xdg-utils \
     xvfb \
     --no-install-recommends \
+    # Disable chrome auto updates, based on https://support.google.com/chrome/a/answer/9052345
+    && mkdir -p /etc/default && echo 'repo_add_once=false' > /etc/default/google-chrome \
+    \
+    # Install chrome
+    && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -nv \
+    && apt install --fix-missing -yq ./google-chrome-stable_current_amd64.deb && rm ./google-chrome-stable_current_amd64.deb \
+    \
+    # Add user so we don't need --no-sandbox.
+    && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
+    && mkdir -p /home/myuser/Downloads \
+    && chown -R myuser:myuser /home/myuser \
+    \
+    && mkdir -p /etc/opt/chrome/policies/managed \
+    && echo '{ "CommandLineFlagSecurityWarningsEnabled": false }' > /etc/opt/chrome/policies/managed/managed_policies.json \
+    && echo '{ "ComponentUpdatesEnabled": false }' > /etc/opt/chrome/policies/managed/component_update.json \
+    \
+    # Globally disable the update-notifier.
+    && npm config --global set update-notifier false \
+    # Cleanup
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
-    && mkdir -p /tmp/.X11-unix \
-    && chmod 1777 /tmp/.X11-unix
-
-# Globally disable the update-notifier.
-RUN npm config --global set update-notifier false
-
-# Install the required dependencies of chrome..by using playwright's useful CLI
-RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm_config_ignore_scripts=1 npx playwright install-deps chrome
-
-# Prepare to install the latest Chrome compatible
-RUN mkdir -p /tmp/chrome-install
-WORKDIR /tmp/chrome-install
-COPY package.json puppeteer_*.js /tmp/chrome-install/
-
-# Install default dependencies
-RUN npm --quiet set progress=false \
-    && npm install --only=prod --no-optional --no-package-lock --prefer-online
-
-# Download the latest Chrome
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O /tmp/chrome.deb
-# Install it
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y /tmp/chrome.deb \
-    && rm /tmp/chrome.deb \
-    && rm -rf /tmp/chrome-install
-
-# Add user so we don't need --no-sandbox.
-RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
-    && mkdir -p /home/myuser/Downloads \
-    && chown -R myuser:myuser /home/myuser
-
-RUN mkdir -p /etc/opt/chrome/policies/managed \
-    && echo '{ "CommandLineFlagSecurityWarningsEnabled": false }' > /etc/opt/chrome/policies/managed/managed_policies.json \
-    && echo '{ "ComponentUpdatesEnabled": "false" }' > /etc/opt/chrome/policies/managed/component_update.json
+    && apt-get clean -y && apt-get autoremove -y \
+    && rm -rf /root/.npm
 
 # Run everything after as non-privileged user.
 USER myuser

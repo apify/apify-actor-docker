@@ -7,7 +7,7 @@ on:
         description: 'Tag for the images (e.g.: beta)'
         required: true
       apify_version:
-        description: 'Apify SDK version (e.g.: 0.2.0)'
+        description: 'Apify SDK version (e.g.: 1.0.0)'
         required: true
 
   repository_dispatch:
@@ -34,7 +34,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=CI_TEST" >> $GITHUB_ENV; fi
-          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=0.2.0" >> $GITHUB_ENV; fi
+          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=1.1.0" >> $GITHUB_ENV; fi
       -
         name: Check if inputs are set correctly
         run: |
@@ -99,8 +99,8 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.APIFY_SERVICE_ACCOUNT_DOCKERHUB_USERNAME }}
+          password: ${{ secrets.APIFY_SERVICE_ACCOUNT_DOCKERHUB_TOKEN }}
       -
         name: Push images
         if: github.event_name != 'pull_request'

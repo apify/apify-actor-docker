@@ -1,13 +1,13 @@
 # Use the specified Python version
 ARG PYTHON_VERSION
-FROM python:${PYTHON_VERSION}
+FROM python:${PYTHON_VERSION}-bullseye
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors written in Python using Selenium"
 
 # Install firefox and gecko driver
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates curl firefox-esr \
- && curl -L https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz | tar xz -C /usr/local/bin
+ && curl -L https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz | tar xz -C /usr/local/bin
 
 # Install google chrome
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
@@ -44,7 +44,7 @@ RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools wheel
 
 # Install the specified Apify SDK for Python version and selenium
-ARG APIFY_VERSION=0.2.0
+ARG APIFY_VERSION=1.1.0
 RUN pip install apify~=${APIFY_VERSION} selenium
 
 # Create app directory
