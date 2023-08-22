@@ -53,7 +53,9 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
     && apt-get clean -y && apt-get autoremove -y \
-    && rm -rf /root/.npm
+    && rm -rf /root/.npm \
+    # This is needed to remove an annoying error message when running headful.
+    && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
 
 # Run everything after as non-privileged user.
 USER myuser
