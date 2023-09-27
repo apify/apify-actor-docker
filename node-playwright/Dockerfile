@@ -61,6 +61,9 @@ WORKDIR /home/myuser
 # Point playwright to the preincluded browsers - moving browsers around increases the image size a *lot*
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
+# Tell the crawlee cli that we already have browers installed, so it skips installing them
+ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
+
 # Copy source code and xvfb script
 COPY --chown=myuser:myuser package.json main.js chrome_test.js start_xvfb_and_run_cmd.sh /home/myuser/
 

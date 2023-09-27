@@ -64,6 +64,9 @@ COPY --chown=myuser:myuser package.json main.js chrome_test.js start_xvfb_and_ru
 # Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
 ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
 
+# Tell the crawlee cli that we already have browers installed, so it skips installing them
+ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
+
 # Tell Node.js this is a production environemnt
 ENV NODE_ENV=production
 
