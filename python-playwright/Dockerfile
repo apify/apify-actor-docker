@@ -2,7 +2,7 @@
 ARG PYTHON_VERSION
 FROM python:${PYTHON_VERSION}-bullseye
 
-LABEL maintainer="support@apify.com" Description="Base image for simple Apify actors written in Python using playwright"
+LABEL maintainer="support@apify.com" description="Base image for simple Apify actors written in Python using playwright"
 
 # Don't store bytecode, the Python app will be only run once
 ENV PYTHONDONTWRITEBYTECODE 1

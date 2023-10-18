@@ -1,7 +1,7 @@
 ARG NODE_VERSION=16
 FROM node:${NODE_VERSION}-alpine
 
-LABEL maintainer="support@apify.com" Description="Base image for simple Apify actors"
+LABEL maintainer="support@apify.com" description="Base image for simple Apify actors"
 
 # Globally disable the update-notifier.
 RUN npm config --global set update-notifier false

@@ -2,7 +2,7 @@ ARG NODE_VERSION=16
 # Use bullseye to be consistent across node versions.
 FROM node:${NODE_VERSION}-bullseye-slim
 
-LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Firefox"
+LABEL maintainer="support@apify.com" description="Base image for Apify actors using Firefox"
 ENV DEBIAN_FRONTEND=noninteractive
 
 COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh

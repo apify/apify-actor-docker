@@ -1,7 +1,7 @@
 FROM ubuntu:jammy
 ARG NODE_VERSION=16
 
-LABEL maintainer="support@apify.com" Description="Base image for Apify actors using Webkit"
+LABEL maintainer="support@apify.com" description="Base image for Apify actors using Webkit"
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install WebKit dependencies
