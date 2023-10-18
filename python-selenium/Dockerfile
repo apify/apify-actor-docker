@@ -2,7 +2,7 @@
 ARG PYTHON_VERSION
 FROM python:${PYTHON_VERSION}-bullseye
 
-LABEL maintainer="support@apify.com" Description="Base image for Apify actors written in Python using Selenium"
+LABEL maintainer="support@apify.com" description="Base image for Apify actors written in Python using Selenium"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 

@@ -3,7 +3,7 @@ ARG NODE_VERSION=16
 # Use bullseye to be consistent across node versions.
 FROM node:${NODE_VERSION}-bullseye-slim
 
-LABEL maintainer="support@apify.com" Description="Base image for Apify actors using headless Chrome"
+LABEL maintainer="support@apify.com" description="Base image for Apify actors using headless Chrome"
 ENV DEBIAN_FRONTEND=noninteractive
 
 # This image was inspired by https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-in-docker

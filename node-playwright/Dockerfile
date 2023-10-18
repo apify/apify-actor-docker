@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/playwright:${PLAYWRIGHT_VERSION}jammy
 
 ARG NODE_VERSION=16
 
-LABEL maintainer="support@apify.com" Description="Base image for Apify actors using headless Chrome"
+LABEL maintainer="support@apify.com" description="Base image for Apify actors using headless Chrome"
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Copy the script for registering intermediate certificates.
