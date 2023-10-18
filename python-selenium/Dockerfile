@@ -6,7 +6,7 @@ LABEL maintainer="support@apify.com" Description="Base image for Apify actors wr
 
 # Install firefox and gecko driver
 RUN apt-get update \
- && apt-get install -y --no-install-recommends ca-certificates curl firefox-esr \
+ && apt-get install -y --no-install-recommends ca-certificates curl firefox-esr unzip jq \
  && curl -L https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz | tar xz -C /usr/local/bin
 
 # Install google chrome
@@ -15,10 +15,11 @@ RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable 
 RUN apt-get -y update
 RUN apt-get install -y google-chrome-stable
 
-# Install chromedriver
-RUN apt-get install -yqq unzip
-RUN wget -O /tmp/chromedriver.zip http://chromedriver.storage.googleapis.com/`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE`/chromedriver_linux64.zip
-RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
+# Install Google Chrome driver
+RUN export CHROME_DRIVER_VERSION="$(curl -s https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json | jq -r '.channels.Stable.version')" && \
+    curl -sSL -o /tmp/chromedriver-linux64.zip "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/${CHROME_DRIVER_VERSION}/linux64/chromedriver-linux64.zip" && \
+    unzip /tmp/chromedriver-linux64.zip -d /usr/local/bin/ && \
+    rm -f /tmp/chromedriver-linux64.zip
 
 # Install XVFB
 RUN apt-get install -y xvfb
