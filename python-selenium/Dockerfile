@@ -4,24 +4,63 @@ FROM python:${PYTHON_VERSION}-bullseye
 
 LABEL maintainer="support@apify.com" Description="Base image for Apify actors written in Python using Selenium"
 
-# Install firefox and gecko driver
-RUN apt-get update \
- && apt-get install -y --no-install-recommends ca-certificates curl firefox-esr \
- && curl -L https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz | tar xz -C /usr/local/bin
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# Install google chrome
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
-RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-RUN apt-get -y update
-RUN apt-get install -y google-chrome-stable
+# Install curl, firefox, jq, unzip, xvfb and other dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        firefox-esr \
+        fonts-liberation \
+        jq \
+        libappindicator3-1 \
+        libasound2 \
+        libatk-bridge2.0-0 \
+        libgbm-dev \
+        libglib2.0-0 \
+        libgtk-3-0 \
+        libnspr4 \
+        libnss3 \
+        libx11-6 \
+        libx11-xcb1 \
+        libxcomposite1 \
+        libxcursor1 \
+        libxdamage1 \
+        libxext6 \
+        libxfixes3 \
+        libxi6 \
+        libxkbcommon0 \
+        libxrandr2 \
+        libxrender1 \
+        libxslt1.1 \
+        libxss1 \
+        libxt6 \
+        libxtst6 \
+        unzip \
+        wget \
+        xdg-utils \
+        xvfb && \
+    apt-get autoremove -yqq --purge && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install chromedriver
-RUN apt-get install -yqq unzip
-RUN wget -O /tmp/chromedriver.zip http://chromedriver.storage.googleapis.com/`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE`/chromedriver_linux64.zip
-RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
+# Install gecko driver
+RUN curl -L https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz | tar xz -C /usr/local/bin
 
-# Install XVFB
-RUN apt-get install -y xvfb
+# Install Google Chrome
+RUN CHROME_URL="$(curl -s https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json | jq -r '.channels.Stable.downloads.chrome[] | select(.platform=="linux64") | .url')" && \
+    curl -sSL -o /tmp/chrome-linux64.zip "$CHROME_URL" && \
+    unzip /tmp/chrome-linux64.zip -d /opt/ && \
+    ln -s /opt/chrome-linux64/chrome /usr/bin/google-chrome && \
+    ln -s /opt/chrome-linux64/chrome /usr/bin/google-chrome-stable && \
+    rm -f /tmp/chrome-linux64.zip
+
+# Install Google Chrome driver
+RUN CHROME_DRIVER_URL="$(curl -s https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json | jq -r '.channels.Stable.downloads.chromedriver[] | select(.platform=="linux64") | .url')" && \
+    curl -sSL -o /tmp/chromedriver-linux64.zip "$CHROME_DRIVER_URL" && \
+    unzip /tmp/chromedriver-linux64.zip -d /usr/local/bin/ && \
+    rm -f /tmp/chromedriver-linux64.zip
 
 # Don't store bytecode, the Python app will be only run once
 ENV PYTHONDONTWRITEBYTECODE 1
