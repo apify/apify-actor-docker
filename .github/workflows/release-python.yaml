@@ -7,11 +7,13 @@ on:
         description: 'Tag for the images (e.g.: "latest" or "beta")'
         required: true
       apify_version:
-        description: 'Apify SDK for Python version (e.g.: 1.0.0)'
+        description: 'Apify Python SDK version (e.g.: "1.0.0")'
         required: true
 
   repository_dispatch:
     types: [ build-python-images ]
+
+  pull_request:
 
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
