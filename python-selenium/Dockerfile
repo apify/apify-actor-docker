@@ -83,7 +83,7 @@ RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools wheel
 
 # Install the specified Apify SDK for Python version and selenium
-ARG APIFY_VERSION=1.1.0
+ARG APIFY_VERSION
 RUN pip install apify~=${APIFY_VERSION} selenium
 
 # Create app directory
