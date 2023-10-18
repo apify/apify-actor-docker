@@ -48,15 +48,17 @@ RUN apt-get update && \
 # Install gecko driver
 RUN curl -L https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz | tar xz -C /usr/local/bin
 
-RUN export CHROME_VERSION="$(curl -s https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json | jq -r '.channels.Stable.version')" && \
-    # Install Google Chrome \
-    curl -sSL -o /tmp/chrome-linux64.zip "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/${CHROME_VERSION}/linux64/chrome-linux64.zip" && \
+# Install Google Chrome
+RUN CHROME_URL="$(curl -s https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json | jq -r '.channels.Stable.downloads.chrome[] | select(.platform=="linux64") | .url')" && \
+    curl -sSL -o /tmp/chrome-linux64.zip "$CHROME_URL" && \
     unzip /tmp/chrome-linux64.zip -d /opt/ && \
     ln -s /opt/chrome-linux64/chrome /usr/bin/google-chrome && \
     ln -s /opt/chrome-linux64/chrome /usr/bin/google-chrome-stable && \
-    rm -f /tmp/chrome-linux64.zip && \
-    # Install Google Chrome driver \
-    curl -sSL -o /tmp/chromedriver-linux64.zip "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/${CHROME_VERSION}/linux64/chromedriver-linux64.zip" && \
+    rm -f /tmp/chrome-linux64.zip
+
+# Install Google Chrome driver
+RUN CHROME_DRIVER_URL="$(curl -s https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json | jq -r '.channels.Stable.downloads.chromedriver[] | select(.platform=="linux64") | .url')" && \
+    curl -sSL -o /tmp/chromedriver-linux64.zip "$CHROME_DRIVER_URL" && \
     unzip /tmp/chromedriver-linux64.zip -d /usr/local/bin/ && \
     rm -f /tmp/chromedriver-linux64.zip
 
