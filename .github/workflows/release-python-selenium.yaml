@@ -9,6 +9,9 @@ on:
       apify_version:
         description: 'Apify Python SDK version (e.g.: "1.0.0")'
         required: true
+      selenium_version:
+        description: 'Selenium version (e.g.: "4.14.0")'
+        required: true
 
   repository_dispatch:
     types: [ build-python-images ]
@@ -18,6 +21,7 @@ on:
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
+  SELENIUM_VERSION: ${{ github.event.inputs.selenium_version || github.event.client_payload.selenium_version || '4.14.0' }}
   LATEST_PYTHON: "3.11"
 
 jobs:
@@ -68,6 +72,7 @@ jobs:
         env:
           CURRENT_PYTHON: ${{ matrix.python-version }}
           LATEST_PYTHON: ${{ env.LATEST_PYTHON }}
+          FRAMEWORK_VERSION: ${{ env.PLAYWRIGHT_VERSION }}
           RELEASE_TAG: ${{ env.RELEASE_TAG }}
           IMAGE_NAME: apify/actor-${{ matrix.image-name }}
         with:
@@ -89,6 +94,7 @@ jobs:
           build-args: |
             PYTHON_VERSION=${{ matrix.python-version }}
             APIFY_VERSION=${{ env.APIFY_VERSION }}
+            SELENIUM_VERSION=${{ env.SELENIUM_VERSION }}
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
       -
