@@ -20,14 +20,20 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Don't buffer output and flush it straight away
 ENV PYTHONUNBUFFERED=1
 
+# Don't use a cache dir
+ENV PIP_NO_CACHE_DIR=1
+
 # Disable warnings about outdated pip
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Disable warnings about running pip as root
+ENV PIP_ROOT_USER_ACTION=ignore
 
 # This instruction:
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
 # - Installs the specified version of the Apify Python SDK
-RUN pip install --upgrade --no-cache-dir --root-user-action ignore \
+RUN pip install --upgrade ignore \
     pip \
     setuptools \
     wheel \

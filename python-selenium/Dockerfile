@@ -23,8 +23,14 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Don't buffer output and flush it straight away
 ENV PYTHONUNBUFFERED=1
 
+# Don't use a cache dir
+ENV PIP_NO_CACHE_DIR=1
+
 # Disable warnings about outdated pip
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Disable warnings about running pip as root
+ENV PIP_ROOT_USER_ACTION=ignore
 
 # Set up XVFB
 # We should use the autodisplay detection as suggested here: https://github.com/microsoft/playwright/issues/2728#issuecomment-678083619
@@ -99,7 +105,7 @@ RUN CHROME_DRIVER_URL="$( \
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
 # - Installs the specified version of the Apify Python SDK and Selenium
-RUN pip install --upgrade --no-cache-dir --root-user-action ignore \
+RUN pip install --upgrade \
     pip \
     setuptools \
     wheel \
