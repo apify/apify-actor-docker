@@ -1,12 +1,37 @@
-# Use the specified Python version
+# Get the Python version provided as a build argument
 ARG PYTHON_VERSION
-FROM python:${PYTHON_VERSION}-bullseye
 
-LABEL maintainer="support@apify.com" description="Base image for Apify Actors written in Python using Selenium"
+# Extend from the latest Debian and its slim version to keep the image as small as possible
+FROM python:${PYTHON_VERSION}-slim-bullseye
 
+# Add labels to the image to identify it as an Apify Actor
+LABEL maintainer="support@apify.com" \
+      description="Base image for Apify Actors written in Python using Selenium"
+
+# Set the shell to use /bin/bash with specific options (see Hadolint DL4006)
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# Install curl, firefox, jq, unzip, xvfb and other dependencies
+# Get the Apify Python SDK version provided as a build argument
+ARG APIFY_VERSION
+
+# Get the Selenium version provided as a build argument
+ARG SELENIUM_VERSION
+
+# Don't store bytecode, the Python app will be only run once
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Don't buffer output and flush it straight away
+ENV PYTHONUNBUFFERED=1
+
+# Disable warnings about outdated pip
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Set up XVFB
+# We should use the autodisplay detection as suggested here: https://github.com/microsoft/playwright/issues/2728#issuecomment-678083619
+ENV DISPLAY=:99
+ENV XVFB_WHD=1920x1080x24+32
+
+# Install curl, firefox, jq, unzip, xvfb and dependencies of Chrome and its driver
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         ca-certificates \
@@ -38,53 +63,48 @@ RUN apt-get update && \
         libxt6 \
         libxtst6 \
         unzip \
-        wget \
         xdg-utils \
         xvfb && \
     apt-get autoremove -yqq --purge && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* /var/log/*
 
-# Install gecko driver
-RUN curl -L https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz | tar xz -C /usr/local/bin
+# Download and install Geckodriver
+RUN GECKO_DRIVER_URL="https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz" && \
+    curl --silent --show-error --location --output /tmp/geckodriver.tar.gz "$GECKO_DRIVER_URL" && \
+    tar --gzip --extract --file=/tmp/geckodriver.tar.gz --directory=/usr/local/bin && \
+    rm -f /tmp/geckodriver.tar.gz
 
-# Install Google Chrome
-RUN CHROME_URL="$(curl -s https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json | jq -r '.channels.Stable.downloads.chrome[] | select(.platform=="linux64") | .url')" && \
-    curl -sSL -o /tmp/chrome-linux64.zip "$CHROME_URL" && \
+# Download and install Google Chrome
+RUN CHROME_URL="$( \
+        curl --silent --show-error --location https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json | \
+        jq -r '.channels.Stable.downloads.chrome[] | select(.platform=="linux64") | .url' \
+    )" && \
+    curl --silent --show-error --location --output /tmp/chrome-linux64.zip "$CHROME_URL" && \
     unzip /tmp/chrome-linux64.zip -d /opt/ && \
     ln -s /opt/chrome-linux64/chrome /usr/bin/google-chrome && \
     ln -s /opt/chrome-linux64/chrome /usr/bin/google-chrome-stable && \
     rm -f /tmp/chrome-linux64.zip
 
-# Install Google Chrome driver
-RUN CHROME_DRIVER_URL="$(curl -s https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json | jq -r '.channels.Stable.downloads.chromedriver[] | select(.platform=="linux64") | .url')" && \
-    curl -sSL -o /tmp/chromedriver-linux64.zip "$CHROME_DRIVER_URL" && \
+# Download and install Google Chrome driver
+RUN CHROME_DRIVER_URL="$( \
+        curl --silent --show-error --location https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json | \
+        jq -r '.channels.Stable.downloads.chromedriver[] | select(.platform=="linux64") | .url' \
+    )" && \
+    curl --silent --show-error --location --output /tmp/chromedriver-linux64.zip "$CHROME_DRIVER_URL" && \
     unzip /tmp/chromedriver-linux64.zip -d /usr/local/bin/ && \
     rm -f /tmp/chromedriver-linux64.zip
 
-# Don't store bytecode, the Python app will be only run once
-ENV PYTHONDONTWRITEBYTECODE 1
-
-# Don't buffer output and flush it straight away
-ENV PYTHONUNBUFFERED 1
-
-# Create a virtual environment
-ENV VIRTUAL_ENV=/opt/venv
-RUN python3 -m venv $VIRTUAL_ENV
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
-# Disable warnings about outdated pip
-ENV PIP_DISABLE_PIP_VERSION_CHECK=1
-
-# Upgrade pip before installing anything else first
-RUN pip install --upgrade pip
-
-# Preinstall the latest versions of setuptools and wheel for faster package installs
-RUN pip install --upgrade setuptools wheel
-
-# Install the specified Apify SDK for Python version and selenium
-ARG APIFY_VERSION
-RUN pip install apify~=${APIFY_VERSION} selenium
+# This instruction:
+# - Upgrades pip to the latest version
+# - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
+# - Installs the specified version of the Apify Python SDK and Selenium
+RUN pip install --upgrade --no-cache-dir --root-user-action ignore \
+    pip \
+    setuptools \
+    wheel \
+    apify~=${APIFY_VERSION} \
+    selenium~=${SELENIUM_VERSION}
 
 # Create app directory
 RUN mkdir -p /usr/src/app
@@ -92,11 +112,6 @@ WORKDIR /usr/src/app
 
 # Copy the dummy source code to the image
 COPY . .
-
-# Set up XVFB
-# We should use the autodisplay detection as suggested here: https://github.com/microsoft/playwright/issues/2728#issuecomment-678083619
-ENV DISPLAY=:99
-ENV XVFB_WHD=1920x1080x24+32
 
 # NOTE: This needs to be compatible with how Apify CLI launches Actors
 ENTRYPOINT ["./start_xvfb_and_run_cmd.sh"]

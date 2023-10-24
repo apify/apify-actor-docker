@@ -1,32 +1,37 @@
-# Use the specified Python version
+# Get the Python version provided as a build argument
 ARG PYTHON_VERSION
-FROM python:${PYTHON_VERSION}-bullseye
 
-LABEL maintainer="support@apify.com" description="Base image for simple Apify Actors written in Python"
+# Extend from the latest Debian and its slim version to keep the image as small as possible
+FROM python:${PYTHON_VERSION}-slim-bullseye
+
+# Add labels to the image to identify it as an Apify Actor
+LABEL maintainer="support@apify.com" \
+      description="Base image for simple Apify Actors written in Python"
+
+# Set the shell to use /bin/bash with specific options (see Hadolint DL4006)
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Get the Apify Python SDK version provided as a build argument
+ARG APIFY_VERSION
 
 # Don't store bytecode, the Python app will be only run once
-ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONDONTWRITEBYTECODE=1
 
 # Don't buffer output and flush it straight away
-ENV PYTHONUNBUFFERED 1
-
-# Create a virtual environment
-ENV VIRTUAL_ENV=/opt/venv
-RUN python3 -m venv $VIRTUAL_ENV
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+ENV PYTHONUNBUFFERED=1
 
 # Disable warnings about outdated pip
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Upgrade pip before installing anything else first
-RUN pip install --upgrade pip
-
-# Preinstall the latest versions of setuptools and wheel for faster package installs
-RUN pip install --upgrade setuptools wheel
-
-# Install the specified Apify SDK for Python version
-ARG APIFY_VERSION
-RUN pip install apify~=${APIFY_VERSION}
+# This instruction:
+# - Upgrades pip to the latest version
+# - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
+# - Installs the specified version of the Apify Python SDK
+RUN pip install --upgrade --no-cache-dir --root-user-action ignore \
+    pip \
+    setuptools \
+    wheel \
+    apify~=${APIFY_VERSION}
 
 # Create app directory
 RUN mkdir -p /usr/src/app
@@ -36,4 +41,4 @@ WORKDIR /usr/src/app
 COPY . .
 
 # Set default startup command, using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD python3 -m src
+CMD ["python3", "-m", "src"]

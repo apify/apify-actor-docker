@@ -10,7 +10,7 @@ on:
         description: 'Apify Python SDK version (e.g.: "1.0.0")'
         required: true
       playwright_version:
-        description: 'Playwright version (e.g.: 1.39.0)'
+        description: 'Playwright version (e.g.: "1.39.0")'
         required: true
 
   repository_dispatch:
