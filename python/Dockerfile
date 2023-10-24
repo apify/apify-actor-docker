@@ -33,7 +33,7 @@ ENV PIP_ROOT_USER_ACTION=ignore
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
 # - Installs the specified version of the Apify Python SDK
-RUN pip install --upgrade ignore \
+RUN pip install --upgrade \
     pip \
     setuptools \
     wheel \
