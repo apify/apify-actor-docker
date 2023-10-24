@@ -3,7 +3,7 @@ ARG NODE_VERSION=16
 # Use bullseye to be consistent across node versions.
 FROM node:${NODE_VERSION}-bullseye-slim
 
-LABEL maintainer="support@apify.com" description="Base image for Apify actors using headless Chrome"
+LABEL maintainer="support@apify.com" description="Base image for Apify Actors using headless Chrome"
 ENV DEBIAN_FRONTEND=noninteractive
 
 # This image was inspired by https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-in-docker
@@ -78,7 +78,7 @@ ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 # Tell Node.js this is a production environemnt
 ENV NODE_ENV=production
 
-# Enable Node.js process to use a lot of memory (actor has limit of 32GB)
+# Enable Node.js process to use a lot of memory (Actor has limit of 32GB)
 # Increases default size of headers. The original limit was 80kb, but from node 10+ they decided to lower it to 8kb.
 # However they did not think about all the sites there with large headers,
 # so we put back the old limit of 80kb, which seems to work just fine.

@@ -1,7 +1,7 @@
 FROM ubuntu:jammy
 ARG NODE_VERSION=16
 
-LABEL maintainer="support@apify.com" description="Base image for Apify actors using Webkit"
+LABEL maintainer="support@apify.com" description="Base image for Apify Actors using Webkit"
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install WebKit dependencies
@@ -53,7 +53,7 @@ COPY --chown=myuser:myuser package.json main.js webkit_test.js start_xvfb_and_ru
 # Tell Node.js this is a production environemnt
 ENV NODE_ENV=production
 
-# Enable Node.js process to use a lot of memory (actor has limit of 32GB)
+# Enable Node.js process to use a lot of memory (Actor has limit of 32GB)
 # Increases default size of headers. The original limit was 80kb, but from node 10+ they decided to lower it to 8kb.
 # However they did not think about all the sites there with large headers,
 # so we put back the old limit of 80kb, which seems to work just fine.

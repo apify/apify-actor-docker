@@ -2,7 +2,7 @@
 ARG PYTHON_VERSION
 FROM python:${PYTHON_VERSION}-bullseye
 
-LABEL maintainer="support@apify.com" description="Base image for Apify actors written in Python using Selenium"
+LABEL maintainer="support@apify.com" description="Base image for Apify Actors written in Python using Selenium"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -98,6 +98,6 @@ COPY . .
 ENV DISPLAY=:99
 ENV XVFB_WHD=1920x1080x24+32
 
-# NOTE: This needs to be compatible with how Apify CLI launches actors
+# NOTE: This needs to be compatible with how Apify CLI launches Actors
 ENTRYPOINT ["./start_xvfb_and_run_cmd.sh"]
 CMD ["python3", "-m", "src"]

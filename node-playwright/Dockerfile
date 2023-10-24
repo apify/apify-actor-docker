@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/playwright:${PLAYWRIGHT_VERSION}jammy
 
 ARG NODE_VERSION=16
 
-LABEL maintainer="support@apify.com" description="Base image for Apify actors using headless Chrome"
+LABEL maintainer="support@apify.com" description="Base image for Apify Actors using headless Chrome"
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Copy the script for registering intermediate certificates.
@@ -73,7 +73,7 @@ ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
 # Tell Node.js this is a production environemnt
 ENV NODE_ENV=production
 
-# Enable Node.js process to use a lot of memory (actor has limit of 32GB)
+# Enable Node.js process to use a lot of memory (Actor has limit of 32GB)
 # Increases default size of headers. The original limit was 80kb, but from node 10+ they decided to lower it to 8kb.
 # However they did not think about all the sites there with large headers,
 # so we put back the old limit of 80kb, which seems to work just fine.
