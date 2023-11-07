@@ -15,9 +15,15 @@ on:
       puppeteer_version:
         description: 'Puppeteer version (e.g.: 5.5.0)'
         required: true
+      is_latest_browser_image:
+        description: If this is a release of the latest browser image. This gets autofilled by CI in crawlee
+        type: boolean
+        default: false
 
   repository_dispatch:
-    types: [ build-node-images ]
+    types:
+      - build-node-images
+      - build-node-images-puppeteer
 
   pull_request:
 
@@ -26,6 +32,7 @@ env:
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   CRAWLEE_VERSION: ${{ github.event.inputs.crawlee_version || github.event.client_payload.crawlee_version }}
   PUPPETEER_VERSION: ${{ github.event.inputs.puppeteer_version || github.event.client_payload.puppeteer_version }}
+  IS_LATEST_BROWSER_IMAGE: ${{ github.event.inputs.is_latest_browser_image || github.event.client_payload.is_latest_browser_image || false }}
   NODE_LATEST: 18
 
 jobs:
@@ -53,10 +60,11 @@ jobs:
           RELEASE_TAG: ${{ env.RELEASE_TAG }}
           IMAGE_NAME: apify/actor-${{ matrix.image-name }}
           FRAMEWORK_VERSION: ${{ env.PUPPETEER_VERSION }}
+          IS_LATEST_BROWSER_IMAGE: ${{ env.IS_LATEST_BROWSER_IMAGE }}
         with:
           script: |
              const generateTags = require("./.github/scripts/prepare-node-image-tags.js");
-             return generateTags()
+             return generateTags();
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
