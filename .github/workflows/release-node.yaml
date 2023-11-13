@@ -14,7 +14,9 @@ on:
         required: true
 
   repository_dispatch:
-    types: [ build-node-images ]
+    types:
+      - build-node-images
+      - build-node-image-only
 
   pull_request:
 
@@ -48,10 +50,12 @@ jobs:
           LATEST_NODE: ${{ env.NODE_LATEST }}
           RELEASE_TAG: ${{ env.RELEASE_TAG }}
           IMAGE_NAME: apify/actor-${{ matrix.image-name }}
+          # Force this to true, as these images have no browsers
+          IS_LATEST_BROWSER_IMAGE: 'true'
         with:
           script: |
              const generateTags = require("./.github/scripts/prepare-node-image-tags.js");
-             return generateTags()
+             return generateTags();
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
