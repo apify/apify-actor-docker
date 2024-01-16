@@ -15,14 +15,14 @@ COPY package.json main.js /usr/src/app/
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
- && npm config --global set update-notifier false \
- && npm install --only=prod --no-optional --no-package-lock --prefer-online \
- && echo "Installed NPM packages:" \
- && (npm list --only=prod --no-optional || true) \
- && echo "Node.js version:" \
- && node --version \
- && echo "NPM version:" \
- && npm --version
+	&& npm config --global set update-notifier false \
+	&& npm install --omit=dev --omit=optional --no-package-lock --prefer-online \
+	&& echo "Installed NPM packages:" \
+	&& (npm list --omit=dev --omit=optional || true) \
+	&& echo "Node.js version:" \
+	&& node --version \
+	&& echo "NPM version:" \
+	&& npm --version
 
 # Tell Node.js this is a production environemnt
 ENV NODE_ENV=production
