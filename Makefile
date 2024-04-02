@@ -16,6 +16,9 @@ all:
 		echo "Done $$test"; \
 	done
 
+	@echo ""
+	@echo "All tests done!"
+
 test-node:
 	@echo "Building node with version $(NODE_VERSION) (overwrite using NODE_VERSION=XX)"
 
