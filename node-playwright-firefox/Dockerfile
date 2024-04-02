@@ -1,6 +1,6 @@
-ARG NODE_VERSION=16
-# Use bullseye to be consistent across node versions.
-FROM node:${NODE_VERSION}-bullseye-slim
+ARG NODE_VERSION=20
+# Use bookworm to be consistent across node versions.
+FROM --platform=linux/amd64 node:${NODE_VERSION}-bookworm-slim
 
 LABEL maintainer="support@apify.com" description="Base image for Apify Actors using Firefox"
 ENV DEBIAN_FRONTEND=noninteractive
@@ -8,7 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
 
 # Install Firefox dependencies + tools
-RUN sh -c 'echo "deb http://ftp.us.debian.org/debian bullseye main non-free" >> /etc/apt/sources.list.d/fonts.list' \
+RUN sh -c 'echo "deb http://ftp.us.debian.org/debian bookworm main non-free" >> /etc/apt/sources.list.d/fonts.list' \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
     # Found this in other images, not sure whether it's needed, it does not come from Playwright deps

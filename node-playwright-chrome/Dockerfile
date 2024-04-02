@@ -1,6 +1,6 @@
-ARG NODE_VERSION=16
-# Use bullseye to be consistent across node versions.
-FROM node:${NODE_VERSION}-bullseye-slim
+ARG NODE_VERSION=20
+# Use bookworm to be consistent across node versions.
+FROM --platform=linux/amd64 node:${NODE_VERSION}-bookworm-slim
 
 LABEL maintainer="support@apify.com" description="Base image for Apify Actors using Chrome"
 ENV DEBIAN_FRONTEND=noninteractive
@@ -16,7 +16,7 @@ RUN \
     && apt-get install -y wget gnupg unzip ca-certificates xvfb --no-install-recommends \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
-    && sh -c 'echo "deb http://ftp.us.debian.org/debian bullseye main non-free" >> /etc/apt/sources.list.d/fonts.list' \
+    && sh -c 'echo "deb http://ftp.us.debian.org/debian bookworm main non-free" >> /etc/apt/sources.list.d/fonts.list' \
     && apt-get update \
     && apt-get purge --auto-remove -y wget unzip \
     && apt-get install -y \
