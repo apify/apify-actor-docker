@@ -1,5 +1,5 @@
-ARG NODE_VERSION=16
-FROM node:${NODE_VERSION}-alpine
+ARG NODE_VERSION=20
+FROM --platform=linux/amd64 node:${NODE_VERSION}-alpine
 
 LABEL maintainer="support@apify.com" description="Base image for simple Apify Actors"
 
