@@ -10,7 +10,7 @@
         "apify": "APIFY_VERSION",
         "crawlee": "CRAWLEE_VERSION",
         "playwright-webkit": "PLAYWRIGHT_VERSION",
-        "typescript": "^4.7.4"
+        "typescript": "^5.4.3"
     },
     "repository": {}
 }
