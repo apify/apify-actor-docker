@@ -46,7 +46,7 @@ jobs:
           if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION input is empty!" >&2; exit 1; fi
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
