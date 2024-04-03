@@ -9,7 +9,7 @@
     "dependencies": {
         "apify": "APIFY_VERSION",
         "crawlee": "CRAWLEE_VERSION",
-        "typescript": "^4.7.4"
+        "typescript": "^5.0.0"
     },
     "repository": {}
 }
