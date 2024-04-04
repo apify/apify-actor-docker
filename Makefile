@@ -7,6 +7,12 @@ PUPPETEER_VERSION ?= 22.6.2
 
 ALL_TESTS = test-node test-playwright test-playwright-chrome test-playwright-firefox test-playwright-webkit test-puppeteer-chrome
 
+what-tests:
+	@echo "Available tests:"
+	@for test in $(ALL_TESTS); do \
+		echo "  $$test"; \
+	done
+
 all:
 	@echo "Running all tests, this will take a while..."
 
