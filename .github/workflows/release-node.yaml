@@ -78,7 +78,7 @@ jobs:
           command: cd ${{ matrix.image-name }} && npm i --dry-run
 
       - name: Build and tag image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
