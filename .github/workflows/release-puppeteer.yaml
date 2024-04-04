@@ -4,16 +4,16 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Tag for the images (e.g.: beta)'
+        description: "Tag for the images (e.g.: beta)"
         required: true
       apify_version:
-        description: 'Apify SDK version (e.g.: ^1.0.0)'
+        description: "Apify SDK version (e.g.: ^1.0.0)"
         required: true
       crawlee_version:
-        description: 'Crawlee version (e.g.: ^1.0.0)'
+        description: "Crawlee version (e.g.: ^1.0.0)"
         required: true
       puppeteer_version:
-        description: 'Puppeteer version (e.g.: 5.5.0)'
+        description: "Puppeteer version (e.g.: 5.5.0)"
         required: true
       is_latest_browser_image:
         description: If this is a release of the latest browser image. This gets autofilled by CI in crawlee
@@ -33,7 +33,7 @@ env:
   CRAWLEE_VERSION: ${{ github.event.inputs.crawlee_version || github.event.client_payload.crawlee_version }}
   PUPPETEER_VERSION: ${{ github.event.inputs.puppeteer_version || github.event.client_payload.puppeteer_version }}
   IS_LATEST_BROWSER_IMAGE: ${{ github.event.inputs.is_latest_browser_image || github.event.client_payload.is_latest_browser_image || false }}
-  NODE_LATEST: 18
+  NODE_LATEST: 20
 
 jobs:
   # Build master images that are not dependent on existing builds.
@@ -45,13 +45,12 @@ jobs:
       fail-fast: false
       matrix:
         image-name: [node-puppeteer-chrome]
-        node-version: [16, 18, 20]
+        node-version: [18, 20]
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v4
-      -
-        name: Prepare image tags
+
+      - name: Prepare image tags
         id: prepare-tags
         uses: actions/github-script@v7
         env:
@@ -63,21 +62,21 @@ jobs:
           IS_LATEST_BROWSER_IMAGE: ${{ env.IS_LATEST_BROWSER_IMAGE }}
         with:
           script: |
-             const generateTags = require("./.github/scripts/prepare-node-image-tags.js");
-             return generateTags();
-      -
-        name: Set up QEMU
+            const generateTags = require("./.github/scripts/prepare-node-image-tags.js");
+            return generateTags();
+
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-      -
-        name: Set up Docker Buildx
+
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      -
-        name: Set Dependency Versions
+
+      - name: Set Dependency Versions
         run: |
           cd ${{ matrix.image-name }}
           node ../.github/scripts/set-dependency-versions.js ${{ github.event_name == 'pull_request' }}
-      -
-        # It seems that it takes at least two minutes before a newly published version
+
+      - # It seems that it takes at least two minutes before a newly published version
         # becomes available in the NPM registry. We wait before starting the image builds.
         name: Wait For Package Registry
         uses: nick-fields/retry@v2
@@ -86,8 +85,8 @@ jobs:
           max_attempts: 3
           retry_wait_seconds: 60 # wait between retries
           command: cd ${{ matrix.image-name }} && npm i --dry-run
-      -
-        name: Build and tag image
+
+      - name: Build and tag image
         uses: docker/build-push-action@v4
         with:
           context: ./${{ matrix.image-name }}
@@ -95,17 +94,17 @@ jobs:
           build-args: NODE_VERSION=${{ matrix.node-version }}
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
-      -
-        name: Test image
+
+      - name: Test image
         run: docker run ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}
-      -
-        name: Login to DockerHub
+
+      - name: Login to DockerHub
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.APIFY_SERVICE_ACCOUNT_DOCKERHUB_USERNAME }}
           password: ${{ secrets.APIFY_SERVICE_ACCOUNT_DOCKERHUB_TOKEN }}
-      -
-        name: Push images
+
+      - name: Push images
         if: github.event_name != 'pull_request'
         run: docker push apify/actor-${{ matrix.image-name }} --all-tags

@@ -1,7 +1,7 @@
 ARG PLAYWRIGHT_VERSION=
-FROM mcr.microsoft.com/playwright:${PLAYWRIGHT_VERSION}jammy
+FROM --platform=linux/amd64 mcr.microsoft.com/playwright:${PLAYWRIGHT_VERSION}jammy
 
-ARG NODE_VERSION=16
+ARG NODE_VERSION=20
 
 LABEL maintainer="support@apify.com" description="Base image for Apify Actors using headless Chrome"
 ENV DEBIAN_FRONTEND=noninteractive

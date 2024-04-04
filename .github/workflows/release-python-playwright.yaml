@@ -14,7 +14,7 @@ on:
         required: true
 
   repository_dispatch:
-    types: [ build-python-images ]
+    types: [build-python-images]
 
   pull_request:
 
@@ -32,31 +32,31 @@ jobs:
       matrix:
         image-name: [python-playwright]
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
     steps:
-      -
-        name: Set default inputs if event is pull request
+      - name: Set default inputs if event is pull request
         if: github.event_name == 'pull_request'
         run: |
           if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=CI_TEST" >> $GITHUB_ENV; fi
           if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=1.1.0" >> $GITHUB_ENV; fi
-      -
-        name: Check if inputs are set correctly
+
+      - name: Check if inputs are set correctly
         run: |
           if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG input is empty!" >&2; exit 1; fi
           if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION input is empty!" >&2; exit 1; fi
-      -
-        name: Checkout
+
+      - name: Checkout
         uses: actions/checkout@v4
-      -
-        name: Set up Python ${{ matrix.python-version }}
+
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      -
-        name: Update pip
+
+      - name: Update pip
         run: python -m pip install --upgrade pip
-      -
-        # It seems that it takes a few minutes before a newly published version
+
+      - # It seems that it takes a few minutes before a newly published version
         # becomes available in the PyPI registry. We wait before starting the image builds.
         name: Wait For Package Registry
         uses: nick-fields/retry@v2
@@ -65,8 +65,8 @@ jobs:
           max_attempts: 3
           retry_wait_seconds: 60 # wait between retries
           command: pip install apify~=$APIFY_VERSION
-      -
-        name: Prepare image tags
+
+      - name: Prepare image tags
         id: prepare-tags
         uses: actions/github-script@v7
         env:
@@ -77,16 +77,16 @@ jobs:
           IMAGE_NAME: apify/actor-${{ matrix.image-name }}
         with:
           script: |
-             const generateTags = require("./.github/scripts/prepare-python-image-tags.js");
-             return generateTags()
-      -
-        name: Set up QEMU
+            const generateTags = require("./.github/scripts/prepare-python-image-tags.js");
+            return generateTags()
+
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-      -
-        name: Set up Docker Buildx
+
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      -
-        name: Build and tag image
+
+      - name: Build and tag image
         uses: docker/build-push-action@v4
         with:
           context: ./${{ matrix.image-name }}
@@ -97,17 +97,17 @@ jobs:
             PLAYWRIGHT_VERSION=${{ env.PLAYWRIGHT_VERSION }}
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
-      -
-        name: Test image
+
+      - name: Test image
         run: docker run ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}
-      -
-        name: Login to DockerHub
+
+      - name: Login to DockerHub
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.APIFY_SERVICE_ACCOUNT_DOCKERHUB_USERNAME }}
           password: ${{ secrets.APIFY_SERVICE_ACCOUNT_DOCKERHUB_TOKEN }}
-      -
-        name: Push images
+
+      - name: Push images
         if: github.event_name != 'pull_request'
         run: docker push apify/actor-${{ matrix.image-name }} --all-tags
