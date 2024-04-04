@@ -59,7 +59,7 @@ jobs:
       - # It seems that it takes a few minutes before a newly published version
         # becomes available in the PyPI registry. We wait before starting the image builds.
         name: Wait For Package Registry
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 2 # timeout for a single attempt
           max_attempts: 3
