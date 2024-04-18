@@ -61,7 +61,7 @@ USER myuser
 WORKDIR /home/myuser
 
 # Copy source code and xvfb script
-COPY --chown=myuser:myuser package.json main.js puppeteer_*.js start_xvfb_and_run_cmd.sh /home/myuser/
+COPY --chown=myuser:myuser package.json main.js puppeteer_*.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh /home/myuser/
 
 # Uncomment to skip the chromium download when installing puppeteer. If you do,
 # you'll need to launch puppeteer with:
@@ -102,4 +102,5 @@ ENV XVFB_WHD=1920x1080x24+32
 # NOTEs:
 # - This needs to be compatible with CLI.
 # - Using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD ./start_xvfb_and_run_cmd.sh && npm start --silent
+# CMD ./start_xvfb_and_run_cmd.sh && npm start --silent
+CMD ./new_xvfb_run_cmd.sh npm start --silent
