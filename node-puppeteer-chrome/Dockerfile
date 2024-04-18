@@ -29,6 +29,7 @@ RUN apt-get update \
     procps \
     xdg-utils \
     xvfb \
+    xauth \
     --no-install-recommends \
     # Disable chrome auto updates, based on https://support.google.com/chrome/a/answer/9052345
     && mkdir -p /etc/default && echo 'repo_add_once=false' > /etc/default/google-chrome \

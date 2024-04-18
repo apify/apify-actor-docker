@@ -10,6 +10,7 @@ RUN apt-get update \
     git \
     procps \
     xvfb \
+    xauth \
     # Install node
     && apt-get update && apt-get install -y curl \
     && curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \

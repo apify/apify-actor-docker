@@ -18,6 +18,7 @@ RUN sh -c 'echo "deb http://ftp.us.debian.org/debian bookworm main non-free" >> 
     jq \
     wget \
     p11-kit \
+    xauth \
     \
     # Register cerificates
     && chmod +x ./register_intermediate_certs.sh \

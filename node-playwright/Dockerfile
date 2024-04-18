@@ -11,7 +11,7 @@ COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
 
 # Install libs
 RUN apt-get update \
-    && apt-get install --fix-missing -yq --no-install-recommends procps xvfb wget \
+    && apt-get install --fix-missing -yq --no-install-recommends procps xvfb xauth wget \
     && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix \
     # Uninstall system NodeJs
     && apt-get purge -yq nodejs \

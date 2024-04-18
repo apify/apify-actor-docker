@@ -13,7 +13,7 @@ RUN \
     # Disable chrome auto updates, based on https://support.google.com/chrome/a/answer/9052345
     mkdir -p /etc/default && echo 'repo_add_once=false' > /etc/default/google-chrome \
     && apt-get update \
-    && apt-get install -y wget gnupg unzip ca-certificates xvfb --no-install-recommends \
+    && apt-get install -y wget gnupg unzip ca-certificates xvfb xauth --no-install-recommends \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
     && sh -c 'echo "deb http://ftp.us.debian.org/debian bookworm main non-free" >> /etc/apt/sources.list.d/fonts.list' \
