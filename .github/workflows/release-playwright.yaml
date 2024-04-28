@@ -51,7 +51,7 @@ jobs:
             node-playwright-firefox,
             node-playwright-webkit,
           ]
-        node-version: [18, 20]
+        node-version: [18, 20, 22]
 
     steps:
       - name: Checkout
