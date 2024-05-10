@@ -16,7 +16,7 @@ on:
         description: "Playwright version (e.g.: 1.7.1) (must not be semver range)"
         required: true
       is_latest_browser_image:
-        description: If this is a release of the latest browser image it gets autofilled by CI in Crawlee
+        description: If this is a release of the latest browser image. This gets autofilled by CI in crawlee
         type: boolean
         default: false
 
