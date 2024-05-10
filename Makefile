@@ -1,11 +1,19 @@
 # Environment values
+# Node
 NODE_VERSION ?= 20
 # Tag must have format: v1.42.0-
 PLAYWRIGHT_VERSION ?= v1.42.0-
 # Tag must have format: 22.6.2
 PUPPETEER_VERSION ?= 22.6.2
 
-ALL_TESTS = test-node test-playwright test-playwright-chrome test-playwright-firefox test-playwright-webkit test-puppeteer-chrome
+# Python
+PYTHON_VERSION ?= 3.12
+# Apify latest version (python does not support the 'latest' tag)
+PYTHON_APIFY_VERSION ?= 1.7.0
+PYTHON_PLAYWRIGHT_VERSION = $(subst v,,$(subst -,,$(PLAYWRIGHT_VERSION)))
+PYTHON_SELENIUM_VERSION ?= 4.14.0
+
+ALL_TESTS = test-node test-playwright test-playwright-chrome test-playwright-firefox test-playwright-webkit test-puppeteer-chrome test-python test-python-playwright test-python-selenium
 
 what-tests:
 	@echo "Available tests:"
@@ -120,4 +128,30 @@ test-puppeteer-chrome:
 	@# Delete docker image
 	docker rmi apify/puppeteer-chrome:local
 
-# TODO: python too
+test-python:
+	@echo "Building python with version $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX)"
+
+	docker buildx build --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --file ./python/Dockerfile -t apify/python:local --load ./python
+	docker run --rm -it --platform linux/amd64 apify/python:local
+
+	@# Delete docker image
+	docker rmi apify/python:local
+
+test-python-playwright:
+	@echo "Building python-playwright with version $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX)"
+
+	docker buildx build --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --file ./python-playwright/Dockerfile -t apify/python-playwright:local --load ./python-playwright
+	docker run --rm -it --platform linux/amd64 apify/python-playwright:local
+
+	@# Delete docker image
+	docker rmi apify/python-playwright:local
+
+test-python-selenium:
+	@echo "Building python-selenium with version $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX)"
+
+	docker buildx build --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --build-arg SELENIUM_VERSION=$(PYTHON_SELENIUM_VERSION) --file ./python-selenium/Dockerfile -t apify/python-selenium:local --load ./python-selenium
+	docker run --rm -it --platform linux/amd64 apify/python-selenium:local
+
+	@# Delete docker image
+	docker rmi apify/python-selenium:local
+

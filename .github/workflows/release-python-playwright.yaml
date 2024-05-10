@@ -21,8 +21,8 @@ on:
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
-  PLAYWRIGHT_VERSION: ${{ github.event.inputs.playwright_version || github.event.client_payload.playwright_version || '1.39.0' }}
-  LATEST_PYTHON: "3.11"
+  PLAYWRIGHT_VERSION: ${{ github.event.inputs.playwright_version || github.event.client_payload.playwright_version || '1.42.0' }}
+  LATEST_PYTHON: "3.12"
 
 jobs:
   # Build master images that are not dependent on existing builds.
