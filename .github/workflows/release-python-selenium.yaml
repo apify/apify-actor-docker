@@ -21,6 +21,8 @@ on:
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
+  # The default Selenium version is set because this workflow is triggered by a Python SDK
+  # release where the version is not specified.
   SELENIUM_VERSION: ${{ github.event.inputs.selenium_version || github.event.client_payload.selenium_version || '4.14.0' }}
   LATEST_PYTHON: "3.12"
 
