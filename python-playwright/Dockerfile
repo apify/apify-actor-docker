@@ -2,7 +2,7 @@
 ARG PYTHON_VERSION
 
 # Extend from the latest Debian and its slim version to keep the image as small as possible
-FROM python:${PYTHON_VERSION}-slim-bullseye
+FROM python:${PYTHON_VERSION}-slim-bookworm
 
 # Add labels to the image to identify it as an Apify Actor
 LABEL maintainer="support@apify.com" \

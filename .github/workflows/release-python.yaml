@@ -18,7 +18,7 @@ on:
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
-  LATEST_PYTHON: "3.11"
+  LATEST_PYTHON: "3.12"
 
 jobs:
   # Build master images that are not dependent on existing builds.

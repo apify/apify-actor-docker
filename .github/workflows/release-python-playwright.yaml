@@ -21,8 +21,10 @@ on:
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
-  PLAYWRIGHT_VERSION: ${{ github.event.inputs.playwright_version || github.event.client_payload.playwright_version || '1.39.0' }}
-  LATEST_PYTHON: "3.11"
+  # The default Playwright version is set because this workflow is triggered by a Python SDK
+  # release where the version is not specified.
+  PLAYWRIGHT_VERSION: ${{ github.event.inputs.playwright_version || github.event.client_payload.playwright_version || '1.42.0' }}
+  LATEST_PYTHON: "3.12"
 
 jobs:
   # Build master images that are not dependent on existing builds.
