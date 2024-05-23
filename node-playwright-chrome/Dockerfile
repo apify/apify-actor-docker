@@ -13,7 +13,7 @@ RUN \
     # Disable chrome auto updates, based on https://support.google.com/chrome/a/answer/9052345
     mkdir -p /etc/default && echo 'repo_add_once=false' > /etc/default/google-chrome \
     && apt-get update \
-    && apt-get install -y wget gnupg unzip ca-certificates xvfb --no-install-recommends \
+    && apt-get install -y wget gnupg unzip ca-certificates xvfb xauth --no-install-recommends \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
     && sh -c 'echo "deb http://ftp.us.debian.org/debian bookworm main non-free" >> /etc/apt/sources.list.d/fonts.list' \
@@ -59,7 +59,7 @@ WORKDIR /home/myuser
 ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
 
 # Copy source code and xvfb script
-COPY --chown=myuser:myuser package.json main.js chrome_test.js start_xvfb_and_run_cmd.sh /home/myuser/
+COPY --chown=myuser:myuser package.json main.js chrome_test.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh /home/myuser/
 
 # Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
 ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
@@ -110,4 +110,5 @@ ENV XVFB_WHD=1920x1080x24+32
 # NOTEs:
 # - This needs to be compatible with CLI.
 # - Using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD ./start_xvfb_and_run_cmd.sh && npm start --silent
+# CMD ./start_xvfb_and_run_cmd.sh && npm start --silent
+CMD ./new_xvfb_run_cmd.sh npm start --silent

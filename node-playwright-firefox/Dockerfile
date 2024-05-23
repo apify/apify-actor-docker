@@ -18,6 +18,7 @@ RUN sh -c 'echo "deb http://ftp.us.debian.org/debian bookworm main non-free" >> 
     jq \
     wget \
     p11-kit \
+    xauth \
     \
     # Register cerificates
     && chmod +x ./register_intermediate_certs.sh \
@@ -52,7 +53,7 @@ ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
 ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 
 # Copy source code and xvfb script
-COPY --chown=myuser:myuser package.json main.js firefox_test.js start_xvfb_and_run_cmd.sh /home/myuser/
+COPY --chown=myuser:myuser package.json main.js firefox_test.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh /home/myuser/
 
 # Tell Node.js this is a production environemnt
 ENV NODE_ENV=production
@@ -97,4 +98,5 @@ ENV XVFB_WHD=1920x1080x24+32
 # NOTEs:
 # - This needs to be compatible with CLI.
 # - Using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD ./start_xvfb_and_run_cmd.sh && npm start --silent
+# CMD ./start_xvfb_and_run_cmd.sh && npm start --silent
+CMD ./new_xvfb_run_cmd.sh npm start --silent

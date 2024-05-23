@@ -11,7 +11,7 @@ COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
 
 # Install libs
 RUN apt-get update \
-    && apt-get install --fix-missing -yq --no-install-recommends procps xvfb wget \
+    && apt-get install --fix-missing -yq --no-install-recommends procps xvfb xauth wget \
     && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix \
     # Uninstall system NodeJs
     && apt-get purge -yq nodejs \
@@ -65,7 +65,7 @@ ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 
 # Copy source code and xvfb script
-COPY --chown=myuser:myuser package.json main.js chrome_test.js start_xvfb_and_run_cmd.sh /home/myuser/
+COPY --chown=myuser:myuser package.json main.js chrome_test.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh /home/myuser/
 
 # Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
 ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
@@ -105,4 +105,5 @@ ENV XVFB_WHD=1920x1080x24+32
 # NOTEs:
 # - This needs to be compatible with CLI.
 # - Using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD ./start_xvfb_and_run_cmd.sh && npm start --silent
+# CMD ./start_xvfb_and_run_cmd.sh && npm start --silent
+CMD ./new_xvfb_run_cmd.sh npm start --silent

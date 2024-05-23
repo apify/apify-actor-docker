@@ -10,6 +10,7 @@ RUN apt-get update \
     git \
     procps \
     xvfb \
+    xauth \
     # Install node
     && apt-get update && apt-get install -y curl \
     && curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
@@ -48,7 +49,7 @@ ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
 ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 
 # Copy source code and xvfb script
-COPY --chown=myuser:myuser package.json main.js webkit_test.js start_xvfb_and_run_cmd.sh /home/myuser/
+COPY --chown=myuser:myuser package.json main.js webkit_test.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh /home/myuser/
 
 # Tell Node.js this is a production environemnt
 ENV NODE_ENV=production
@@ -87,4 +88,5 @@ ENV XVFB_WHD=1920x1080x24+32
 # NOTEs:
 # - This needs to be compatible with CLI.
 # - Using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD ./start_xvfb_and_run_cmd.sh && npm start --silent
+# CMD ./start_xvfb_and_run_cmd.sh && npm start --silent
+CMD ./new_xvfb_run_cmd.sh npm start --silent
