@@ -50,13 +50,18 @@ function updateDependencyVersions(pkg, dependencyVersions) {
 }
 
 function updateDependencyVersion(pkg, depName, depVersion) {
-    const { dependencies } = pkg;
-    if (!dependencies) throw new Error('Invalid package.json: Has no dependencies.');
+    if (!pkg.dependencies) throw new Error('Invalid package.json: Has no dependencies.');
     // Only update existing deps, so we don't add Puppeteer where it does not belong.
-    if (dependencies[depName]) {
+    if (pkg.dependencies[depName]) {
         // Enforce version only for dependencies that will be updated.
         if (!depVersion) throw new Error(`Version not provided for dependency: ${depName}`)
         console.log(`Setting dependency: ${depName} to version: ${depVersion}`);
-        dependencies[depName] = depVersion;
+        pkg.dependencies[depName] = depVersion;
+    }
+    if (depName === 'crawlee' && pkg.overrides?.apify) {
+        Object.keys(pkg.overrides.apify).forEach(dep => {
+            console.log(`Setting dependency: ${dep} to version: ${depVersion}`);
+            pkg.overrides.apify[dep] = depVersion;
+        });
     }
 }
