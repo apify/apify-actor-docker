@@ -32,6 +32,7 @@ env:
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   CRAWLEE_VERSION: ${{ github.event.inputs.crawlee_version || github.event.client_payload.crawlee_version }}
   PLAYWRIGHT_VERSION: ${{ github.event.inputs.playwright_version || github.event.client_payload.playwright_version }}
+  LATEST_PLAYWRIGHT_VERSION: npm view playwright version
   IS_LATEST_BROWSER_IMAGE: ${{ github.event.inputs.is_latest_browser_image || github.event.client_payload.is_latest_browser_image || false }}
   NODE_LATEST: 20
 
@@ -101,7 +102,7 @@ jobs:
           # For some reason build-args doesn't want to be a list, so we manually make it one
           build-args: |
             NODE_VERSION=${{ matrix.node-version }}
-            PLAYWRIGHT_VERSION=${{ (github.event_name != 'pull_request' && format('v{0}-', env.PLAYWRIGHT_VERSION)) || '' }}
+            PLAYWRIGHT_VERSION=${{ format('v{0}-', env.PLAYWRIGHT_VERSION || env.LATEST_PLAYWRIGHT_VERSION) }}
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
 
