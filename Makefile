@@ -2,7 +2,7 @@
 # Node
 NODE_VERSION ?= 20
 # Tag must have format: v1.42.0-
-PLAYWRIGHT_VERSION ?= v1.42.0-
+PLAYWRIGHT_VERSION ?= v1.48.0-
 # Tag must have format: 22.6.2
 PUPPETEER_VERSION ?= 22.6.2
 
