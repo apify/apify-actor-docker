@@ -24,7 +24,7 @@ env:
   # The default Selenium version is set because this workflow is triggered by a Python SDK
   # release where the version is not specified.
   SELENIUM_VERSION: ${{ github.event.inputs.selenium_version || github.event.client_payload.selenium_version || '4.14.0' }}
-  LATEST_PYTHON: "3.12"
+  LATEST_PYTHON: "3.13"
 
 jobs:
   # Build master images that are not dependent on existing builds.
@@ -33,7 +33,7 @@ jobs:
     strategy:
       matrix:
         image-name: [python-selenium]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - name: Set default inputs if event is pull request

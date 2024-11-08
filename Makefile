@@ -2,12 +2,12 @@
 # Node
 NODE_VERSION ?= 20
 # Tag must have format: v1.42.0-
-PLAYWRIGHT_VERSION ?= v1.42.0-
+PLAYWRIGHT_VERSION ?= v1.48.0-
 # Tag must have format: 22.6.2
 PUPPETEER_VERSION ?= 22.6.2
 
 # Python
-PYTHON_VERSION ?= 3.12
+PYTHON_VERSION ?= 3.13
 # Apify latest version (python does not support the 'latest' tag)
 PYTHON_APIFY_VERSION ?= 1.7.0
 PYTHON_PLAYWRIGHT_VERSION = $(subst v,,$(subst -,,$(PLAYWRIGHT_VERSION)))
