@@ -24,7 +24,7 @@ env:
   # The default Playwright version is set because this workflow is triggered by a Python SDK
   # release where the version is not specified.
   PLAYWRIGHT_VERSION: ${{ github.event.inputs.playwright_version || github.event.client_payload.playwright_version || '1.42.0' }}
-  LATEST_PYTHON: "3.12"
+  LATEST_PYTHON: "3.13"
 
 jobs:
   # Build master images that are not dependent on existing builds.
@@ -33,7 +33,7 @@ jobs:
     strategy:
       matrix:
         image-name: [python-playwright]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - name: Set default inputs if event is pull request
