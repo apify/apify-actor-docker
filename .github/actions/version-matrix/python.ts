@@ -50,4 +50,4 @@ for (const playwrightVersion of lastFiveVersions) {
 	}
 }
 
-console.log(JSON.stringify(matrix).replaceAll('"', '\\"'));
+console.log(JSON.stringify(matrix));
