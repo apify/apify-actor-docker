@@ -3,6 +3,7 @@ name: New Release Python + Playwright images
 on:
   push:
     paths:
+      - .github/workflows/new-release-python-playwright.yaml
       - .github/actions/version-matrix/**
 
 env:
