@@ -70,6 +70,8 @@ jobs:
           LATEST_PYTHON: ${{ env.LATEST_PYTHON }}
           RELEASE_TAG: ${{ env.RELEASE_TAG }}
           IMAGE_NAME: apify/actor-${{ matrix.image-name }}
+          # Force this to true, as these images have no browsers
+          IS_LATEST_BROWSER_IMAGE: "true"
         with:
           script: |
             const generateTags = require("./.github/scripts/prepare-python-image-tags.js");

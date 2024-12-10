@@ -27,20 +27,42 @@ env:
   LATEST_PYTHON: "3.13"
 
 jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up bun
+        uses: oven-sh/setup-bun@v1
+
+      - run: bun install
+        working-directory: ./.github/actions/version-matrix
+
+      - name: Generate matrix
+        id: set-matrix
+        run: echo "matrix=$(bun python)" >> $GITHUB_OUTPUT
+        working-directory: ./.github/actions/version-matrix
+
+      - name: Print matrix
+        run: echo ${{ steps.set-matrix.outputs.matrix }} | jq
+
   # Build master images that are not dependent on existing builds.
   build-main:
+    needs: [matrix]
+
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        image-name: [python-playwright]
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+      matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}
 
     steps:
       - name: Set default inputs if event is pull request
         if: github.event_name == 'pull_request'
         run: |
           if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=CI_TEST" >> $GITHUB_ENV; fi
-          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=1.1.0" >> $GITHUB_ENV; fi
+          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=${{ matrix.apify-version }}" >> $GITHUB_ENV; fi
 
       - name: Check if inputs are set correctly
         run: |
@@ -77,6 +99,7 @@ jobs:
           FRAMEWORK_VERSION: ${{ env.PLAYWRIGHT_VERSION }}
           RELEASE_TAG: ${{ env.RELEASE_TAG }}
           IMAGE_NAME: apify/actor-${{ matrix.image-name }}
+          IS_LATEST_BROWSER_IMAGE: ${{ matrix.is-latest }}
         with:
           script: |
             const generateTags = require("./.github/scripts/prepare-python-image-tags.js");

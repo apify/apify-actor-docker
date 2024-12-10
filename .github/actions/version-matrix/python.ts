@@ -1,7 +1,7 @@
-import { semver } from "bun";
-import { fetchPackageVersions } from "./src/pypy";
+import { semver } from 'bun';
+import { fetchPackageVersions } from './src/pypy';
 
-const supportedPythonVersions = ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"];
+const supportedPythonVersions = ['3.9', '3.10', '3.11', '3.12', '3.13'];
 
 /**
  * Certain playwright versions will not run on newer Python versions.
@@ -10,29 +10,31 @@ const supportedPythonVersions = ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"];
  * The value is the minimum Python version that is supported.
  */
 const playwrightPythonVersionConstraints = [
-	[">=1.48.0", ">=3.13.x"], //
+	// Playwright, python
+	['>=1.48.0', '>=3.13.x'],
 ];
 
-const versions = await fetchPackageVersions("playwright");
+const versions = await fetchPackageVersions('playwright');
+const apifyVersions = await fetchPackageVersions('apify');
 
 const lastFiveVersions = versions.slice(-5);
 
-console.error("Last five versions", lastFiveVersions);
+console.error('Last five versions', lastFiveVersions);
 
 const matrix = {
 	include: [] as {
-		"image-name": "python-playwright";
-		"python-version": string;
-		"playwright-version": string;
+		'image-name': 'python-playwright';
+		'python-version': string;
+		'playwright-version': string;
+		'apify-version': string;
+		'is-latest': 'true' | 'false';
 	}[],
 };
 
 for (const playwrightVersion of lastFiveVersions) {
-	const maybeFilter = playwrightPythonVersionConstraints.findLast(
-		([constraint]) => {
-			return semver.satisfies(playwrightVersion, constraint);
-		},
-	);
+	const maybeFilter = playwrightPythonVersionConstraints.findLast(([constraint]) => {
+		return semver.satisfies(playwrightVersion, constraint);
+	});
 
 	for (const pythonVersion of supportedPythonVersions) {
 		if (maybeFilter) {
@@ -43,9 +45,11 @@ for (const playwrightVersion of lastFiveVersions) {
 		}
 
 		matrix.include.push({
-			"image-name": "python-playwright",
-			"python-version": pythonVersion,
-			"playwright-version": playwrightVersion,
+			'image-name': 'python-playwright',
+			'python-version': pythonVersion,
+			'playwright-version': playwrightVersion,
+			'apify-version': apifyVersions.at(-1)!,
+			'is-latest': playwrightVersion === lastFiveVersions.at(-1)! ? 'true' : 'false',
 		});
 	}
 }
