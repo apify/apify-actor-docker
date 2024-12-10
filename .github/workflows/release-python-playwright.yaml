@@ -12,11 +12,18 @@ on:
       playwright_version:
         description: 'Playwright version (e.g.: "1.39.0")'
         required: true
+      is_latest_browser_image:
+        description: If this is a release of the latest browser image. This gets autofilled by CI here
+        type: boolean
+        default: false
 
-  repository_dispatch:
-    types: [build-python-images]
+  # repository_dispatch:
+  #   types: [build-python-images]
 
   pull_request:
+
+  schedule:
+    - cron: 0 */1 * * *
 
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
@@ -64,6 +71,12 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=CI_TEST" >> $GITHUB_ENV; fi
+          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=${{ matrix.apify-version }}" >> $GITHUB_ENV; fi
+
+      - name: Set default inputs if event is schedule
+        if: github.event_name == 'schedule'
+        run: |
+          if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=latest" >> $GITHUB_ENV; fi
           if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=${{ matrix.apify-version }}" >> $GITHUB_ENV; fi
 
       - name: Check if inputs are set correctly
@@ -120,8 +133,8 @@ jobs:
           file: ./${{ matrix.image-name }}/Dockerfile
           build-args: |
             PYTHON_VERSION=${{ matrix.python-version }}
-            APIFY_VERSION=${{ env.APIFY_VERSION }}
-            PLAYWRIGHT_VERSION=${{ env.PLAYWRIGHT_VERSION }}
+            APIFY_VERSION=${{ matrix.apify-version }}
+            PLAYWRIGHT_VERSION=${{ matrix.playwright-version }}
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
 
