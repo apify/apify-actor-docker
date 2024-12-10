@@ -47,7 +47,7 @@ jobs:
         working-directory: ./.github/actions/version-matrix
 
       - name: Print matrix
-        run: echo ${{ steps.set-matrix.outputs.matrix }} | jq -e
+        run: echo '${{ steps.set-matrix.outputs.matrix }}' | jq -e
 
   # Build master images that are not dependent on existing builds.
   build-main:
