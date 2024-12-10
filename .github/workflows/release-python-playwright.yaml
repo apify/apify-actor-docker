@@ -57,6 +57,8 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}
 
+    name: "py: ${{ matrix.python-version }}, pw: ${{ matrix.playwright-version }}, apify: ${{ matrix.apify-version }}, is-latest: ${{ matrix.is-latest }}"
+
     steps:
       - name: Set default inputs if event is pull request
         if: github.event_name == 'pull_request'
