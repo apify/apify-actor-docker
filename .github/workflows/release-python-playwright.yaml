@@ -44,7 +44,7 @@ jobs:
 
       - name: Generate matrix
         id: set-matrix
-        run: echo "matrix=$(bun python)" >> $GITHUB_OUTPUT
+        run: echo "matrix=$(bun python:playwright)" >> $GITHUB_OUTPUT
         working-directory: ./.github/actions/version-matrix
 
       - name: Print matrix

@@ -2,7 +2,8 @@
 	"name": "python-matrix",
 	"type": "module",
 	"scripts": {
-		"python": "bun python.ts",
+		"python:normal": "bun src/matrices/python/normal.ts",
+		"python:playwright": "bun src/matrices/python/playwright.ts",
 		"fmt": "biome format --write ."
 	},
 	"devDependencies": {

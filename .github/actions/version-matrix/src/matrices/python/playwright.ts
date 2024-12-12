@@ -1,7 +1,6 @@
 import { semver } from 'bun';
-import { fetchPackageVersions } from './src/pypi';
-
-const supportedPythonVersions = ['3.9', '3.10', '3.11', '3.12', '3.13'];
+import { fetchPackageVersions } from '../../shared/pypi';
+import { supportedPythonVersions } from '../../shared/constants';
 
 /**
  * Certain playwright versions will not run on newer Python versions.
