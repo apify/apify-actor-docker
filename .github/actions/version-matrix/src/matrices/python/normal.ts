@@ -19,7 +19,7 @@ for (const pythonVersion of supportedPythonVersions) {
 	matrix.include.push({
 		'image-name': 'python',
 		'python-version': pythonVersion,
-		'apify-version': apifyVersions[pythonVersion],
+		'apify-version': latestApifyVersion,
 	});
 }
 
