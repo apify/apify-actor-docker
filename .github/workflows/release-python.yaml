@@ -45,7 +45,7 @@ jobs:
 
       - name: Print matrix
         run: |
-          echo '${{ steps.set-matrix.outputs.matrix }}' | jq -r '.include[] | "python-version=\(.["python-version"]) playwright-version=\(.["playwright-version"]) apify-version=\(.["apify-version"]) is-latest=\(.["is-latest"])"'
+          echo '${{ steps.set-matrix.outputs.matrix }}' | jq -r '.include[] | "python-version=\(.["python-version"]) apify-version=\(.["apify-version"])"'
           echo ""
           echo "Raw matrix:"
           echo ""
