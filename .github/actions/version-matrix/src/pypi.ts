@@ -1,7 +1,7 @@
 import { compare } from 'semver';
 
-const pypyPackageInfoRoute = (pkg: string) => `https://pypi.org/pypi/${pkg}/json`;
-const pypyPackageVersionInfoRoute = (pkg: string, version: string) => `https://pypi.org/pypi/${pkg}/${version}/json`;
+const pypiPackageInfoRoute = (pkg: string) => `https://pypi.org/pypi/${pkg}/json`;
+const pypiPackageVersionInfoRoute = (pkg: string, version: string) => `https://pypi.org/pypi/${pkg}/${version}/json`;
 
 // Only documents what we need
 interface PackageInfo {
@@ -22,7 +22,7 @@ interface PackageInfo {
 }
 
 export async function fetchPackageVersions(packageName: string) {
-	const url = pypyPackageInfoRoute(packageName);
+	const url = pypiPackageInfoRoute(packageName);
 
 	const response = await fetch(url);
 
@@ -55,7 +55,7 @@ interface PackageVersionInfo {
 }
 
 export async function fetchPackageVersion(packageName: string, version: string) {
-	const url = pypyPackageVersionInfoRoute(packageName, version);
+	const url = pypiPackageVersionInfoRoute(packageName, version);
 
 	const response = await fetch(url);
 
