@@ -50,7 +50,9 @@ jobs:
       - name: Print matrix
         run: |
           echo '${{ steps.set-matrix.outputs.matrix }}' | jq -r '.include[] | "python-version=\(.["python-version"]) playwright-version=\(.["playwright-version"]) apify-version=\(.["apify-version"]) is-latest=\(.["is-latest"])"'
-          echo "Raw matrix:\n\n"
+          echo "Raw matrix:"
+          echo ""
+          echo ""
           echo '${{ steps.set-matrix.outputs.matrix }}' | jq -e
 
   # Build master images that are not dependent on existing builds.
@@ -98,7 +100,7 @@ jobs:
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 2 # timeout for a single attempt
-          max_attempts: 3
+          max_attempts: 5
           retry_wait_seconds: 60 # wait between retries
           command: pip install apify~=$APIFY_VERSION
 
@@ -130,7 +132,7 @@ jobs:
           file: ./${{ matrix.image-name }}/Dockerfile
           build-args: |
             PYTHON_VERSION=${{ matrix.python-version }}
-            APIFY_VERSION=${{ matrix.apify-version }}
+            APIFY_VERSION=${{ env.APIFY_VERSION }}
             PLAYWRIGHT_VERSION=${{ matrix.playwright-version }}
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
