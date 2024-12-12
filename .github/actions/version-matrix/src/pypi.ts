@@ -36,7 +36,7 @@ export async function fetchPackageVersions(packageName: string) {
 
 	const rawVersions = Object.keys(json.releases);
 
-	// For some reason beta versions are `0.0.0a0` (where `a` is a "tag")
+	// For some reason tagged versions follow a structure like `0.0.0a0` (where `a` is a "tag")
 	const filtered = rawVersions.filter((version) => !/[a-z]/.test(version));
 
 	return filtered.sort((a, b) => compare(a, b));
