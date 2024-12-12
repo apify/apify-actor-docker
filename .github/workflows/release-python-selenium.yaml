@@ -9,9 +9,6 @@ on:
       apify_version:
         description: 'Apify Python SDK version (e.g.: "1.0.0")'
         required: true
-      selenium_version:
-        description: 'Selenium version (e.g.: "4.14.0")'
-        required: true
 
   repository_dispatch:
     types: [build-python-images]
@@ -21,26 +18,58 @@ on:
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
-  # The default Selenium version is set because this workflow is triggered by a Python SDK
-  # release where the version is not specified.
-  SELENIUM_VERSION: ${{ github.event.inputs.selenium_version || github.event.client_payload.selenium_version || '4.14.0' }}
   LATEST_PYTHON: "3.13"
 
 jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up bun
+        uses: oven-sh/setup-bun@v1
+
+      - run: bun install
+        working-directory: ./.github/actions/version-matrix
+
+      - name: Generate matrix
+        id: set-matrix
+        run: echo "matrix=$(bun python:selenium)" >> $GITHUB_OUTPUT
+        working-directory: ./.github/actions/version-matrix
+
+      - name: Print matrix
+        run: |
+          echo '${{ steps.set-matrix.outputs.matrix }}' | jq -r '.include[] | "python-version=\(.["python-version"]) selenium-version=\(.["selenium-version"]) apify-version=\(.["apify-version"]) is-latest=\(.["is-latest"])"'
+          echo ""
+          echo "Raw matrix:"
+          echo ""
+          echo '${{ steps.set-matrix.outputs.matrix }}' | jq -e
+
   # Build master images that are not dependent on existing builds.
   build-main:
+    needs: [matrix]
+
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        image-name: [python-selenium]
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+      matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}
+
+    name: "py: ${{ matrix.python-version }}, selenium: ${{ matrix.selenium-version }}, apify: ${{ matrix.apify-version }}, is-latest: ${{ matrix.is-latest }}"
 
     steps:
       - name: Set default inputs if event is pull request
         if: github.event_name == 'pull_request'
         run: |
           if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=CI_TEST" >> $GITHUB_ENV; fi
-          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=1.1.0" >> $GITHUB_ENV; fi
+          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=${{ matrix.apify-version }}" >> $GITHUB_ENV; fi
+
+      - name: Set default inputs if event is schedule
+        if: github.event_name == 'schedule'
+        run: |
+          if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=latest" >> $GITHUB_ENV; fi
+          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=${{ matrix.apify-version }}" >> $GITHUB_ENV; fi
 
       - name: Check if inputs are set correctly
         run: |
@@ -74,11 +103,10 @@ jobs:
         env:
           CURRENT_PYTHON: ${{ matrix.python-version }}
           LATEST_PYTHON: ${{ env.LATEST_PYTHON }}
-          FRAMEWORK_VERSION: ${{ env.SELENIUM_VERSION }}
+          FRAMEWORK_VERSION: ${{ matrix.selenium-version }}
           RELEASE_TAG: ${{ env.RELEASE_TAG }}
           IMAGE_NAME: apify/actor-${{ matrix.image-name }}
-          # Force this to true, as these images have no browsers
-          IS_LATEST_BROWSER_IMAGE: "true"
+          IS_LATEST_BROWSER_IMAGE: ${{ matrix.is-latest }}
         with:
           script: |
             const generateTags = require("./.github/scripts/prepare-python-image-tags.js");
@@ -98,7 +126,7 @@ jobs:
           build-args: |
             PYTHON_VERSION=${{ matrix.python-version }}
             APIFY_VERSION=${{ env.APIFY_VERSION }}
-            SELENIUM_VERSION=${{ env.SELENIUM_VERSION }}
+            SELENIUM_VERSION=${{ matrix.selenium-version }}
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
 
