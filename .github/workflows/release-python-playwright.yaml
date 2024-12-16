@@ -9,10 +9,6 @@ on:
       apify_version:
         description: 'Apify Python SDK version (e.g.: "1.0.0"). If missing, the latest version will be used.'
         required: false
-      is_latest_browser_image:
-        description: If this is a release of the latest browser image. This gets autofilled by CI here
-        type: boolean
-        default: false
 
   repository_dispatch:
     types: [build-python-images]
@@ -76,6 +72,11 @@ jobs:
         if: github.event_name == 'schedule'
         run: |
           if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=latest" >> $GITHUB_ENV; fi
+          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=${{ matrix.apify-version }}" >> $GITHUB_ENV; fi
+
+      - name: Set default inputs if event is workflow_dispatch
+        if: github.event_name == 'workflow_dispatch'
+        run: |
           if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=${{ matrix.apify-version }}" >> $GITHUB_ENV; fi
 
       - name: Check if inputs are set correctly
