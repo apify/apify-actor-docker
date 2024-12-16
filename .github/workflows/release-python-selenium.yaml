@@ -74,6 +74,11 @@ jobs:
           if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=latest" >> $GITHUB_ENV; fi
           if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=${{ matrix.apify-version }}" >> $GITHUB_ENV; fi
 
+      - name: Set default inputs if event is workflow_dispatch
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=${{ matrix.apify-version }}" >> $GITHUB_ENV; fi
+
       - name: Check if inputs are set correctly
         run: |
           if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG input is empty!" >&2; exit 1; fi
