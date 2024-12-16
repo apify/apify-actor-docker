@@ -1,0 +1,23 @@
+{
+	"name": "python-matrix",
+	"type": "module",
+	"scripts": {
+		"python:normal": "bun src/matrices/python/normal.ts",
+		"python:playwright": "bun src/matrices/python/playwright.ts",
+		"python:selenium": "bun src/matrices/python/selenium.ts",
+		"fmt": "biome format --write ."
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"@types/bun": "latest",
+		"@types/semver": "^7.5.8"
+	},
+	"peerDependencies": {
+		"typescript": "^5.0.0"
+	},
+	"dependencies": {
+		"@actions/core": "^1.11.1",
+		"@actions/github": "^6.0.0",
+		"semver": "^7.6.3"
+	}
+}
