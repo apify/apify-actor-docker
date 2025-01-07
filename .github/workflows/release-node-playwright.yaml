@@ -19,6 +19,9 @@ on:
 
   pull_request:
 
+  # schedule:
+  #   - cron: 0 12 * * *
+
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
