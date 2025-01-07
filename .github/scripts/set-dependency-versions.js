@@ -2,7 +2,6 @@ const fs = require('fs');
 
 const PACKAGE_JSON_PATH = './package.json';
 
-// Pull request runs of this script will have an argument passed as true (see Set Dependency Versions steps)
 const DEPENDENCY_VERSIONS = {
 	'apify': process.env.APIFY_VERSION,
 	'crawlee': process.env.CRAWLEE_VERSION,
