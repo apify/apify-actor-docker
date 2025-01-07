@@ -36,10 +36,6 @@ function readPackageJson(path) {
  */
 function updateDependencyVersions(pkg, dependencyVersions) {
 	Object.entries(dependencyVersions).forEach(([name, version]) => {
-		if (!version) {
-			throw new Error(`Version not provided for dependency: ${name}`);
-		}
-
 		return updateDependencyVersion(pkg, name, version);
 	});
 }
@@ -47,21 +43,23 @@ function updateDependencyVersions(pkg, dependencyVersions) {
 function updateDependencyVersion(pkg, depName, depVersion) {
 	if (!pkg.dependencies) throw new Error('Invalid package.json: Has no dependencies.');
 
-	if (!/^[\^~]/.test(depName)) {
-		console.warn(`Dependency ${depName} is set to fixed version ${depVersion}.`);
-	}
-
 	// Only update existing deps, so we don't add Puppeteer where it does not belong.
 	if (pkg.dependencies[depName]) {
-		// Enforce version only for dependencies that will be updated.
-		if (!depVersion) throw new Error(`Version not provided for dependency: ${depName}`);
+		if (!depVersion) {
+			throw new Error(`Version not provided for dependency: ${name}`);
+		}
+
+		if (!/^[\^~]/.test(depName)) {
+			console.warn(`Dependency ${depName} is set to fixed version ${depVersion}.`);
+		}
+
 		console.log(`Setting dependency: ${depName} to version: ${depVersion}`);
 		pkg.dependencies[depName] = depVersion;
 	}
 
 	if (depName === 'crawlee' && pkg.overrides?.apify) {
 		Object.keys(pkg.overrides.apify).forEach((dep) => {
-			console.log(`Setting dependency: ${dep} to version: ${depVersion}`);
+			console.log(`Setting overrides dependency: ${dep} to version: ${depVersion}`);
 			pkg.overrides.apify[dep] = depVersion;
 		});
 	}

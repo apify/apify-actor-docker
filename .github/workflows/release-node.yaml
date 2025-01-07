@@ -1,4 +1,4 @@
-name: Release/test node images
+name: Release Node basic images
 
 on:
   workflow_dispatch:
