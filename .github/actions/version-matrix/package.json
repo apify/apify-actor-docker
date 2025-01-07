@@ -7,6 +7,7 @@
 		"python:selenium": "bun src/matrices/python/selenium.ts",
 		"node:normal": "bun src/matrices/node/normal.ts",
 		"node:puppeteer": "bun src/matrices/node/puppeteer.ts",
+		"node:playwright": "bun src/matrices/node/playwright.ts",
 		"fmt": "biome format --write ."
 	},
 	"devDependencies": {
