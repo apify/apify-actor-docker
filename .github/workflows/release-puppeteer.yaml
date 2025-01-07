@@ -1,4 +1,4 @@
-name: Release/test puppeteer images
+name: Release Node + Puppeteer images
 
 on:
   workflow_dispatch:
@@ -7,48 +7,116 @@ on:
         description: "Tag for the images (e.g.: beta)"
         required: true
       apify_version:
-        description: "Apify SDK version (e.g.: ^1.0.0)"
-        required: true
+        description: "Apify SDK version (e.g.: ^1.0.0). If missing, the latest version will be used."
+        required: false
       crawlee_version:
-        description: "Crawlee version (e.g.: ^1.0.0)"
-        required: true
-      puppeteer_version:
-        description: "Puppeteer version (e.g.: 5.5.0)"
-        required: true
-      is_latest_browser_image:
-        description: If this is a release of the latest browser image. This gets autofilled by CI in crawlee
-        type: boolean
-        default: false
+        description: "Crawlee version (e.g.: ^1.0.0). If missing, the latest version will be used."
+        required: false
 
   repository_dispatch:
     types:
       - build-node-images
-      - build-node-images-puppeteer
 
   pull_request:
 
 env:
-  RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag || 'CI_TEST' }}
+  RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   CRAWLEE_VERSION: ${{ github.event.inputs.crawlee_version || github.event.client_payload.crawlee_version }}
-  PUPPETEER_VERSION: ${{ github.event.inputs.puppeteer_version || github.event.client_payload.puppeteer_version }}
-  IS_LATEST_BROWSER_IMAGE: ${{ github.event.inputs.is_latest_browser_image || github.event.client_payload.is_latest_browser_image || false }}
   NODE_LATEST: 20
 
 jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up bun
+        uses: oven-sh/setup-bun@v2
+
+      - run: bun install
+        working-directory: ./.github/actions/version-matrix
+
+      - name: Generate matrix
+        id: set-matrix
+        run: echo "matrix=$(bun node:puppeteer)" >> $GITHUB_OUTPUT
+        working-directory: ./.github/actions/version-matrix
+
+      - name: Print matrix
+        run: |
+          echo '${{ steps.set-matrix.outputs.matrix }}' | jq -r '.include[] | "node-version=\(.["node-version"]) apify-version=\(.["apify-version"]) crawlee-version=\(.["crawlee-version"]) puppeteer-version=\(.["puppeteer-version"]) is-latest=\(.["is-latest"])"'
+          echo ""
+          echo "Raw matrix:"
+          echo ""
+          echo '${{ steps.set-matrix.outputs.matrix }}' | jq -e
+
   # Build master images that are not dependent on existing builds.
   build-main:
+    needs: [matrix]
+
     runs-on: ubuntu-latest
     strategy:
       # By the time some build fails, other build can be already finished
       # so fail-fast does not really prevent the publishing of all parallel builds
       fail-fast: false
-      matrix:
-        image-name: [node-puppeteer-chrome]
-        node-version: [18, 20, 22]
+      matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}
+
+    name: "node: ${{ matrix.node-version }}, apify: ${{ matrix.apify-version }}, crawlee: ${{ matrix.crawlee-version }}, pptr: ${{ matrix.puppeteer-version }}, is-latest: ${{ matrix.is-latest }}"
+
     steps:
+      - name: Set default inputs if event is pull request
+        if: github.event_name == 'pull_request'
+        run: |
+          if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=CI_TEST" >> $GITHUB_ENV; fi
+          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=${{ matrix.apify-version }}" >> $GITHUB_ENV; fi
+          if [[ -z "$CRAWLEE_VERSION" ]]; then echo "CRAWLEE_VERSION=${{ matrix.crawlee-version }}" >> $GITHUB_ENV; fi
+
+      - name: Set default inputs if event is schedule
+        if: github.event_name == 'schedule'
+        run: |
+          if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=latest" >> $GITHUB_ENV; fi
+          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=${{ matrix.apify-version }}" >> $GITHUB_ENV; fi
+          if [[ -z "$CRAWLEE_VERSION" ]]; then echo "CRAWLEE_VERSION=${{ matrix.crawlee-version }}" >> $GITHUB_ENV; fi
+
+      - name: Set default inputs if event is workflow_dispatch
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=${{ matrix.apify-version }}" >> $GITHUB_ENV; fi
+          if [[ -z "$CRAWLEE_VERSION" ]]; then echo "CRAWLEE_VERSION=${{ matrix.crawlee-version }}" >> $GITHUB_ENV; fi
+
+      - name: Check if inputs are set correctly
+        run: |
+          if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG input is empty!" >&2; exit 1; fi
+          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION input is empty!" >&2; exit 1; fi
+          if [[ -z "$CRAWLEE_VERSION" ]]; then echo "CRAWLEE_VERSION input is empty!" >&2; exit 1; fi
+
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Set Dependency Versions
+        run: |
+          cd ${{ matrix.image-name }}
+          node ../.github/scripts/set-dependency-versions.js
+        env:
+          PUPPETEER_VERSION: ${{ matrix.puppeteer-version }}
+
+      - # It seems that it takes at least two minutes before a newly published version
+        # becomes available in the NPM registry. We wait before starting the image builds.
+        name: Wait For Package Registry
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 2 # timeout for a single attempt
+          max_attempts: 5
+          retry_wait_seconds: 60 # wait between retries
+          command: cd ${{ matrix.image-name }} && npm i --dry-run
 
       - name: Prepare image tags
         id: prepare-tags
@@ -56,10 +124,10 @@ jobs:
         env:
           CURRENT_NODE: ${{ matrix.node-version }}
           LATEST_NODE: ${{ env.NODE_LATEST }}
+          FRAMEWORK_VERSION: ${{ matrix.puppeteer-version }}
           RELEASE_TAG: ${{ env.RELEASE_TAG }}
           IMAGE_NAME: apify/actor-${{ matrix.image-name }}
-          FRAMEWORK_VERSION: ${{ env.PUPPETEER_VERSION }}
-          IS_LATEST_BROWSER_IMAGE: ${{ env.IS_LATEST_BROWSER_IMAGE }}
+          IS_LATEST_BROWSER_IMAGE: ${{ matrix.is-latest }}
         with:
           script: |
             const generateTags = require("./.github/scripts/prepare-node-image-tags.js");
@@ -70,21 +138,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
-      - name: Set Dependency Versions
-        run: |
-          cd ${{ matrix.image-name }}
-          node ../.github/scripts/set-dependency-versions.js ${{ github.event_name == 'pull_request' }}
-
-      - # It seems that it takes at least two minutes before a newly published version
-        # becomes available in the NPM registry. We wait before starting the image builds.
-        name: Wait For Package Registry
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 2 # timeout for a single attempt
-          max_attempts: 3
-          retry_wait_seconds: 60 # wait between retries
-          command: cd ${{ matrix.image-name }} && npm i --dry-run
 
       - name: Build and tag image
         uses: docker/build-push-action@v5

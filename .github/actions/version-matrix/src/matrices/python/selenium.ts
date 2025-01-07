@@ -4,15 +4,13 @@ import { fetchPackageVersions } from '../../shared/pypi';
 const versions = await fetchPackageVersions('selenium');
 const apifyVersions = await fetchPackageVersions('apify');
 
-const shouldUseLastFiveSelenium = process.env.GITHUB_EVENT_NAME
-	? process.env.GITHUB_EVENT_NAME !== 'pull_request'
-	: true;
+const shouldUseLastFive = process.env.GITHUB_EVENT_NAME ? process.env.GITHUB_EVENT_NAME !== 'pull_request' : true;
 
-if (!shouldUseLastFiveSelenium) {
+if (!shouldUseLastFive) {
 	console.warn('Testing with only the latest version of selenium to speed up CI');
 }
 
-const lastFiveSeleniumVersions = versions.slice(shouldUseLastFiveSelenium ? -5 : -1);
+const lastFiveSeleniumVersions = versions.slice(shouldUseLastFive ? -5 : -1);
 const latestSeleniumVersion = lastFiveSeleniumVersions.at(-1)!;
 const latestApifyVersion = apifyVersions.at(-1)!;
 

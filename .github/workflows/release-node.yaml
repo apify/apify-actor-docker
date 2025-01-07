@@ -16,7 +16,6 @@ on:
   repository_dispatch:
     types:
       - build-node-images
-      - build-node-image-only
 
   pull_request:
 
