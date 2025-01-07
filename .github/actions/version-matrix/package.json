@@ -5,6 +5,7 @@
 		"python:normal": "bun src/matrices/python/normal.ts",
 		"python:playwright": "bun src/matrices/python/playwright.ts",
 		"python:selenium": "bun src/matrices/python/selenium.ts",
+		"node:normal": "bun src/matrices/node/normal.ts",
 		"fmt": "biome format --write ."
 	},
 	"devDependencies": {
