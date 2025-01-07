@@ -37,8 +37,8 @@ for (const nodeVersion of supportedNodeVersions) {
 			'image-name': 'node-puppeteer-chrome',
 			'node-version': nodeVersion,
 			'puppeteer-version': puppeteerVersion,
-			'apify-version': latestApifyVersion,
-			'crawlee-version': latestCrawleeVersion,
+			'apify-version': `^${latestApifyVersion}`,
+			'crawlee-version': `^${latestCrawleeVersion}`,
 			'is-latest': puppeteerVersion === latestPuppeteerVersion ? 'true' : 'false',
 		});
 	}
