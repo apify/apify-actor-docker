@@ -16,7 +16,15 @@ const playwrightPythonVersionConstraints = [
 const versions = await fetchPackageVersions('playwright');
 const apifyVersions = await fetchPackageVersions('apify');
 
-const lastFivePlaywrightVersions = versions.slice(-5);
+const shouldUseLastFivePlaywright = process.env.GITHUB_EVENT_NAME
+	? process.env.GITHUB_EVENT_NAME !== 'pull_request'
+	: true;
+
+if (!shouldUseLastFivePlaywright) {
+	console.warn('Testing with only the latest version of playwright to speed up CI');
+}
+
+const lastFivePlaywrightVersions = versions.slice(shouldUseLastFivePlaywright ? -5 : -1);
 const latestPlaywrightVersion = lastFivePlaywrightVersions.at(-1)!;
 const latestApifyVersion = apifyVersions.at(-1)!;
 

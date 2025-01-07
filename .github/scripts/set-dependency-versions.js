@@ -46,10 +46,10 @@ function updateDependencyVersion(pkg, depName, depVersion) {
 	// Only update existing deps, so we don't add Puppeteer where it does not belong.
 	if (pkg.dependencies[depName]) {
 		if (!depVersion) {
-			throw new Error(`Version not provided for dependency: ${name}`);
+			throw new Error(`Version not provided for dependency: ${depName}`);
 		}
 
-		if (!/^[\^~]/.test(depName)) {
+		if (!/^[\^~]/.test(depVersion)) {
 			console.warn(`Dependency ${depName} is set to fixed version ${depVersion}.`);
 		}
 
