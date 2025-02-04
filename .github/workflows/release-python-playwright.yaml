@@ -23,8 +23,7 @@ env:
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   LATEST_PYTHON: "3.13"
   SHOULD_USE_LAST_FIVE: ${{ github.event_name != 'pull_request' }}
-  # Uncomment after testing the if: condition in the build-main step works
-  # SKIP_CACHE_CHECK: ${{ github.event_name == 'pull_request' }}
+  SKIP_CACHE_CHECK: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   matrix:
@@ -34,6 +33,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Set up bun
         uses: oven-sh/setup-bun@v2
@@ -53,6 +55,22 @@ jobs:
           echo "Raw matrix:"
           echo ""
           echo '${{ steps.set-matrix.outputs.matrix }}' | jq -e
+
+      - name: Push updated matrix
+        if: github.event_name != 'pull_request'
+        run: |
+          # Setup git user
+          git config --global user.email "noreply@apify.com"
+          git config --global user.name "Apify CI Bot"
+
+          # Add and commit if there are changes
+          git add ./.github/actions/version-matrix/data/cache-states.json
+          git diff-index --quiet HEAD || git commit -m "chore(docker): update python:playwright cache"
+
+          # Try to push 5 times, with pulls between retries
+          for i in {1..5}; do
+            git push && break || echo "Failed to push, retrying in 5 seconds..." && sleep 5 && git pull
+          done
 
   # Build master images that are not dependent on existing builds.
   build-main:

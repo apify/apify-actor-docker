@@ -19,16 +19,15 @@ on:
 
   pull_request:
 
-  # schedule:
-  #   - cron: 0 12 * * *
+  schedule:
+    - cron: 3 12 * * *
 
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   CRAWLEE_VERSION: ${{ github.event.inputs.crawlee_version || github.event.client_payload.crawlee_version }}
   NODE_LATEST: 20
-  # Uncomment after testing the if: condition in the build-main step works
-  # SKIP_CACHE_CHECK: ${{ github.event_name == 'pull_request' }}
+  SKIP_CACHE_CHECK: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   matrix:
@@ -38,6 +37,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Set up bun
         uses: oven-sh/setup-bun@v2
@@ -57,6 +59,22 @@ jobs:
           echo "Raw matrix:"
           echo ""
           echo '${{ steps.set-matrix.outputs.matrix }}' | jq -e
+
+      - name: Push updated matrix
+        if: github.event_name != 'pull_request'
+        run: |
+          # Setup git user
+          git config --global user.email "noreply@apify.com"
+          git config --global user.name "Apify CI Bot"
+
+          # Add and commit if there are changes
+          git add ./.github/actions/version-matrix/data/cache-states.json
+          git diff-index --quiet HEAD || git commit -m "chore(docker): update node:normal cache"
+
+          # Try to push 5 times, with pulls between retries
+          for i in {1..5}; do
+            git push && break || echo "Failed to push, retrying in 5 seconds..." && sleep 5 && git pull
+          done
 
   # Build master images that are not dependent on existing builds.
   build-main:
