@@ -1,10 +1,8 @@
-import { supportedPythonVersions } from '../../shared/constants';
+import { shouldUseLastFive, supportedPythonVersions } from '../../shared/constants';
 import { fetchPackageVersions } from '../../shared/pypi';
 
 const versions = await fetchPackageVersions('selenium');
 const apifyVersions = await fetchPackageVersions('apify');
-
-const shouldUseLastFive = process.env.GITHUB_EVENT_NAME ? process.env.GITHUB_EVENT_NAME !== 'pull_request' : true;
 
 if (!shouldUseLastFive) {
 	console.warn('Testing with only the latest version of selenium to speed up CI');

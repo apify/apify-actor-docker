@@ -1,6 +1,7 @@
 {
 	"name": "python-matrix",
 	"type": "module",
+	"private": true,
 	"scripts": {
 		"python:normal": "bun src/matrices/python/normal.ts",
 		"python:playwright": "bun src/matrices/python/playwright.ts",
@@ -16,11 +17,11 @@
 		"@types/semver": "^7.5.8"
 	},
 	"peerDependencies": {
-		"typescript": "^5.0.0"
+		"typescript": "^5.7.3"
 	},
 	"dependencies": {
 		"@actions/core": "^1.11.1",
 		"@actions/github": "^6.0.0",
-		"semver": "^7.6.3"
+		"semver": "^7.7.1"
 	}
 }

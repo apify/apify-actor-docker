@@ -1,11 +1,9 @@
-import { supportedNodeVersions } from '../../shared/constants';
+import { shouldUseLastFive, supportedNodeVersions } from '../../shared/constants';
 import { fetchPackageVersions } from '../../shared/npm';
 
 const puppeteerVersions = await fetchPackageVersions('puppeteer');
 const apifyVersions = await fetchPackageVersions('apify');
 const crawleeVersions = await fetchPackageVersions('crawlee');
-
-const shouldUseLastFive = process.env.GITHUB_EVENT_NAME ? process.env.GITHUB_EVENT_NAME !== 'pull_request' : true;
 
 if (!shouldUseLastFive) {
 	console.warn('Testing with only the latest version of puppeteer to speed up CI');

@@ -27,6 +27,7 @@ env:
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   CRAWLEE_VERSION: ${{ github.event.inputs.crawlee_version || github.event.client_payload.crawlee_version }}
   NODE_LATEST: 20
+  SHOULD_USE_LAST_FIVE: ${{ github.event_name != 'pull_request' }}
 
 jobs:
   matrix:

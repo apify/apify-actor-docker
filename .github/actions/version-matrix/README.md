@@ -6,9 +6,9 @@ These scripts are ran using the [bun](https://bun.sh) runtime (for no reason oth
 
 ## Adding a new Python version to the matrix
 
-When a new version of Python is released, just update the `supportedPythonVersions` array in the `python.ts` file.
+When a new version of Python is released, just update the `supportedPythonVersions` array in the `src/shares/constants.ts` file.
 
-Then, run `bun python` locally to preview the new matrix. (you can use `| jq -r '.include[] | "python-version=\(.["python-version"]) playwright-version=\(.["playwright-version"]) apify-version=\(.["apify-version"]) is-latest=\(.["is-latest"])"'` to get a nicer output from the big JSON blob)
+Then, run `bun python:normal` locally to preview the new matrix. (you can use `| jq -r '.include[] | "python-version=\(.["python-version"]) playwright-version=\(.["playwright-version"]) apify-version=\(.["apify-version"]) is-latest=\(.["is-latest"])"'` to get a nicer output from the big JSON blob)
 
 ## Adding a new Python version range for specific Playwright version ranges
 

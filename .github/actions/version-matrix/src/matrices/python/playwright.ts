@@ -1,6 +1,6 @@
 import { semver } from 'bun';
 import { fetchPackageVersions } from '../../shared/pypi';
-import { supportedPythonVersions } from '../../shared/constants';
+import { shouldUseLastFive, supportedPythonVersions } from '../../shared/constants';
 
 /**
  * Certain playwright versions will not run on newer Python versions.
@@ -15,8 +15,6 @@ const playwrightPythonVersionConstraints = [
 
 const versions = await fetchPackageVersions('playwright');
 const apifyVersions = await fetchPackageVersions('apify');
-
-const shouldUseLastFive = process.env.GITHUB_EVENT_NAME ? process.env.GITHUB_EVENT_NAME !== 'pull_request' : true;
 
 if (!shouldUseLastFive) {
 	console.warn('Testing with only the latest version of playwright to speed up CI');
