@@ -27,6 +27,8 @@ env:
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   CRAWLEE_VERSION: ${{ github.event.inputs.crawlee_version || github.event.client_payload.crawlee_version }}
   NODE_LATEST: 20
+  # Uncomment after testing the if: condition in the build-main step works
+  # SKIP_CACHE_CHECK: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   matrix:
@@ -61,6 +63,8 @@ jobs:
     needs: [matrix]
 
     runs-on: ubuntu-latest
+    if: ${{ toJson(fromJson(needs.matrix.outputs.matrix).include) != '[]' }}
+
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}

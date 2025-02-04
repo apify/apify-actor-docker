@@ -1,0 +1,26 @@
+{
+	"python:normal": {
+		"hash": "1cb2878266be74fa177026f8cfecd2a91e21646df264441ca2ef0571c1837a9e",
+		"hashEntries": "APIFY_VERSION=2.2.1;PYTHON_VERSION=3.9,3.10,3.11,3.12,3.13"
+	},
+	"python:playwright": {
+		"hash": "f1568eff432c27be9af509dacc11f7daa70881c7f8e0e53b5c01cf392ccfe5e1",
+		"hashEntries": "APIFY_VERSION=2.2.1;PLAYWRIGHT_VERSION=1.47.0,1.48.0,1.49.0,1.49.1,1.50.0;PYTHON_VERSION=3.9,3.10,3.11,3.12,3.13"
+	},
+	"python:selenium": {
+		"hash": "c6474bc43d1960f1d2867c774278e9d38dfdadda7070d42edc3c839043d8df20",
+		"hashEntries": "APIFY_VERSION=2.2.1;PYTHON_VERSION=3.9,3.10,3.11,3.12,3.13;SELENIUM_VERSION=4.26.1,4.27.0,4.27.1,4.28.0,4.28.1"
+	},
+	"node:normal": {
+		"hash": "33bfc5810537cd8c4c9fe2dc33e0d78d1f2e1b6a62594a6e8e159969db9ca83c",
+		"hashEntries": "APIFY_VERSION=3.2.6;CRAWLEE_VERSION=3.12.2;NODE_VERSION=18,20,22"
+	},
+	"node:puppeteer-chrome": {
+		"hash": "03ad5a3449ee8da3668724eb54dc59a486faa582f85de52750adbcebdcde6db7",
+		"hashEntries": "APIFY_VERSION=3.2.6;CRAWLEE_VERSION=3.12.2;NODE_VERSION=18,20,22;PUPPETEER_VERSION=23.11.0,23.11.1,24.0.0,24.1.0,24.1.1"
+	},
+	"node:playwright": {
+		"hash": "9e2e3513151d4df8dde67a5f94f6c3285d0fd06921f3f5a85df2d4994d68fb88",
+		"hashEntries": "APIFY_VERSION=3.2.6;CRAWLEE_VERSION=3.12.2;NODE_VERSION=18,20,22;PLAYWRIGHT_VERSION=1.48.2,1.49.0,1.49.1,1.50.0,1.50.1"
+	}
+}

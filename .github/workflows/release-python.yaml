@@ -22,6 +22,8 @@ env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   LATEST_PYTHON: "3.13"
+  # Uncomment after testing the if: condition in the build-main step works
+  # SKIP_CACHE_CHECK: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   matrix:
@@ -56,6 +58,8 @@ jobs:
     needs: [matrix]
 
     runs-on: ubuntu-latest
+    if: ${{ toJson(fromJson(needs.matrix.outputs.matrix).include) != '[]' }}
+
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}

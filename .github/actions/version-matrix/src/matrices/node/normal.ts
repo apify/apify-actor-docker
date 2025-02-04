@@ -1,5 +1,6 @@
-import { supportedNodeVersions } from '../../shared/constants';
-import { fetchPackageVersions } from '../../shared/npm';
+import { needsToRunMatrixGeneration, updateCacheState, type CacheValues } from '../../shared/cache.ts';
+import { emptyMatrix, supportedNodeVersions } from '../../shared/constants.ts';
+import { fetchPackageVersions } from '../../shared/npm.ts';
 
 const apifyVersions = await fetchPackageVersions('apify');
 const crawleeVersions = await fetchPackageVersions('crawlee');
@@ -9,6 +10,20 @@ const latestApifyVersion = apifyVersions.at(-1)!;
 
 console.error('Latest crawlee version:', latestCrawleeVersion);
 console.error('Latest apify version:', latestApifyVersion);
+
+const cacheParams: CacheValues = {
+	NODE_VERSION: supportedNodeVersions,
+	APIFY_VERSION: [latestApifyVersion],
+	CRAWLEE_VERSION: [latestCrawleeVersion],
+};
+
+if (!(await needsToRunMatrixGeneration('node:normal', cacheParams))) {
+	console.error('Matrix generation is not needed, exiting.');
+
+	console.log(emptyMatrix);
+
+	process.exit(0);
+}
 
 const matrix = {
 	include: [] as {
@@ -30,3 +45,5 @@ for (const nodeVersion of supportedNodeVersions) {
 }
 
 console.log(JSON.stringify(matrix));
+
+await updateCacheState('node:normal', cacheParams);

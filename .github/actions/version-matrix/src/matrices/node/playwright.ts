@@ -1,5 +1,6 @@
-import { shouldUseLastFive, supportedNodeVersions } from '../../shared/constants';
-import { fetchPackageVersions } from '../../shared/npm';
+import { needsToRunMatrixGeneration, updateCacheState, type CacheValues } from '../../shared/cache.ts';
+import { emptyMatrix, shouldUseLastFive, supportedNodeVersions } from '../../shared/constants.ts';
+import { fetchPackageVersions } from '../../shared/npm.ts';
 
 const playwrightVersions = await fetchPackageVersions('playwright');
 const apifyVersions = await fetchPackageVersions('apify');
@@ -17,6 +18,21 @@ const latestCrawleeVersion = crawleeVersions.at(-1)!;
 console.error('Latest five versions', latestFivePlaywrightVersions);
 console.error('Latest apify version', latestApifyVersion);
 console.error('Latest crawlee version', latestCrawleeVersion);
+
+const cacheParams: CacheValues = {
+	NODE_VERSION: supportedNodeVersions,
+	PLAYWRIGHT_VERSION: latestFivePlaywrightVersions,
+	APIFY_VERSION: [latestApifyVersion],
+	CRAWLEE_VERSION: [latestCrawleeVersion],
+};
+
+if (!(await needsToRunMatrixGeneration('node:playwright', cacheParams))) {
+	console.error('Matrix generation is not needed, exiting.');
+
+	console.log(emptyMatrix);
+
+	process.exit(0);
+}
 
 const imageNames = [
 	'node-playwright',
@@ -52,3 +68,5 @@ for (const nodeVersion of supportedNodeVersions) {
 }
 
 console.log(JSON.stringify(matrix));
+
+await updateCacheState('node:playwright', cacheParams);

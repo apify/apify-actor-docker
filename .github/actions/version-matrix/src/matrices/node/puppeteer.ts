@@ -1,5 +1,6 @@
-import { shouldUseLastFive, supportedNodeVersions } from '../../shared/constants';
-import { fetchPackageVersions } from '../../shared/npm';
+import { needsToRunMatrixGeneration, updateCacheState, type CacheValues } from '../../shared/cache.ts';
+import { emptyMatrix, shouldUseLastFive, supportedNodeVersions } from '../../shared/constants.ts';
+import { fetchPackageVersions } from '../../shared/npm.ts';
 
 const puppeteerVersions = await fetchPackageVersions('puppeteer');
 const apifyVersions = await fetchPackageVersions('apify');
@@ -17,6 +18,21 @@ const latestCrawleeVersion = crawleeVersions.at(-1)!;
 console.error('Latest five versions', latestFivePuppeteerVersions);
 console.error('Latest apify version', latestApifyVersion);
 console.error('Latest crawlee version', latestCrawleeVersion);
+
+const cacheParams: CacheValues = {
+	NODE_VERSION: supportedNodeVersions,
+	PUPPETEER_VERSION: latestFivePuppeteerVersions,
+	APIFY_VERSION: [latestApifyVersion],
+	CRAWLEE_VERSION: [latestCrawleeVersion],
+};
+
+if (!(await needsToRunMatrixGeneration('node:puppeteer-chrome', cacheParams))) {
+	console.error('Matrix generation is not needed, exiting.');
+
+	console.log(emptyMatrix);
+
+	process.exit(0);
+}
 
 const matrix = {
 	include: [] as {
@@ -43,3 +59,5 @@ for (const nodeVersion of supportedNodeVersions) {
 }
 
 console.log(JSON.stringify(matrix));
+
+await updateCacheState('node:puppeteer-chrome', cacheParams);

@@ -28,6 +28,8 @@ env:
   CRAWLEE_VERSION: ${{ github.event.inputs.crawlee_version || github.event.client_payload.crawlee_version }}
   NODE_LATEST: 20
   SHOULD_USE_LAST_FIVE: ${{ github.event_name != 'pull_request' }}
+  # Uncomment after testing the if: condition in the build-main step works
+  # SKIP_CACHE_CHECK: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   matrix:
@@ -62,6 +64,8 @@ jobs:
     needs: [matrix]
 
     runs-on: ubuntu-latest
+    if: ${{ toJson(fromJson(needs.matrix.outputs.matrix).include) != '[]' }}
+
     strategy:
       # By the time some build fails, other build can be already finished
       # so fail-fast does not really prevent the publishing of all parallel builds

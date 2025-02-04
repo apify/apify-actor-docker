@@ -1,6 +1,7 @@
-import { semver } from 'bun';
-import { fetchPackageVersions } from '../../shared/pypi';
-import { shouldUseLastFive, supportedPythonVersions } from '../../shared/constants';
+import { fetchPackageVersions } from '../../shared/pypi.ts';
+import { emptyMatrix, shouldUseLastFive, supportedPythonVersions } from '../../shared/constants.ts';
+import { needsToRunMatrixGeneration, updateCacheState, type CacheValues } from '../../shared/cache.ts';
+import { satisfies } from 'semver';
 
 /**
  * Certain playwright versions will not run on newer Python versions.
@@ -28,6 +29,20 @@ console.error('Last five versions:', lastFivePlaywrightVersions);
 console.error('Latest playwright version:', latestPlaywrightVersion);
 console.error('Latest apify version:', latestApifyVersion);
 
+const cacheParams: CacheValues = {
+	PYTHON_VERSION: supportedPythonVersions,
+	APIFY_VERSION: [latestApifyVersion],
+	PLAYWRIGHT_VERSION: lastFivePlaywrightVersions,
+};
+
+if (!(await needsToRunMatrixGeneration('python:playwright', cacheParams))) {
+	console.error('Matrix is up to date, skipping new image building');
+
+	console.log(emptyMatrix);
+
+	process.exit(0);
+}
+
 const matrix = {
 	include: [] as {
 		'image-name': 'python-playwright';
@@ -40,12 +55,12 @@ const matrix = {
 
 for (const pythonVersion of supportedPythonVersions) {
 	const maybePlaywrightVersionConstraint = playwrightPythonVersionConstraints.findLast(([constraint]) => {
-		return semver.satisfies(`${pythonVersion}.0`, constraint);
+		return satisfies(`${pythonVersion}.0`, constraint);
 	})?.[1];
 
 	for (const playwrightVersion of lastFivePlaywrightVersions) {
 		if (maybePlaywrightVersionConstraint) {
-			if (!semver.satisfies(playwrightVersion, maybePlaywrightVersionConstraint)) {
+			if (!satisfies(playwrightVersion, maybePlaywrightVersionConstraint)) {
 				continue;
 			}
 		}
@@ -61,3 +76,5 @@ for (const pythonVersion of supportedPythonVersions) {
 }
 
 console.log(JSON.stringify(matrix));
+
+await updateCacheState('python:playwright', cacheParams);

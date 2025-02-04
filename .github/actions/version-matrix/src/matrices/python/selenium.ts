@@ -1,5 +1,6 @@
-import { shouldUseLastFive, supportedPythonVersions } from '../../shared/constants';
-import { fetchPackageVersions } from '../../shared/pypi';
+import { needsToRunMatrixGeneration, updateCacheState, type CacheValues } from '../../shared/cache.ts';
+import { emptyMatrix, shouldUseLastFive, supportedPythonVersions } from '../../shared/constants.ts';
+import { fetchPackageVersions } from '../../shared/pypi.ts';
 
 const versions = await fetchPackageVersions('selenium');
 const apifyVersions = await fetchPackageVersions('apify');
@@ -15,6 +16,20 @@ const latestApifyVersion = apifyVersions.at(-1)!;
 console.error('Last five versions:', lastFiveSeleniumVersions);
 console.error('Latest selenium version:', latestSeleniumVersion);
 console.error('Latest apify version:', latestApifyVersion);
+
+const cacheParams: CacheValues = {
+	PYTHON_VERSION: supportedPythonVersions,
+	APIFY_VERSION: [latestApifyVersion],
+	SELENIUM_VERSION: lastFiveSeleniumVersions,
+};
+
+if (!(await needsToRunMatrixGeneration('python:selenium', cacheParams))) {
+	console.error('Matrix generation is not needed, exiting.');
+
+	console.log(emptyMatrix);
+
+	process.exit(0);
+}
 
 const matrix = {
 	include: [] as {
@@ -39,3 +54,5 @@ for (const pythonVersion of supportedPythonVersions) {
 }
 
 console.log(JSON.stringify(matrix));
+
+await updateCacheState('python:selenium', cacheParams);
