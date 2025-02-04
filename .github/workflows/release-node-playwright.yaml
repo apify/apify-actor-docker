@@ -19,8 +19,8 @@ on:
 
   pull_request:
 
-  # schedule:
-  #   - cron: 5 12 * * *
+  schedule:
+    - cron: 5 12 * * *
 
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
