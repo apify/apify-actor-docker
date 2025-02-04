@@ -8,7 +8,10 @@ export const SELENIUM_VERSION_MARKER = 'SELENIUM_VERSION';
 export const PLAYWRIGHT_VERSION_MARKER = 'PLAYWRIGHT_VERSION';
 export const CRAWLEE_VERSION_MARKER = 'CRAWLEE_VERSION';
 
-const cacheStateFile = new URL('../../data/cache-states.json', import.meta.url);
+const cacheStateFile = new URL(
+	`../../data/cache-states${process.env.RELEASE_TAG ? `-${process.env.RELEASE_TAG}` : ''}.json`,
+	import.meta.url,
+);
 
 type CacheState = Record<string, { hash: string; hashEntries: string }>;
 
