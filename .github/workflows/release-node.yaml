@@ -69,7 +69,7 @@ jobs:
 
           # Add and commit if there are changes
           git add ./.github/actions/version-matrix/data/*.json
-          git diff-index --quiet HEAD || git commit -m "chore(docker): update node:normal cache"
+          git diff-index --quiet HEAD || git commit -m "chore(docker): update ${{ env.RELEASE_TAG || 'latest' }} node:normal cache"
 
           # Try to push 5 times, with pulls between retries
           for i in {1..5}; do
