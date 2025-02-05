@@ -20,7 +20,7 @@
 		"hashEntries": "APIFY_VERSION=2.2.1;PLAYWRIGHT_VERSION=1.47.0,1.48.0,1.49.0,1.49.1,1.50.0;PYTHON_VERSION=3.9,3.10,3.11,3.12,3.13"
 	},
 	"python:selenium": {
-		"hash": "totally_a_hash_mhm_not_a_random_value_to_ensure_the_file_shape_stays_the_same_for_initial_test",
-		"hashEntries": ""
+		"hash": "c6474bc43d1960f1d2867c774278e9d38dfdadda7070d42edc3c839043d8df20",
+		"hashEntries": "APIFY_VERSION=2.2.1;PYTHON_VERSION=3.9,3.10,3.11,3.12,3.13;SELENIUM_VERSION=4.26.1,4.27.0,4.27.1,4.28.0,4.28.1"
 	}
 }
