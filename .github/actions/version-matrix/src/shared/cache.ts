@@ -87,6 +87,11 @@ export async function generateCacheHashForMatrix(name: string, values: CacheValu
 }
 
 export async function updateCacheState(name: string, values: CacheValues) {
+	// Skip updating the cache if the SKIP_CACHE_CHECK environment variable is set to true
+	if (process.env.SKIP_CACHE_CHECK === 'true') {
+		return true;
+	}
+
 	const cacheState = await getCacheState();
 
 	const [hashEntries, hash] = await generateCacheHashForMatrix(name, values);
