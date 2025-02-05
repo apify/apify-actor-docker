@@ -63,7 +63,7 @@ jobs:
           git config --global user.name "Apify CI Bot"
 
           # Add and commit if there are changes
-          git add ./.github/actions/version-matrix/data/cache-states.json
+          git add ./.github/actions/version-matrix/data/*.json
           git diff-index --quiet HEAD || git commit -m "chore(docker): update python:selenium cache"
 
           # Try to push 5 times, with pulls between retries
