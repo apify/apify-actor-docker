@@ -5,19 +5,19 @@ LABEL maintainer="support@apify.com" description="Base image for Apify Actors us
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install WebKit dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+RUN apt update \
+    && apt install -y --no-install-recommends \
     git \
     procps \
     xvfb \
     xauth \
     # Install node
-    && apt-get update && apt-get install -y curl \
+    && apt update && apt install -y curl \
     && curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
-    && apt-get install -y nodejs \
+    && apt install -y nodejs \
     # Feature-parity with Node.js base images.
     # From: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal
-    && apt-get update && apt-get install -y --no-install-recommends git ssh \
+    && apt update && apt install -y --no-install-recommends git ssh \
     && npm install -g yarn \
     \
     # Add user so we don't need --no-sandbox.
@@ -29,11 +29,12 @@ RUN apt-get update \
     \
     # Install all required playwright dependencies for webkit
     && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm_config_ignore_scripts=1 npx playwright install-deps webkit \
+    && apt install -y libgtk-3-0 \
     \
     # Cleanup time
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
-    && apt-get clean -y && apt-get autoremove -y \
+    && apt clean -y && apt autoremove -y \
     && rm -rf /root/.npm \
     \
     # This is needed to remove an annoying error message when running headful.
