@@ -9,8 +9,8 @@ COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
 
 # Install Firefox dependencies + tools
 RUN sh -c 'echo "deb http://ftp.us.debian.org/debian bookworm main non-free" >> /etc/apt/sources.list.d/fonts.list' \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
+    && apt update \
+    && apt install -y --no-install-recommends \
     # Found this in other images, not sure whether it's needed, it does not come from Playwright deps
     procps \
     # The following packages are needed for the intermediate certificates to work in Firefox.
@@ -38,7 +38,7 @@ RUN sh -c 'echo "deb http://ftp.us.debian.org/debian bookworm main non-free" >> 
     # Cleanup time
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
-    && apt-get clean -y && apt-get autoremove -y \
+    && apt clean -y && apt autoremove -y \
     && rm -rf /root/.npm \
     # This is needed to remove an annoying error message when running headful.
     && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix

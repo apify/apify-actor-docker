@@ -9,14 +9,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install latest Chrome dev packages and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
 # Note: this also installs the necessary libs to make the bundled version of Chromium that Puppeteer installs work.
-RUN apt-get update \
-    && apt-get install -y wget gnupg unzip ca-certificates --no-install-recommends \
+RUN apt update \
+    && apt install -y wget gnupg unzip ca-certificates --no-install-recommends \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
     && sh -c 'echo "deb http://ftp.us.debian.org/debian bookworm main non-free" >> /etc/apt/sources.list.d/fonts.list' \
-    && apt-get update \
-    && apt-get purge --auto-remove -y unzip \
-    && apt-get install -y \
+    && apt update \
+    && apt purge --auto-remove -y unzip \
+    && apt install -y \
     fonts-freefont-ttf \
     fonts-ipafont-gothic \
     fonts-kacst \
@@ -52,7 +52,7 @@ RUN apt-get update \
     # Cleanup
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
-    && apt-get clean -y && apt-get autoremove -y \
+    && apt clean -y && apt autoremove -y \
     && rm -rf /root/.npm \
     # This is needed to remove an annoying error message when running headful.
     && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
