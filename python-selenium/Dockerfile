@@ -6,7 +6,7 @@ FROM python:${PYTHON_VERSION}-slim-bookworm
 
 # Add labels to the image to identify it as an Apify Actor
 LABEL maintainer="support@apify.com" \
-      description="Base image for Apify Actors written in Python using Selenium"
+    description="Base image for Apify Actors written in Python using Selenium"
 
 # Set the shell to use /bin/bash with specific options (see Hadolint DL4006)
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -38,41 +38,41 @@ ENV DISPLAY=:99
 ENV XVFB_WHD=1920x1080x24+32
 
 # Install curl, firefox, jq, unzip, xvfb and dependencies of Chrome and its driver
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        ca-certificates \
-        curl \
-        firefox-esr \
-        fonts-liberation \
-        jq \
-        libappindicator3-1 \
-        libasound2 \
-        libatk-bridge2.0-0 \
-        libgbm-dev \
-        libglib2.0-0 \
-        libgtk-3-0 \
-        libnspr4 \
-        libnss3 \
-        libx11-6 \
-        libx11-xcb1 \
-        libxcomposite1 \
-        libxcursor1 \
-        libxdamage1 \
-        libxext6 \
-        libxfixes3 \
-        libxi6 \
-        libxkbcommon0 \
-        libxrandr2 \
-        libxrender1 \
-        libxslt1.1 \
-        libxss1 \
-        libxt6 \
-        libxtst6 \
-        unzip \
-        xdg-utils \
-        xvfb && \
-    apt-get autoremove -yqq --purge && \
-    apt-get clean && \
+RUN apt update && \
+    apt install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    firefox-esr \
+    fonts-liberation \
+    jq \
+    libappindicator3-1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libgbm-dev \
+    libglib2.0-0 \
+    libgtk-3-0 \
+    libnspr4 \
+    libnss3 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxi6 \
+    libxkbcommon0 \
+    libxrandr2 \
+    libxrender1 \
+    libxslt1.1 \
+    libxss1 \
+    libxt6 \
+    libxtst6 \
+    unzip \
+    xdg-utils \
+    xvfb && \
+    apt autoremove -yqq --purge && \
+    apt clean && \
     rm -rf /var/lib/apt/lists/* /var/log/*
 
 # Download and install Geckodriver
@@ -83,8 +83,8 @@ RUN GECKO_DRIVER_URL="https://github.com/mozilla/geckodriver/releases/download/v
 
 # Download and install Google Chrome
 RUN CHROME_URL="$( \
-        curl --silent --show-error --location https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json | \
-        jq -r '.channels.Stable.downloads.chrome[] | select(.platform=="linux64") | .url' \
+    curl --silent --show-error --location https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json | \
+    jq -r '.channels.Stable.downloads.chrome[] | select(.platform=="linux64") | .url' \
     )" && \
     curl --silent --show-error --location --output /tmp/chrome-linux64.zip "$CHROME_URL" && \
     unzip /tmp/chrome-linux64.zip -d /opt/ && \
@@ -94,8 +94,8 @@ RUN CHROME_URL="$( \
 
 # Download and install Google Chrome driver
 RUN CHROME_DRIVER_URL="$( \
-        curl --silent --show-error --location https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json | \
-        jq -r '.channels.Stable.downloads.chromedriver[] | select(.platform=="linux64") | .url' \
+    curl --silent --show-error --location https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json | \
+    jq -r '.channels.Stable.downloads.chromedriver[] | select(.platform=="linux64") | .url' \
     )" && \
     curl --silent --show-error --location --output /tmp/chromedriver-linux64.zip "$CHROME_DRIVER_URL" && \
     unzip /tmp/chromedriver-linux64.zip -d /usr/local/bin/ && \

@@ -66,11 +66,11 @@ jobs:
           # Setup git user
           git config --global user.email "noreply@apify.com"
           git config --global user.name "Apify CI Bot"
-          git config pull.rebase false
+          git config pull.rebase true
 
           # Add and commit if there are changes
           git add ./.github/actions/version-matrix/data/*.json
-          git diff-index --quiet HEAD || git commit -m "chore(docker): update node:playwright cache"
+          git diff-index --quiet HEAD || git commit -m "chore(docker): update ${{ env.RELEASE_TAG || 'latest' }} node:playwright cache"
 
           # Try to push 5 times, with pulls between retries
           for i in {1..5}; do

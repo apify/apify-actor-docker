@@ -10,15 +10,15 @@ ENV DEBIAN_FRONTEND=noninteractive
 COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
 
 # Install libs
-RUN apt-get update \
-    && apt-get install --fix-missing -yq --no-install-recommends procps xvfb xauth wget \
+RUN apt update \
+    && apt install --fix-missing -yq --no-install-recommends procps xvfb xauth wget \
     && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix \
     # Uninstall system NodeJs
-    && apt-get purge -yq nodejs \
+    && apt purge -yq nodejs \
     # Install node
-    && apt-get update && apt-get install -y curl \
+    && apt update && apt install -y curl \
     && curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
-    && apt-get install -y nodejs \
+    && apt install -y nodejs \
     # The following packages are needed for the intermediate certificates to work in Firefox.
     ca-certificates \
     jq \
@@ -49,7 +49,7 @@ RUN apt-get update \
     # Cleanup time
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
-    && apt-get clean -y && apt-get autoremove -y \
+    && apt clean -y && apt autoremove -y \
     && rm -rf /root/.npm \
     # This is needed to remove an annoying error message when running headful.
     && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix

@@ -19,11 +19,13 @@ const { testChrome, testPageLoading } = require('./chrome_test');
 Actor.main(async () => {
     const browsers = ['webkit', 'firefox', 'chromium'];
     const promisesHeadless = browsers.map(async (browserName) => {
+        console.log(`Testing Playwright with ${browserName} and headless`);
         const browser = await launchPlaywright({ launcher: playwright[browserName] });
         return testPageLoading(browser);
     });
 
     const promisesHeadful = browsers.map(async (browserName) => {
+        console.log(`Testing Playwright with ${browserName} and headful`);
         const browser = await launchPlaywright({ launcher: playwright[browserName], launchOptions: { headless: false } });
         return testPageLoading(browser);
     });
