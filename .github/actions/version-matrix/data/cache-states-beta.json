@@ -4,8 +4,8 @@
 		"hashEntries": ""
 	},
 	"node:playwright": {
-		"hash": "totally_a_hash_mhm_not_a_random_value_to_ensure_the_file_shape_stays_the_same_for_initial_test",
-		"hashEntries": ""
+		"hash": "9e2e3513151d4df8dde67a5f94f6c3285d0fd06921f3f5a85df2d4994d68fb88",
+		"hashEntries": "APIFY_VERSION=3.2.6;CRAWLEE_VERSION=3.12.2;NODE_VERSION=18,20,22;PLAYWRIGHT_VERSION=1.48.2,1.49.0,1.49.1,1.50.0,1.50.1"
 	},
 	"node:puppeteer-chrome": {
 		"hash": "totally_a_hash_mhm_not_a_random_value_to_ensure_the_file_shape_stays_the_same_for_initial_test",
