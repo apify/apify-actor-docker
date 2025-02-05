@@ -21,7 +21,6 @@ on:
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
-  LATEST_PYTHON: "3.13"
   SHOULD_USE_LAST_FIVE: ${{ github.event_name != 'pull_request' }}
   SKIP_CACHE_CHECK: ${{ github.event_name == 'pull_request' }}
 
@@ -134,7 +133,7 @@ jobs:
         uses: actions/github-script@v7
         env:
           CURRENT_PYTHON: ${{ matrix.python-version }}
-          LATEST_PYTHON: ${{ env.LATEST_PYTHON }}
+          LATEST_PYTHON: ${{ matrix.latest-python-version }}
           FRAMEWORK_VERSION: ${{ matrix.playwright-version }}
           RELEASE_TAG: ${{ env.RELEASE_TAG }}
           IMAGE_NAME: apify/actor-${{ matrix.image-name }}

@@ -1,5 +1,5 @@
 import { needsToRunMatrixGeneration, updateCacheState, type CacheValues } from '../../shared/cache.ts';
-import { emptyMatrix, shouldUseLastFive, supportedNodeVersions } from '../../shared/constants.ts';
+import { emptyMatrix, latestNodeVersion, shouldUseLastFive, supportedNodeVersions } from '../../shared/constants.ts';
 import { fetchPackageVersions } from '../../shared/npm.ts';
 
 const puppeteerVersions = await fetchPackageVersions('puppeteer');
@@ -42,6 +42,7 @@ const matrix = {
 		'apify-version': string;
 		'crawlee-version': string;
 		'is-latest': 'true' | 'false';
+		'latest-node-version': string;
 	}[],
 };
 
@@ -54,6 +55,7 @@ for (const nodeVersion of supportedNodeVersions) {
 			'apify-version': `^${latestApifyVersion}`,
 			'crawlee-version': `^${latestCrawleeVersion}`,
 			'is-latest': puppeteerVersion === latestPuppeteerVersion ? 'true' : 'false',
+			'latest-node-version': latestNodeVersion,
 		});
 	}
 }

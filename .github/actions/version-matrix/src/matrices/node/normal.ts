@@ -1,5 +1,5 @@
 import { needsToRunMatrixGeneration, updateCacheState, type CacheValues } from '../../shared/cache.ts';
-import { emptyMatrix, supportedNodeVersions } from '../../shared/constants.ts';
+import { emptyMatrix, latestNodeVersion, supportedNodeVersions } from '../../shared/constants.ts';
 import { fetchPackageVersions } from '../../shared/npm.ts';
 
 const apifyVersions = await fetchPackageVersions('apify');
@@ -31,6 +31,7 @@ const matrix = {
 		'node-version': string;
 		'apify-version': string;
 		'crawlee-version': string;
+		'latest-node-version': string;
 	}[],
 };
 
@@ -41,6 +42,7 @@ for (const nodeVersion of supportedNodeVersions) {
 		// Node uses semver ranges for the versions
 		'apify-version': `^${latestApifyVersion}`,
 		'crawlee-version': `^${latestCrawleeVersion}`,
+		'latest-node-version': latestNodeVersion,
 	});
 }
 

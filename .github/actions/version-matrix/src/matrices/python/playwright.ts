@@ -1,5 +1,10 @@
 import { fetchPackageVersions } from '../../shared/pypi.ts';
-import { emptyMatrix, shouldUseLastFive, supportedPythonVersions } from '../../shared/constants.ts';
+import {
+	emptyMatrix,
+	latestPythonVersion,
+	shouldUseLastFive,
+	supportedPythonVersions,
+} from '../../shared/constants.ts';
 import { needsToRunMatrixGeneration, updateCacheState, type CacheValues } from '../../shared/cache.ts';
 import { satisfies } from 'semver';
 
@@ -50,6 +55,7 @@ const matrix = {
 		'playwright-version': string;
 		'apify-version': string;
 		'is-latest': 'true' | 'false';
+		'latest-python-version': string;
 	}[],
 };
 
@@ -71,6 +77,7 @@ for (const pythonVersion of supportedPythonVersions) {
 			'playwright-version': playwrightVersion,
 			'apify-version': latestApifyVersion,
 			'is-latest': playwrightVersion === latestPlaywrightVersion ? 'true' : 'false',
+			'latest-python-version': latestPythonVersion,
 		});
 	}
 }

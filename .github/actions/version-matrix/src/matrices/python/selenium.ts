@@ -1,5 +1,10 @@
 import { needsToRunMatrixGeneration, updateCacheState, type CacheValues } from '../../shared/cache.ts';
-import { emptyMatrix, shouldUseLastFive, supportedPythonVersions } from '../../shared/constants.ts';
+import {
+	emptyMatrix,
+	latestPythonVersion,
+	shouldUseLastFive,
+	supportedPythonVersions,
+} from '../../shared/constants.ts';
 import { fetchPackageVersions } from '../../shared/pypi.ts';
 
 const versions = await fetchPackageVersions('selenium');
@@ -38,6 +43,7 @@ const matrix = {
 		'selenium-version': string;
 		'apify-version': string;
 		'is-latest': 'true' | 'false';
+		'latest-python-version': string;
 	}[],
 };
 
@@ -49,6 +55,7 @@ for (const pythonVersion of supportedPythonVersions) {
 			'selenium-version': seleniumVersion,
 			'apify-version': latestApifyVersion,
 			'is-latest': seleniumVersion === latestSeleniumVersion ? 'true' : 'false',
+			'latest-python-version': latestPythonVersion,
 		});
 	}
 }

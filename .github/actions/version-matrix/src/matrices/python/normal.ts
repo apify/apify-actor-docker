@@ -1,5 +1,5 @@
 import { needsToRunMatrixGeneration, updateCacheState, type CacheValues } from '../../shared/cache.ts';
-import { emptyMatrix, supportedPythonVersions } from '../../shared/constants.ts';
+import { emptyMatrix, latestPythonVersion, supportedPythonVersions } from '../../shared/constants.ts';
 import { fetchPackageVersions } from '../../shared/pypi.ts';
 
 const apifyVersions = await fetchPackageVersions('apify');
@@ -26,6 +26,7 @@ const matrix = {
 		'image-name': 'python';
 		'python-version': string;
 		'apify-version': string;
+		'latest-python-version': string;
 	}[],
 };
 
@@ -34,6 +35,7 @@ for (const pythonVersion of supportedPythonVersions) {
 		'image-name': 'python',
 		'python-version': pythonVersion,
 		'apify-version': latestApifyVersion,
+		'latest-python-version': latestPythonVersion,
 	});
 }
 
