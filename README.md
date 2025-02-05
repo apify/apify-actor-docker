@@ -15,13 +15,12 @@ The images are using the following tags:
 
 ## Maintenance
 
-In order to build and publish a new version of the Docker images,
-open the Actions tab and find the Release Images workflow.
-You can then run the workflow by providing the following inputs:
+The process of building and publishing new images is automated using GitHub Actions, and a set of scripts that are stored in `.github/actions/version-matrix`. We recommend reading the [`README.md`](.github/actions/version-matrix/README.md) in that directory to understand how the scripts work.
 
--   A tag, which will be used to tag the image in DockerHub. Typically beta or latest.
--   A version of the `apify` package that should be pre-installed in the images.
--   A version of the `puppeteer` package that should be pre-installed in the images that use Puppeteer.
+Manual releases can also be done by triggering the specified workflows manually. At minimum, you **must** specify the `release_tag` input, which is the tag for the image. Every other variable is optional, and if not specified, the matrix generator will fetch the latest version of the corresponding package from the registry.
+
+> [!CAUTION]
+> When manually building a `latest` image, please try to avoid specifying certain library versions unless absolutely necessary.
 
 ### Adding a new actor image
 
@@ -32,7 +31,7 @@ After, you need to follow these steps:
 1. Create a new folder with the same name as the package you want to create without the prefix `actor-`.
    For image `apify/actor-node`, create folder `node`.
 
-2. Create a source of the image in that folder. Remember to create a test that is runnable using docker run to be able to test in the image in CI/CD.
+2. Create a source of the image in that folder. Remember to create a test that is runnable using `docker run` to be able to test in the image in CI/CD.
 
 3. Create a new repository in the Apify DockerHub organization, use the name with `actor-` prefix, e.g. `apify/actor-node`.
 
@@ -46,7 +45,7 @@ You will need the following tools installed: docker, make, jq, git
 
 1. Clone this repository
 
-1. Run `make all` to test out all images (this will take a long while, be patient).
+1. Run `make all` to test out all images (this will take a long while, be patient). You can use `make test-node` or `make test-python` to run a specific collection of tests.
 
 You can overwrite the node version you build the images for by specifying `NODE_VERSION=xx` environment variable.
 You can overwrite the playwright version you build the images for by specifying `PLAYWRIGHT_VERSION=vx.x.x-` environment variable. You must respect the format of `v<full-semver-version>-`
