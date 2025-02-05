@@ -66,7 +66,7 @@ jobs:
           # Setup git user
           git config --global user.email "noreply@apify.com"
           git config --global user.name "Apify CI Bot"
-          git config pull.rebase false
+          git config pull.rebase true
 
           # Add and commit if there are changes
           git add ./.github/actions/version-matrix/data/*.json
