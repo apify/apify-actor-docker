@@ -1,26 +1,31 @@
-name: Release Python + Playwright images
+name: Release Node + Puppeteer images
 
 on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Tag for the images (e.g.: "latest" or "beta")'
+        description: "Tag for the images (e.g.: beta)"
         required: true
       apify_version:
-        description: 'Apify Python SDK version (e.g.: "1.0.0"). If missing, the latest version will be used.'
+        description: "Apify SDK version (e.g.: ^1.0.0). If missing, the latest version will be used."
+        required: false
+      crawlee_version:
+        description: "Crawlee version (e.g.: ^1.0.0). If missing, the latest version will be used."
         required: false
 
   repository_dispatch:
-    types: [build-python-images]
+    types:
+      - build-node-images
 
   pull_request:
 
   schedule:
-    - cron: 1 12 * * *
+    - cron: 4 12 * * *
 
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
+  CRAWLEE_VERSION: ${{ github.event.inputs.crawlee_version || github.event.client_payload.crawlee_version }}
   SHOULD_USE_LAST_FIVE: ${{ github.event_name != 'pull_request' }}
   SKIP_CACHE_CHECK: ${{ github.event_name == 'pull_request' }}
 
@@ -44,12 +49,12 @@ jobs:
 
       - name: Generate matrix
         id: set-matrix
-        run: echo "matrix=$(bun python:playwright)" >> $GITHUB_OUTPUT
+        run: echo "matrix=$(bun node:puppeteer)" >> $GITHUB_OUTPUT
         working-directory: ./.github/actions/version-matrix
 
       - name: Print matrix
         run: |
-          echo '${{ steps.set-matrix.outputs.matrix }}' | jq -r '.include[] | "python-version=\(.["python-version"]) playwright-version=\(.["playwright-version"]) apify-version=\(.["apify-version"]) is-latest=\(.["is-latest"])"'
+          echo '${{ steps.set-matrix.outputs.matrix }}' | jq -r '.include[] | "node-version=\(.["node-version"]) apify-version=\(.["apify-version"]) crawlee-version=\(.["crawlee-version"]) puppeteer-version=\(.["puppeteer-version"]) is-latest=\(.["is-latest"])"'
           echo ""
           echo "Raw matrix:"
           echo ""
@@ -64,7 +69,7 @@ jobs:
 
           # Add and commit if there are changes
           git add ./.github/actions/version-matrix/data/cache-states.json
-          git diff-index --quiet HEAD || git commit -m "chore(docker): update python:playwright cache"
+          git diff-index --quiet HEAD || git commit -m "chore(docker): update node:puppeteer-chrome cache"
 
           # Try to push 5 times, with pulls between retries
           for i in {1..5}; do
@@ -79,10 +84,12 @@ jobs:
     if: ${{ toJson(fromJson(needs.matrix.outputs.matrix).include) != '[]' }}
 
     strategy:
+      # By the time some build fails, other build can be already finished
+      # so fail-fast does not really prevent the publishing of all parallel builds
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}
 
-    name: "py: ${{ matrix.python-version }}, pw: ${{ matrix.playwright-version }}, apify: ${{ matrix.apify-version }}, is-latest: ${{ matrix.is-latest }}"
+    name: "node: ${{ matrix.node-version }}, apify: ${{ matrix.apify-version }}, crawlee: ${{ matrix.crawlee-version }}, pptr: ${{ matrix.puppeteer-version }}, is-latest: ${{ matrix.is-latest }}"
 
     steps:
       - name: Set default inputs if event is pull request
@@ -90,58 +97,66 @@ jobs:
         run: |
           if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=CI_TEST" >> $GITHUB_ENV; fi
           if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=${{ matrix.apify-version }}" >> $GITHUB_ENV; fi
+          if [[ -z "$CRAWLEE_VERSION" ]]; then echo "CRAWLEE_VERSION=${{ matrix.crawlee-version }}" >> $GITHUB_ENV; fi
 
       - name: Set default inputs if event is schedule
         if: github.event_name == 'schedule'
         run: |
           if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=latest" >> $GITHUB_ENV; fi
           if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=${{ matrix.apify-version }}" >> $GITHUB_ENV; fi
+          if [[ -z "$CRAWLEE_VERSION" ]]; then echo "CRAWLEE_VERSION=${{ matrix.crawlee-version }}" >> $GITHUB_ENV; fi
 
       - name: Set default inputs if event is workflow_dispatch
         if: github.event_name == 'workflow_dispatch'
         run: |
           if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=${{ matrix.apify-version }}" >> $GITHUB_ENV; fi
+          if [[ -z "$CRAWLEE_VERSION" ]]; then echo "CRAWLEE_VERSION=${{ matrix.crawlee-version }}" >> $GITHUB_ENV; fi
 
       - name: Check if inputs are set correctly
         run: |
           if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG input is empty!" >&2; exit 1; fi
           if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION input is empty!" >&2; exit 1; fi
+          if [[ -z "$CRAWLEE_VERSION" ]]; then echo "CRAWLEE_VERSION input is empty!" >&2; exit 1; fi
 
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - name: Set up Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          node-version: ${{ matrix.node-version }}
 
-      - name: Update pip
-        run: python -m pip install --upgrade pip
+      - name: Set Dependency Versions
+        run: |
+          cd ${{ matrix.image-name }}
+          node ../.github/scripts/set-dependency-versions.js
+        env:
+          PUPPETEER_VERSION: ${{ matrix.puppeteer-version }}
 
-      - # It seems that it takes a few minutes before a newly published version
-        # becomes available in the PyPI registry. We wait before starting the image builds.
+      - # It seems that it takes at least two minutes before a newly published version
+        # becomes available in the NPM registry. We wait before starting the image builds.
         name: Wait For Package Registry
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 2 # timeout for a single attempt
           max_attempts: 5
           retry_wait_seconds: 60 # wait between retries
-          command: pip install apify~=$APIFY_VERSION
+          command: cd ${{ matrix.image-name }} && npm i --dry-run
 
       - name: Prepare image tags
         id: prepare-tags
         uses: actions/github-script@v7
         env:
-          CURRENT_PYTHON: ${{ matrix.python-version }}
-          LATEST_PYTHON: ${{ matrix.latest-python-version }}
-          FRAMEWORK_VERSION: ${{ matrix.playwright-version }}
+          CURRENT_NODE: ${{ matrix.node-version }}
+          LATEST_NODE: ${{ matrix.latest-node-version }}
+          FRAMEWORK_VERSION: ${{ matrix.puppeteer-version }}
           RELEASE_TAG: ${{ env.RELEASE_TAG }}
           IMAGE_NAME: apify/actor-${{ matrix.image-name }}
           IS_LATEST_BROWSER_IMAGE: ${{ matrix.is-latest }}
         with:
           script: |
-            const generateTags = require("./.github/scripts/prepare-python-image-tags.js");
-            return generateTags()
+            const generateTags = require("./.github/scripts/prepare-node-image-tags.js");
+            return generateTags();
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -154,10 +169,7 @@ jobs:
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
-          build-args: |
-            PYTHON_VERSION=${{ matrix.python-version }}
-            APIFY_VERSION=${{ env.APIFY_VERSION }}
-            PLAYWRIGHT_VERSION=${{ matrix.playwright-version }}
+          build-args: NODE_VERSION=${{ matrix.node-version }}
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
 

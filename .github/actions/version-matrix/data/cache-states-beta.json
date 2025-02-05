@@ -1,0 +1,26 @@
+{
+	"node:normal": {
+		"hash": "totally_a_hash_mhm_not_a_random_value_to_ensure_the_file_shape_stays_the_same_for_initial_test",
+		"hashEntries": ""
+	},
+	"node:playwright": {
+		"hash": "totally_a_hash_mhm_not_a_random_value_to_ensure_the_file_shape_stays_the_same_for_initial_test",
+		"hashEntries": ""
+	},
+	"node:puppeteer-chrome": {
+		"hash": "totally_a_hash_mhm_not_a_random_value_to_ensure_the_file_shape_stays_the_same_for_initial_test",
+		"hashEntries": ""
+	},
+	"python:normal": {
+		"hash": "totally_a_hash_mhm_not_a_random_value_to_ensure_the_file_shape_stays_the_same_for_initial_test",
+		"hashEntries": ""
+	},
+	"python:playwright": {
+		"hash": "totally_a_hash_mhm_not_a_random_value_to_ensure_the_file_shape_stays_the_same_for_initial_test",
+		"hashEntries": ""
+	},
+	"python:selenium": {
+		"hash": "totally_a_hash_mhm_not_a_random_value_to_ensure_the_file_shape_stays_the_same_for_initial_test",
+		"hashEntries": ""
+	}
+}

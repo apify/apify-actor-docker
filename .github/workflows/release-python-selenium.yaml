@@ -16,12 +16,13 @@ on:
   pull_request:
 
   schedule:
-    - cron: 0 12 * * *
+    - cron: 2 12 * * *
 
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
-  LATEST_PYTHON: "3.13"
+  SHOULD_USE_LAST_FIVE: ${{ github.event_name != 'pull_request' }}
+  SKIP_CACHE_CHECK: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   matrix:
@@ -31,6 +32,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Set up bun
         uses: oven-sh/setup-bun@v2
@@ -51,12 +55,31 @@ jobs:
           echo ""
           echo '${{ steps.set-matrix.outputs.matrix }}' | jq -e
 
+      - name: Push updated matrix
+        if: github.event_name != 'pull_request'
+        run: |
+          # Setup git user
+          git config --global user.email "noreply@apify.com"
+          git config --global user.name "Apify CI Bot"
+
+          # Add and commit if there are changes
+          git add ./.github/actions/version-matrix/data/cache-states.json
+          git diff-index --quiet HEAD || git commit -m "chore(docker): update python:selenium cache"
+
+          # Try to push 5 times, with pulls between retries
+          for i in {1..5}; do
+            git push && break || echo "Failed to push, retrying in 5 seconds..." && sleep 5 && git pull
+          done
+
   # Build master images that are not dependent on existing builds.
   build-main:
     needs: [matrix]
 
     runs-on: ubuntu-latest
+    if: ${{ toJson(fromJson(needs.matrix.outputs.matrix).include) != '[]' }}
+
     strategy:
+      fail-fast: false
       matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}
 
     name: "py: ${{ matrix.python-version }}, selenium: ${{ matrix.selenium-version }}, apify: ${{ matrix.apify-version }}, is-latest: ${{ matrix.is-latest }}"
@@ -110,7 +133,7 @@ jobs:
         uses: actions/github-script@v7
         env:
           CURRENT_PYTHON: ${{ matrix.python-version }}
-          LATEST_PYTHON: ${{ env.LATEST_PYTHON }}
+          LATEST_PYTHON: ${{ matrix.latest-python-version }}
           FRAMEWORK_VERSION: ${{ matrix.selenium-version }}
           RELEASE_TAG: ${{ env.RELEASE_TAG }}
           IMAGE_NAME: apify/actor-${{ matrix.image-name }}
