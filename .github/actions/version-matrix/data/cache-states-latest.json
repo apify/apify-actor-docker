@@ -16,8 +16,8 @@
 		"hashEntries": ""
 	},
 	"python:playwright": {
-		"hash": "totally_a_hash_mhm_not_a_random_value_to_ensure_the_file_shape_stays_the_same_for_initial_test",
-		"hashEntries": ""
+		"hash": "f1568eff432c27be9af509dacc11f7daa70881c7f8e0e53b5c01cf392ccfe5e1",
+		"hashEntries": "APIFY_VERSION=2.2.1;PLAYWRIGHT_VERSION=1.47.0,1.48.0,1.49.0,1.49.1,1.50.0;PYTHON_VERSION=3.9,3.10,3.11,3.12,3.13"
 	},
 	"python:selenium": {
 		"hash": "totally_a_hash_mhm_not_a_random_value_to_ensure_the_file_shape_stays_the_same_for_initial_test",
