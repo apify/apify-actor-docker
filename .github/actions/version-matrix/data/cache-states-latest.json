@@ -12,8 +12,8 @@
 		"hashEntries": ""
 	},
 	"python:normal": {
-		"hash": "totally_a_hash_mhm_not_a_random_value_to_ensure_the_file_shape_stays_the_same_for_initial_test",
-		"hashEntries": ""
+		"hash": "1cb2878266be74fa177026f8cfecd2a91e21646df264441ca2ef0571c1837a9e",
+		"hashEntries": "APIFY_VERSION=2.2.1;PYTHON_VERSION=3.9,3.10,3.11,3.12,3.13"
 	},
 	"python:playwright": {
 		"hash": "f1568eff432c27be9af509dacc11f7daa70881c7f8e0e53b5c01cf392ccfe5e1",
