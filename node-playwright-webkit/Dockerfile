@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 ubuntu:jammy
+FROM --platform=linux/amd64 ubuntu:noble
 ARG NODE_VERSION=20
 
 LABEL maintainer="support@apify.com" description="Base image for Apify Actors using Webkit"
