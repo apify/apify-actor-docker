@@ -28,11 +28,16 @@ if (!shouldUseLastFive) {
 
 const lastFivePlaywrightVersions = versions.slice(shouldUseLastFive ? -5 : -1);
 const latestPlaywrightVersion = lastFivePlaywrightVersions.at(-1)!;
-const latestApifyVersion = apifyVersions.at(-1)!;
+let latestApifyVersion = apifyVersions.at(-1)!;
 
 console.error('Last five versions:', lastFivePlaywrightVersions);
 console.error('Latest playwright version:', latestPlaywrightVersion);
 console.error('Latest apify version:', latestApifyVersion);
+
+if (process.env.APIFY_VERSION) {
+	console.error('Using custom apify version:', process.env.APIFY_VERSION);
+	latestApifyVersion = process.env.APIFY_VERSION;
+}
 
 const cacheParams: CacheValues = {
 	PYTHON_VERSION: supportedPythonVersions,

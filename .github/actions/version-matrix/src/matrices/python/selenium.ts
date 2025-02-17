@@ -16,11 +16,16 @@ if (!shouldUseLastFive) {
 
 const lastFiveSeleniumVersions = versions.slice(shouldUseLastFive ? -5 : -1);
 const latestSeleniumVersion = lastFiveSeleniumVersions.at(-1)!;
-const latestApifyVersion = apifyVersions.at(-1)!;
+let latestApifyVersion = apifyVersions.at(-1)!;
 
 console.error('Last five versions:', lastFiveSeleniumVersions);
 console.error('Latest selenium version:', latestSeleniumVersion);
 console.error('Latest apify version:', latestApifyVersion);
+
+if (process.env.APIFY_VERSION) {
+	console.error('Using custom apify version:', process.env.APIFY_VERSION);
+	latestApifyVersion = process.env.APIFY_VERSION;
+}
 
 const cacheParams: CacheValues = {
 	PYTHON_VERSION: supportedPythonVersions,
