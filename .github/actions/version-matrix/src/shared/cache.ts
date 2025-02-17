@@ -101,5 +101,5 @@ export async function updateCacheState(name: string, values: CacheValues) {
 		hashEntries,
 	};
 
-	await writeFile(cacheStateFile, JSON.stringify(cacheState, null, '\t'));
+	await writeFile(cacheStateFile, JSON.stringify(cacheState, null, '\t') + '\n');
 }

@@ -4,9 +4,14 @@ import { fetchPackageVersions } from '../../shared/pypi.ts';
 
 const apifyVersions = await fetchPackageVersions('apify');
 
-const latestApifyVersion = apifyVersions.at(-1)!;
+let latestApifyVersion = apifyVersions.at(-1)!;
 
 console.error('Latest apify version:', latestApifyVersion);
+
+if (process.env.APIFY_VERSION) {
+	console.error('Using custom apify version:', process.env.APIFY_VERSION);
+	latestApifyVersion = process.env.APIFY_VERSION;
+}
 
 const cacheParams: CacheValues = {
 	PYTHON_VERSION: supportedPythonVersions,

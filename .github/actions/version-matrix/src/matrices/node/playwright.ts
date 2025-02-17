@@ -12,12 +12,22 @@ if (!shouldUseLastFive) {
 
 const latestFivePlaywrightVersions = playwrightVersions.slice(shouldUseLastFive ? -5 : -1);
 const latestPlaywrightVersion = latestFivePlaywrightVersions.at(-1)!;
-const latestApifyVersion = apifyVersions.at(-1)!;
-const latestCrawleeVersion = crawleeVersions.at(-1)!;
+let latestApifyVersion = apifyVersions.at(-1)!;
+let latestCrawleeVersion = crawleeVersions.at(-1)!;
 
 console.error('Latest five versions', latestFivePlaywrightVersions);
 console.error('Latest apify version', latestApifyVersion);
 console.error('Latest crawlee version', latestCrawleeVersion);
+
+if (process.env.CRAWLEE_VERSION) {
+	console.error('Using custom crawlee version:', process.env.CRAWLEE_VERSION);
+	latestCrawleeVersion = process.env.CRAWLEE_VERSION;
+}
+
+if (process.env.APIFY_VERSION) {
+	console.error('Using custom apify version:', process.env.APIFY_VERSION);
+	latestApifyVersion = process.env.APIFY_VERSION;
+}
 
 const cacheParams: CacheValues = {
 	NODE_VERSION: supportedNodeVersions,
