@@ -12,6 +12,10 @@ on:
       crawlee_version:
         description: "Crawlee version (e.g.: ^1.0.0). If missing, the latest version will be used."
         required: false
+      rebuild_images:
+        description: "Rebuilds images even if the cache state matches the current state."
+        required: false
+        type: boolean
 
   repository_dispatch:
     types:
@@ -27,7 +31,7 @@ env:
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   CRAWLEE_VERSION: ${{ github.event.inputs.crawlee_version || github.event.client_payload.crawlee_version }}
   SHOULD_USE_LAST_FIVE: ${{ github.event_name != 'pull_request' }}
-  SKIP_CACHE_CHECK: ${{ github.event_name == 'pull_request' }}
+  SKIP_CACHE_CHECK: ${{ github.event_name == 'pull_request' || github.event.inputs.rebuild_images == 'true' }}
 
 jobs:
   matrix:

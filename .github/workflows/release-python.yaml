@@ -9,6 +9,10 @@ on:
       apify_version:
         description: 'Apify Python SDK version (e.g.: "1.0.0"). If missing, the latest version will be used.'
         required: false
+      rebuild_images:
+        description: "Rebuilds images even if the cache state matches the current state."
+        required: false
+        type: boolean
 
   repository_dispatch:
     types: [build-python-images]
@@ -21,7 +25,7 @@ on:
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
   APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
-  SKIP_CACHE_CHECK: ${{ github.event_name == 'pull_request' }}
+  SKIP_CACHE_CHECK: ${{ github.event_name == 'pull_request' || github.event.inputs.rebuild_images == 'true' }}
 
 jobs:
   matrix:
