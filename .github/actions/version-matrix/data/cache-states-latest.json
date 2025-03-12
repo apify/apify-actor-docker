@@ -12,8 +12,8 @@
 		"hashEntries": "APIFY_VERSION=3.3.2;CRAWLEE_VERSION=3.13.0;NODE_VERSION=18,20,22;PUPPETEER_VERSION=24.2.0,24.2.1,24.3.0,24.3.1,24.4.0"
 	},
 	"python:normal": {
-		"hash": "011e033cb9feea28537a6f1746a26275f53201c025076950d4ee5a7836bc2d4f",
-		"hashEntries": "APIFY_VERSION=2.3.1;PYTHON_VERSION=3.9,3.10,3.11,3.12,3.13"
+		"hash": "2cbadb672599baf73a9a95b9961953a0bcefefb06c6b8f4320df6cfd028e6efe",
+		"hashEntries": "APIFY_VERSION=2.4.0;PYTHON_VERSION=3.9,3.10,3.11,3.12,3.13"
 	},
 	"python:playwright": {
 		"hash": "27e7431f6e36a66982f5a335a58b17337603cd008af43d80abc6825104825a06",
