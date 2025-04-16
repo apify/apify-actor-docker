@@ -4,8 +4,8 @@
 		"hashEntries": "APIFY_VERSION=3.4.0;CRAWLEE_VERSION=3.13.3-beta.6;NODE_VERSION=18,20,22"
 	},
 	"node:playwright": {
-		"hash": "a3ac1e9e35a22beebfe8a987237a3c9d88dcf126ac535acb0ee2da9398da91ba",
-		"hashEntries": "APIFY_VERSION=3.4.0;CRAWLEE_VERSION=3.13.3-beta.6;NODE_VERSION=18,20,22;PLAYWRIGHT_VERSION=1.49.1,1.50.0,1.50.1,1.51.0,1.51.1"
+		"hash": "98d2c1f568bcf6ea6099d18ce8e7f4989c64398a2d69b263b2463ba590f3b8fc",
+		"hashEntries": "APIFY_VERSION=3.4.0;CRAWLEE_VERSION=3.13.3-beta.7;NODE_VERSION=18,20,22;PLAYWRIGHT_VERSION=1.49.1,1.50.0,1.50.1,1.51.0,1.51.1"
 	},
 	"node:puppeteer-chrome": {
 		"hash": "f5160e1eb11ea3995d8a1d68c8fde70a6acac8c91d8cee8bdb703b105cb24945",
