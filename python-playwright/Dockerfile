@@ -6,7 +6,7 @@ FROM python:${PYTHON_VERSION}-slim-bookworm
 
 # Add labels to the image to identify it as an Apify Actor
 LABEL maintainer="support@apify.com" \
-      description="Base image for Apify Actors written in Python using Playwright"
+    description="Base image for Apify Actors written in Python using Playwright"
 
 # Set the shell to use /bin/bash with specific options (see Hadolint DL4006)
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -33,9 +33,15 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 ENV PIP_ROOT_USER_ACTION=ignore
 
 # Set up XVFB
-# We should use the autodisplay detection as suggested here: https://github.com/microsoft/playwright/issues/2728#issuecomment-678083619
-ENV DISPLAY=:99
 ENV XVFB_WHD=1920x1080x24+32
+
+# Install xvfb and xauth
+RUN apt update \
+    && apt install -y xvfb xauth --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /src/*.deb \
+    && apt clean -y && apt autoremove -y \
+    && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
 
 # This instruction:
 # - Upgrades pip to the latest version

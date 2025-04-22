@@ -33,8 +33,6 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 ENV PIP_ROOT_USER_ACTION=ignore
 
 # Set up XVFB
-# We should use the autodisplay detection as suggested here: https://github.com/microsoft/playwright/issues/2728#issuecomment-678083619
-ENV DISPLAY=:99
 ENV XVFB_WHD=1920x1080x24+32
 
 # Install curl, firefox, jq, unzip, xvfb and dependencies of Chrome and its driver
@@ -70,7 +68,8 @@ RUN apt update && \
     libxtst6 \
     unzip \
     xdg-utils \
-    xvfb && \
+    xvfb \
+    xauth && \
     apt autoremove -yqq --purge && \
     apt clean && \
     rm -rf /var/lib/apt/lists/* /var/log/*
