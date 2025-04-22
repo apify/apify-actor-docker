@@ -78,7 +78,7 @@ RUN npm --quiet set progress=false \
 ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/MiniBrowser
 
 # Prevent installing of browsers by future `npm install`.
-ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD 1
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 
 # Set up xvfb
 ENV XVFB_WHD=1920x1080x24+32
@@ -89,4 +89,4 @@ ENTRYPOINT ["/home/myuser/new_xvfb_run_cmd.sh"]
 # NOTEs:
 # - This needs to be compatible with CLI.
 # - Using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD npm start --silent
+CMD ["npm", "start", "--silent"]
