@@ -1,10 +1,6 @@
 #!/bin/bash
 
-set -o errexit
+# xvfb-run -a -s "-ac -screen 0 $XVFB_WHD -nolisten tcp" npm start --silent
 
-echo "Starting X virtual framebuffer using: Xvfb $DISPLAY -ac -screen 0 $XVFB_WHD -nolisten tcp"
-Xvfb $DISPLAY -ac -screen 0 $XVFB_WHD -nolisten tcp &
-
-# Execute CMD (original CMD of this Dockerfile gets overridden in actor build)
-echo "Executing main command"
-exec "$@"
+echo "Will run command: xvfb-run -a -s \"-ac -screen 0 $XVFB_WHD -nolisten tcp\" $@"
+xvfb-run -a -s "-ac -screen 0 $XVFB_WHD -nolisten tcp" "$@"
