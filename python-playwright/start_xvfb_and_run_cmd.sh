@@ -1,10 +1,19 @@
 #!/bin/bash
 
-set -o errexit
+filtered_args="$@"
 
-echo "Starting X virtual framebuffer using: Xvfb $DISPLAY -ac -screen 0 $XVFB_WHD -nolisten tcp"
-Xvfb $DISPLAY -ac -screen 0 $XVFB_WHD -nolisten tcp &
+# If the filtered_args start with /bin/sh, that means we are in an extended Docker image, and we want to strip out /bin/sh -c + possibly the script name
+if [[ "$filtered_args" == "/bin/sh"* ]]; then
+    filtered_args=$(echo "$filtered_args" | sed 's|/bin/sh -c||g')
+fi
 
-# Execute CMD (original CMD of this Dockerfile gets overridden in actor build)
-echo "Executing main command"
-exec "$@"
+# Filter out './new_xvfb_run_cmd.sh' and './start_xvfb_and_run_cmd.sh' from the arguments
+filtered_args=$(echo "$filtered_args" | sed 's|./new_xvfb_run_cmd.sh||g' | sed 's|./start_xvfb_and_run_cmd.sh||g')
+filtered_args=$(echo "$filtered_args" | sed 's|^[[:space:]]*||')
+
+# If the filtered_args start with && or ||, remove them
+filtered_args=$(echo "$filtered_args" | sed 's|^&&||g' | sed 's|^||g' | sed 's|^||g')
+filtered_args=$(echo "$filtered_args" | sed 's|^[[:space:]]*||')
+
+echo "Will run command: xvfb-run -a -s \"-ac -screen 0 $XVFB_WHD -nolisten tcp\" $filtered_args"
+xvfb-run -a -s "-ac -screen 0 $XVFB_WHD -nolisten tcp" $filtered_args
