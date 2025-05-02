@@ -119,5 +119,5 @@ WORKDIR /usr/src/app
 COPY . .
 
 # NOTE: This needs to be compatible with how Apify CLI launches Actors
-ENTRYPOINT ["./start_xvfb_and_run_cmd.sh"]
+ENTRYPOINT ["./xvfb-entrypoint.sh"]
 CMD ["python3", "-m", "src"]
