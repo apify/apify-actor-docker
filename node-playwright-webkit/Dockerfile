@@ -50,7 +50,7 @@ ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
 ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 
 # Copy source code and xvfb script
-COPY --chown=myuser:myuser package.json main.js webkit_test.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh /home/myuser/
+COPY --chown=myuser:myuser package.json main.js webkit_test.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh xvfb-entrypoint.sh /home/myuser/
 
 # Tell Node.js this is a production environemnt
 ENV NODE_ENV=production
@@ -84,7 +84,7 @@ ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 ENV XVFB_WHD=1920x1080x24+32
 
 # The entrypoint script will be the one handling the CMD passed in, and will always wrap it into xvfb-run
-ENTRYPOINT ["/home/myuser/new_xvfb_run_cmd.sh"]
+ENTRYPOINT ["/home/myuser/xvfb-entrypoint.sh"]
 
 # NOTEs:
 # - This needs to be compatible with CLI.

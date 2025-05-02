@@ -65,7 +65,7 @@ ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 
 # Copy source code and xvfb script
-COPY --chown=myuser:myuser package.json main.js chrome_test.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh /home/myuser/
+COPY --chown=myuser:myuser package.json main.js chrome_test.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh xvfb-entrypoint.sh /home/myuser/
 
 # Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
 ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
@@ -98,7 +98,7 @@ RUN npm --quiet set progress=false \
 ENV XVFB_WHD=1920x1080x24+32
 
 # The entrypoint script will be the one handling the CMD passed in, and will always wrap it into xvfb-run
-ENTRYPOINT ["/home/myuser/new_xvfb_run_cmd.sh"]
+ENTRYPOINT ["/home/myuser/xvfb-entrypoint.sh"]
 
 # NOTEs:
 # - This needs to be compatible with CLI.
