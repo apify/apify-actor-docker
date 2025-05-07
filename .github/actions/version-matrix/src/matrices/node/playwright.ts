@@ -49,6 +49,7 @@ const imageNames = [
 	'node-playwright-chrome',
 	'node-playwright-firefox',
 	'node-playwright-webkit',
+	'node-playwright-camoufox',
 ] as const;
 
 const matrix = {

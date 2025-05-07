@@ -2,7 +2,7 @@ ARG NODE_VERSION=20
 # Use bookworm to be consistent across node versions.
 FROM --platform=linux/amd64 node:${NODE_VERSION}-bookworm-slim
 
-LABEL maintainer="support@apify.com" description="Base image for Apify Actors using Firefox"
+LABEL maintainer="support@apify.com" description="Base image for Apify Actors using Camoufox"
 ENV DEBIAN_FRONTEND=noninteractive
 
 COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
@@ -73,13 +73,12 @@ RUN npm --quiet set progress=false \
     && node --version \
     && echo "NPM version:" \
     && npm --version \
-    \
+    # Install Camoufox
+    && npx camoufox-js fetch \
     # symlink the firefox binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
     && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/firefox-*/firefox/firefox ${PLAYWRIGHT_BROWSERS_PATH}/ \
-    \
     # Playwright allows downloading only one browser through separate package with same export. So we rename it to just playwright.
     && mv ./node_modules/playwright-firefox ./node_modules/playwright && rm -rf ./node_modules/playwright-firefox \
-    \
     # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
     && rm -f $PLAYWRIGHT_BROWSERS_PATH/firefox-*/firefox/libnssckbi.so \
     && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so $(ls -d $PLAYWRIGHT_BROWSERS_PATH/firefox-*)/firefox/libnssckbi.so
