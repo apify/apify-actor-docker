@@ -72,6 +72,10 @@ const matrix = {
 for (const nodeVersion of supportedNodeVersions) {
 	for (const playwrightVersion of latestFivePlaywrightVersions) {
 		for (const imageName of imageNames) {
+			if (imageName.includes('camoufox') && nodeVersion === '18') {
+				continue;
+			}
+
 			matrix.include.push({
 				'image-name': imageName,
 				'node-version': nodeVersion,
