@@ -137,6 +137,7 @@ jobs:
           node ../.github/scripts/set-dependency-versions.js
         env:
           PLAYWRIGHT_VERSION: ${{ matrix.playwright-version }}
+          CAMOUFOX_VERSION: ${{ matrix.camoufox-version }}
 
       - # It seems that it takes at least two minutes before a newly published version
         # becomes available in the NPM registry. We wait before starting the image builds.

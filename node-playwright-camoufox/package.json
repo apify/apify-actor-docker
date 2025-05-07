@@ -8,9 +8,10 @@
     },
     "dependencies": {
         "apify": "APIFY_VERSION",
-        "crawlee": "CRAWLEE_VERSION",
-        "playwright-firefox": "PLAYWRIGHT_VERSION",
         "camoufox-js": "CAMOUFOX_VERSION",
+        "crawlee": "CRAWLEE_VERSION",
+        "impit": "latest",
+        "playwright-firefox": "PLAYWRIGHT_VERSION",
         "typescript": "^5.4.3"
     },
     "overrides": {

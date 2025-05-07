@@ -10,6 +10,7 @@ const DEPENDENCY_VERSIONS = {
 	'playwright-chromium': process.env.PLAYWRIGHT_VERSION,
 	'playwright-firefox': process.env.PLAYWRIGHT_VERSION,
 	'playwright-webkit': process.env.PLAYWRIGHT_VERSION,
+	'camoufox-js': process.env.CAMOUFOX_VERSION,
 };
 
 const pkg = readPackageJson(PACKAGE_JSON_PATH);

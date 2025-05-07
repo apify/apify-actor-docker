@@ -5,6 +5,7 @@ import { fetchPackageVersions } from '../../shared/npm.ts';
 const playwrightVersions = await fetchPackageVersions('playwright');
 const apifyVersions = await fetchPackageVersions('apify');
 const crawleeVersions = await fetchPackageVersions('crawlee');
+const camoufoxVersions = await fetchPackageVersions('camoufox-js');
 
 if (!shouldUseLastFive) {
 	console.warn('Testing with only the latest version of playwright to speed up CI');
@@ -14,10 +15,12 @@ const latestFivePlaywrightVersions = playwrightVersions.slice(shouldUseLastFive 
 const latestPlaywrightVersion = latestFivePlaywrightVersions.at(-1)!;
 let latestApifyVersion = apifyVersions.at(-1)!;
 let latestCrawleeVersion = crawleeVersions.at(-1)!;
+let latestCamoufoxVersion = camoufoxVersions.at(-1)!;
 
 console.error('Latest five versions', latestFivePlaywrightVersions);
 console.error('Latest apify version', latestApifyVersion);
 console.error('Latest crawlee version', latestCrawleeVersion);
+console.error('Latest camoufox version', latestCamoufoxVersion);
 
 if (process.env.CRAWLEE_VERSION) {
 	console.error('Using custom crawlee version:', process.env.CRAWLEE_VERSION);
@@ -34,6 +37,7 @@ const cacheParams: CacheValues = {
 	PLAYWRIGHT_VERSION: latestFivePlaywrightVersions,
 	APIFY_VERSION: [latestApifyVersion],
 	CRAWLEE_VERSION: [latestCrawleeVersion],
+	CAMOUFOX_VERSION: [latestCamoufoxVersion],
 };
 
 if (!(await needsToRunMatrixGeneration('node:playwright', cacheParams))) {
@@ -59,6 +63,7 @@ const matrix = {
 		'playwright-version': string;
 		'apify-version': string;
 		'crawlee-version': string;
+		'camoufox-version': string;
 		'is-latest': 'true' | 'false';
 		'latest-node-version': string;
 	}[],
@@ -73,6 +78,7 @@ for (const nodeVersion of supportedNodeVersions) {
 				'playwright-version': playwrightVersion,
 				'apify-version': `^${latestApifyVersion}`,
 				'crawlee-version': `^${latestCrawleeVersion}`,
+				'camoufox-version': `^${latestCamoufoxVersion}`,
 				'is-latest': playwrightVersion === latestPlaywrightVersion ? 'true' : 'false',
 				'latest-node-version': latestNodeVersion,
 			});

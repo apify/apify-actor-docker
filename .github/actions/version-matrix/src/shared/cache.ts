@@ -7,6 +7,7 @@ export const PUPPETEER_VERSION_MARKER = 'PUPPETEER_VERSION';
 export const SELENIUM_VERSION_MARKER = 'SELENIUM_VERSION';
 export const PLAYWRIGHT_VERSION_MARKER = 'PLAYWRIGHT_VERSION';
 export const CRAWLEE_VERSION_MARKER = 'CRAWLEE_VERSION';
+export const CAMOUFOX_VERSION_MARKER = 'CAMOUFOX_VERSION';
 
 const cacheStateFile = new URL(`../../data/cache-states-${process.env.RELEASE_TAG || 'latest'}.json`, import.meta.url);
 
@@ -31,7 +32,8 @@ export type CacheValues = Partial<
 		| typeof PUPPETEER_VERSION_MARKER
 		| typeof SELENIUM_VERSION_MARKER
 		| typeof PLAYWRIGHT_VERSION_MARKER
-		| typeof CRAWLEE_VERSION_MARKER,
+		| typeof CRAWLEE_VERSION_MARKER
+		| typeof CAMOUFOX_VERSION_MARKER,
 		string[]
 	>
 >;
