@@ -67,6 +67,7 @@ ENV NODE_OPTIONS="--max_old_space_size=30000 --max-http-header-size=80000"
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
     && npm install --omit=dev --omit=optional --no-package-lock --prefer-online \
+    && npm install --no-package-lock --prefer-online --no-save impit@latest \
     && echo "Installed NPM packages:" \
     && (npm list --omit=dev --omit=optional || true) \
     && echo "Node.js version:" \
