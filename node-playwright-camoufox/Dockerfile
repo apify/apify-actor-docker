@@ -66,8 +66,8 @@ ENV NODE_OPTIONS="--max_old_space_size=30000 --max-http-header-size=80000"
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
-    && npm install --omit=dev --omit=optional --no-package-lock --prefer-online \
-    && npm install --no-package-lock --prefer-online --no-save impit@latest \
+    && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install --omit=dev --omit=optional --no-package-lock --prefer-online \
+    && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install --no-package-lock --prefer-online --no-save impit@latest \
     && echo "Installed NPM packages:" \
     && (npm list --omit=dev --omit=optional || true) \
     && echo "Node.js version:" \
@@ -76,15 +76,11 @@ RUN npm --quiet set progress=false \
     && npm --version \
     # Install Camoufox
     && npx camoufox-js fetch \
-    # symlink the firefox binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
-    && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/firefox-*/firefox/firefox ${PLAYWRIGHT_BROWSERS_PATH}/ \
-    # Playwright allows downloading only one browser through separate package with same export. So we rename it to just playwright.
-    && mv ./node_modules/playwright-firefox ./node_modules/playwright && rm -rf ./node_modules/playwright-firefox \
     # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
-    && rm -f $PLAYWRIGHT_BROWSERS_PATH/firefox-*/firefox/libnssckbi.so \
-    && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so $(ls -d $PLAYWRIGHT_BROWSERS_PATH/firefox-*)/firefox/libnssckbi.so
+    && rm -f /home/myuser/.cache/camoufox/libnssckbi.so \
+    && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so /home/myuser/.cache/camoufox/libnssckbi.so
 
-ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/firefox
+ENV APIFY_DEFAULT_BROWSER_PATH=/home/myuser/.cache/camoufox/camoufox-bin
 
 # Prevent installing of browsers by future `npm install`.
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
