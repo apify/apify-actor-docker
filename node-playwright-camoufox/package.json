@@ -11,7 +11,7 @@
         "camoufox-js": "CAMOUFOX_VERSION",
         "crawlee": "CRAWLEE_VERSION",
         "impit": "latest",
-        "playwright-firefox": "PLAYWRIGHT_VERSION",
+        "playwright": "PLAYWRIGHT_VERSION",
         "typescript": "^5.4.3"
     },
     "overrides": {
