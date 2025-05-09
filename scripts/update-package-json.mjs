@@ -9,7 +9,7 @@ const path = process.argv[2];
 
 const packageJsonPath = new URL(`../${path}/package.json`, import.meta.url);
 
-const replacers = ['APIFY_VERSION', 'CRAWLEE_VERSION', 'PLAYWRIGHT_VERSION', 'PUPPETEER_VERSION'];
+const replacers = ['APIFY_VERSION', 'CRAWLEE_VERSION', 'PLAYWRIGHT_VERSION', 'PUPPETEER_VERSION', 'CAMOUFOX_VERSION'];
 
 try {
 	const packageJson = JSON.parse(await readFile(packageJsonPath, 'utf8'));
