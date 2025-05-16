@@ -45,15 +45,27 @@ jobs:
           token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: Set up bun
-        uses: oven-sh/setup-bun@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .github/actions/version-matrix/package.json
 
-      - run: bun install
+      - name: Enable corepack
+        run: |
+          corepack enable
+          corepack prepare yarn@stable --activate
+
+      - name: Activate cache for Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: yarn
+
+      - run: yarn
         working-directory: ./.github/actions/version-matrix
 
       - name: Generate matrix
         id: set-matrix
-        run: echo "matrix=$(bun node:playwright)" >> $GITHUB_OUTPUT
+        run: echo "matrix=$(yarn node:playwright)" >> $GITHUB_OUTPUT
         working-directory: ./.github/actions/version-matrix
 
       - name: Print matrix

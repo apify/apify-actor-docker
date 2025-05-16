@@ -3,12 +3,12 @@
 		// Enable latest features
 		"lib": ["ESNext", "DOM"],
 		"target": "ESNext",
-		"module": "Node16",
+		"module": "NodeNext",
 		"moduleDetection": "force",
 		"allowJs": true,
 
 		// Bundler mode
-		"moduleResolution": "Node16",
+		"moduleResolution": "NodeNext",
 		"allowImportingTsExtensions": true,
 		"verbatimModuleSyntax": true,
 		"noEmit": true,
@@ -22,5 +22,6 @@
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
 		"noPropertyAccessFromIndexSignature": false
-	}
+	},
+	"include": ["src/**/*.ts"]
 }
