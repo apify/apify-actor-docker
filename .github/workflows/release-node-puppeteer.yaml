@@ -1,4 +1,4 @@
-name: Release Node + Puppeteer images
+name: Node + Puppeteer images
 
 on:
   workflow_dispatch:

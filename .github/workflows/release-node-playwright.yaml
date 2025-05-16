@@ -1,4 +1,4 @@
-name: Release Node + Playwright images
+name: Node + Playwright images
 
 on:
   workflow_dispatch:

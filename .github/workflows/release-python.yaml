@@ -1,4 +1,4 @@
-name: Release Python basic images
+name: Python basic images
 
 on:
   workflow_dispatch:
