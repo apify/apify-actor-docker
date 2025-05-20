@@ -9,7 +9,7 @@
 		"node:normal": "node src/matrices/node/normal.ts",
 		"node:puppeteer": "node src/matrices/node/puppeteer.ts",
 		"node:playwright": "node src/matrices/node/playwright.ts",
-		"fmt": "biome format --write .",
+		"fmt": "biome format --write . && biome format --write ../../../renovate.json",
 		"typecheck": "tsc --noEmit"
 	},
 	"devDependencies": {
