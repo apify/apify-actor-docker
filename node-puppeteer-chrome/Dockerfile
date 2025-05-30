@@ -62,7 +62,7 @@ USER myuser
 WORKDIR /home/myuser
 
 # Copy source code and xvfb script
-COPY --chown=myuser:myuser package.json main.js puppeteer_*.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh xvfb-entrypoint.sh /home/myuser/
+COPY --chown=myuser:myuser package.json main.js check-puppeteer-version.mjs puppeteer_*.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh xvfb-entrypoint.sh /home/myuser/
 
 # Uncomment to skip the chromium download when installing puppeteer. If you do,
 # you'll need to launch puppeteer with:
