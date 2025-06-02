@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"node:npm": "node src/caches/npm.ts",
-		"fmt": "biome format --write .",
+		"fmt": "biome format --write ./src",
 		"typecheck": "tsc --noEmit"
 	},
 	"devDependencies": {
