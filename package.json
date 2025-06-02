@@ -1,0 +1,19 @@
+{
+	"name": "@apify/docker-repository",
+	"private": true,
+	"workspaces": [
+		".github/actions/*"
+	],
+	"packageManager": "yarn@4.9.1",
+	"volta": {
+		"node": "24.1.0",
+		"yarn": "4.9.1"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"turbo": "^2.5.4"
+	},
+	"scripts": {
+		"fmt": "biome format --write renovate.json && turbo fmt"
+	}
+}

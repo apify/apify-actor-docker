@@ -4,16 +4,16 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: "Tag for the images (e.g.: beta)"
+        description: 'Tag for the images (e.g.: beta)'
         required: true
       apify_version:
-        description: "Apify SDK version (e.g.: ^1.0.0). If missing, the latest version will be used."
+        description: 'Apify SDK version (e.g.: ^1.0.0). If missing, the latest version will be used.'
         required: false
       crawlee_version:
-        description: "Crawlee version (e.g.: ^1.0.0). If missing, the latest version will be used."
+        description: 'Crawlee version (e.g.: ^1.0.0). If missing, the latest version will be used.'
         required: false
       rebuild_images:
-        description: "Rebuilds images even if the cache state matches the current state."
+        description: 'Rebuilds images even if the cache state matches the current state.'
         required: false
         type: boolean
 
@@ -48,12 +48,11 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: .github/actions/version-matrix/package.json
+          node-version-file: package.json
           cache: yarn
-          cache-dependency-path: .github/actions/version-matrix/yarn.lock
+          cache-dependency-path: yarn.lock
 
       - run: yarn
-        working-directory: ./.github/actions/version-matrix
 
       - name: Generate matrix
         id: set-matrix
@@ -99,7 +98,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}
 
-    name: "img: ${{ matrix.image-name }} node: ${{ matrix.node-version }}, apify: ${{ matrix.apify-version }}, crawlee: ${{ matrix.crawlee-version }}, pw: ${{ matrix.playwright-version }}, cf: ${{ matrix.camoufox-version }}, is-latest: ${{ matrix.is-latest }}"
+    name: 'img: ${{ matrix.image-name }} node: ${{ matrix.node-version }}, apify: ${{ matrix.apify-version }}, crawlee: ${{ matrix.crawlee-version }}, pw: ${{ matrix.playwright-version }}, cf: ${{ matrix.camoufox-version }}, is-latest: ${{ matrix.is-latest }}'
 
     steps:
       - name: Set default inputs if event is pull request
