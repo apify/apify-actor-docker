@@ -176,3 +176,5 @@ dist
 
 # caches
 data/npm
+data/yarn
+data/yarn_tmp

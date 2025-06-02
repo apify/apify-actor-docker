@@ -1,5 +1,5 @@
-import { fileURLToPath } from 'node:url';
 import { compare } from 'semver';
+import { getCachePath } from './constants.ts';
 
 const npmPackageInfoRoute = (pkg: string) => `https://registry.npmjs.org/${pkg}`;
 
@@ -36,7 +36,7 @@ export async function fetchPackageVersions(packageName: string) {
 
 export function getCachePathData() {
 	return {
-		path: fileURLToPath(new URL('../../data/npm/', import.meta.url)),
+		path: getCachePath('npm'),
 		environmentVariable: 'npm_config_cache',
 	};
 }

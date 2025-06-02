@@ -4,6 +4,7 @@
 	"private": true,
 	"scripts": {
 		"node:npm": "node src/caches/npm.ts",
+		"node:yarn": "node src/caches/yarn.ts",
 		"fmt": "biome format --write ./src",
 		"typecheck": "tsc --noEmit"
 	},
