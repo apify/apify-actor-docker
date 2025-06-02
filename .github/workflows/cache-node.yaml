@@ -1,0 +1,62 @@
+name: Node package caches
+
+on:
+  workflow_dispatch:
+
+  repository_dispatch:
+    types:
+      - build-node-cache
+
+  pull_request:
+
+  # schedule:
+  #   - cron: 0 */2 * * *
+
+jobs:
+  cache-node:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: yarn
+          cache-dependency-path: yarn.lock
+
+      - run: yarn
+
+      - run: yarn node:npm
+        working-directory: .github/actions/cache-builder
+
+      - name: Print npm state
+        run: |
+          cat .github/actions/cache-builder/data/npm_state.json
+
+      - name: Store npm output
+        uses: actions/cache/save@v4
+        with:
+          path: .github/actions/cache-builder/data/npm/*
+          key: node-npm-${{ hashFiles('.github/actions/cache-builder/data/npm_state.json') }}
+
+      - name: Push updated matrix
+        if: github.event_name != 'pull_request'
+        run: |
+          # Setup git user
+          git config --global user.email "noreply@apify.com"
+          git config --global user.name "Apify CI Bot"
+          git config pull.rebase true
+
+          # Add and commit if there are changes
+          git add ./.github/actions/cache-builder/data/*.json
+          git diff-index --quiet HEAD || git commit -m "chore(pkg-caches): update node caches"
+
+          # Try to push 5 times, with pulls between retries
+          for i in {1..5}; do
+            git push && break || echo "Failed to push, retrying in 5 seconds..." && sleep 5 && git pull
+          done
