@@ -1,7 +1,7 @@
 import { mkdir, rm, writeFile } from 'node:fs/promises';
+import spawn from 'nano-spawn';
 import { getCachePath, packagesToPrecache } from '../shared/constants.ts';
 import { fetchPackageVersions } from '../shared/npm.ts';
-import spawn from 'nano-spawn';
 
 const environmentVariable = 'YARN_CACHE_FOLDER';
 const globalEnvironmentVariable = 'YARN_GLOBAL_FOLDER';

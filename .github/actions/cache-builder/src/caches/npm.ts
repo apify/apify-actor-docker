@@ -1,7 +1,7 @@
-import spawn from 'nano-spawn';
-import { fetchPackageVersions, getCachePathData } from '../shared/npm.ts';
 import { writeFile } from 'node:fs/promises';
+import spawn from 'nano-spawn';
 import { packagesToPrecache } from '../shared/constants.ts';
+import { fetchPackageVersions, getCachePathData } from '../shared/npm.ts';
 
 const cachePath = getCachePathData();
 
