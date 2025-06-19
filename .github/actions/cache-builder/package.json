@@ -1,0 +1,24 @@
+{
+	"name": "cache-builder",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"node:npm": "node src/caches/npm.ts",
+		"node:yarn": "node src/caches/yarn.ts",
+		"fmt": "biome format --write ./src",
+		"typecheck": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@types/node": "^22.15.32",
+		"@types/semver": "^7.7.0",
+		"typescript": "^5.8.3"
+	},
+	"dependencies": {
+		"nano-spawn": "^1.0.2",
+		"semver": "^7.7.2"
+	},
+	"volta": {
+		"extends": "../../../package.json"
+	},
+	"packageManager": "yarn@4.9.1"
+}

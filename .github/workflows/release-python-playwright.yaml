@@ -43,12 +43,11 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: .github/actions/version-matrix/package.json
+          node-version-file: package.json
           cache: yarn
-          cache-dependency-path: .github/actions/version-matrix/yarn.lock
+          cache-dependency-path: yarn.lock
 
       - run: yarn
-        working-directory: ./.github/actions/version-matrix
 
       - name: Generate matrix
         id: set-matrix

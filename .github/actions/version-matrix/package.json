@@ -1,5 +1,5 @@
 {
-	"name": "python-matrix",
+	"name": "version-matrix",
 	"type": "module",
 	"private": true,
 	"scripts": {
@@ -9,23 +9,19 @@
 		"node:normal": "node src/matrices/node/normal.ts",
 		"node:puppeteer": "node src/matrices/node/puppeteer.ts",
 		"node:playwright": "node src/matrices/node/playwright.ts",
-		"fmt": "biome format --write . && biome format --write ../../../renovate.json",
+		"fmt": "biome format --write .",
 		"typecheck": "tsc --noEmit"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.0.0",
-		"@types/node": "^22.15.18",
+		"@types/node": "^22.15.32",
 		"@types/semver": "^7.7.0",
 		"typescript": "^5.8.3"
 	},
 	"dependencies": {
-		"@actions/core": "^1.11.1",
-		"@actions/github": "^6.0.1",
 		"semver": "^7.7.2"
 	},
 	"volta": {
-		"node": "24.1.0",
-		"yarn": "4.9.1"
+		"extends": "../../../package.json"
 	},
 	"packageManager": "yarn@4.9.1"
 }
