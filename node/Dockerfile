@@ -28,8 +28,7 @@ RUN npm --quiet set progress=false \
 	&& echo "Node.js version:" \
 	&& node --version \
 	&& echo "NPM version:" \
-	&& npm --version \
-    && ls -la /home/myuser
+	&& npm --version
 
 # Tell Node.js this is a production environemnt
 ENV NODE_ENV=production
