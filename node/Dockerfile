@@ -7,7 +7,9 @@ LABEL maintainer="support@apify.com" description="Base image for simple Apify Ac
 RUN npm config --global set update-notifier false \
     # add user
     && addgroup -S myuser \
-    && adduser -S -h /home/myuser -s /bin/sh -D myuser myuser \
+    && adduser -S -h /home/myuser -s /bin/sh -D myuser -G myuser \
+    && adduser myuser audio \
+    && adduser myuser video \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser
 
