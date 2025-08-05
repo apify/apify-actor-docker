@@ -30,13 +30,21 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 ENV PIP_ROOT_USER_ACTION=ignore
 
 # Setup the less privileged user
-RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
+RUN apt update && \
+    apt install -y --no-install-recommends \
+    curl \
+    git \
+    procps \
+    wget \
+    && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser
 
 # Run everything after as non-privileged user.
 USER myuser
 WORKDIR /home/myuser
+
+ENV PATH="/home/myuser/.local/bin:$PATH"
 
 # This instruction:
 # - Upgrades pip to the latest version

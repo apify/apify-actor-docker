@@ -37,7 +37,7 @@ ENV XVFB_WHD=1920x1080x24+32
 
 # Install xvfb and xauth
 RUN apt update \
-    && apt install -y xvfb xauth --no-install-recommends \
+    && apt install -y xvfb xauth git procps curl wget --no-install-recommends \
     # Install playwright browser dependencies
     && python3 -m pip install --user playwright~=${PLAYWRIGHT_VERSION} \
     && python3 -m playwright install-deps \
@@ -58,6 +58,8 @@ WORKDIR /home/myuser
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
 
+ENV PATH="/home/myuser/.local/bin:$PATH"
+
 # This instruction:
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
@@ -70,7 +72,7 @@ RUN pip install --user --upgrade \
     playwright~=${PLAYWRIGHT_VERSION}
 
 # Install Playwright and its dependencies
-RUN python3 -m playwright install
+RUN playwright install
 
 # Copy the dummy source code to the image
 COPY --chown=myuser:myuser . .
