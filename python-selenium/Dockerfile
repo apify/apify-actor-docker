@@ -35,6 +35,9 @@ ENV PIP_ROOT_USER_ACTION=ignore
 # Set up XVFB
 ENV XVFB_WHD=1920x1080x24+32
 
+COPY warn-myuser.sh /build/warn-myuser.sh
+ONBUILD RUN /build/warn-myuser.sh python
+
 # Setup the less privileged user
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
@@ -104,10 +107,6 @@ RUN CHROME_DRIVER_URL="$( \
     unzip /tmp/chromedriver-linux64.zip -d /usr/local/bin/ && \
     rm -f /tmp/chromedriver-linux64.zip
 
-# Run everything after as non-privileged user.
-USER myuser
-WORKDIR /home/myuser
-
 ENV PATH="/home/myuser/.local/bin:$PATH"
 
 # This instruction:
@@ -122,7 +121,7 @@ RUN pip install --upgrade \
     selenium~=${SELENIUM_VERSION}
 
 # Copy the dummy source code to the image
-COPY --chown=myuser:myuser . .
+COPY . .
 
 # NOTE: This needs to be compatible with how Apify CLI launches Actors
 ENTRYPOINT ["./xvfb-entrypoint.sh"]

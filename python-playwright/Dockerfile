@@ -35,12 +35,17 @@ ENV PIP_ROOT_USER_ACTION=ignore
 # Set up XVFB
 ENV XVFB_WHD=1920x1080x24+32
 
+COPY warn-myuser.sh /build/warn-myuser.sh
+ONBUILD RUN /build/warn-myuser.sh python
+
 # Install xvfb and xauth
 RUN apt update \
     && apt install -y xvfb xauth git procps curl wget --no-install-recommends \
     # Install playwright browser dependencies
     && python3 -m pip install --user playwright~=${PLAYWRIGHT_VERSION} \
     && python3 -m playwright install-deps \
+    # Install browsers in a specific path
+    && PLAYWRIGHT_BROWSERS_PATH=/pw-browsers python3 -m playwright install \
     && python3 -m pip uninstall -y playwright \
     # Clean up
     && rm -rf /var/lib/apt/lists/* \
@@ -52,30 +57,23 @@ RUN apt update \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser
 
-# Run everything after as non-privileged user.
-USER myuser
-WORKDIR /home/myuser
-
-ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
-
 ENV PATH="/home/myuser/.local/bin:$PATH"
+
+ENV PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
 
 # This instruction:
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
 # - Installs the specified version of the Apify Python SDK and Playwright
-RUN pip install --user --upgrade \
+RUN pip install --upgrade \
     pip \
     setuptools \
     wheel \
     apify~=${APIFY_VERSION} \
     playwright~=${PLAYWRIGHT_VERSION}
 
-# Install Playwright and its dependencies
-RUN playwright install
-
 # Copy the dummy source code to the image
-COPY --chown=myuser:myuser . .
+COPY . .
 
 # NOTE: This needs to be compatible with how Apify CLI launches Actors
 ENTRYPOINT ["./xvfb-entrypoint.sh"]

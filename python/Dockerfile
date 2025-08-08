@@ -29,6 +29,9 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 # Disable warnings about running pip as root
 ENV PIP_ROOT_USER_ACTION=ignore
 
+COPY warn-myuser.sh /build/warn-myuser.sh
+ONBUILD RUN /build/warn-myuser.sh python
+
 # Setup the less privileged user
 RUN apt update && \
     apt install -y --no-install-recommends \
@@ -39,10 +42,6 @@ RUN apt update && \
     && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser
-
-# Run everything after as non-privileged user.
-USER myuser
-WORKDIR /home/myuser
 
 ENV PATH="/home/myuser/.local/bin:$PATH"
 
@@ -57,7 +56,7 @@ RUN pip install --upgrade \
     apify~=${APIFY_VERSION}
 
 # Copy the dummy source code to the image
-COPY --chown=myuser:myuser . .
+COPY . .
 
 # Set default startup command, using CMD instead of ENTRYPOINT, to allow manual overriding
 CMD ["python3", "-m", "src"]

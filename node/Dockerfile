@@ -13,12 +13,15 @@ RUN npm config --global set update-notifier false \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser
 
+COPY warn-myuser.sh /build/warn-myuser.sh
+ONBUILD RUN /build/warn-myuser.sh node
+
 # Run everything after as non-privileged user.
 USER myuser
 WORKDIR /home/myuser
 
 # Copy source code
-COPY --chown=myuser:myuser package.json main.js /home/myuser/
+COPY --chown=myuser:myuser package.json main.js .
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
