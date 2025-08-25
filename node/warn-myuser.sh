@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 IN_PYTHON_IMAGE=false
 if [ "$1" = "python" ]; then
