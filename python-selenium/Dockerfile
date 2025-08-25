@@ -42,6 +42,8 @@ ONBUILD RUN /build/warn-myuser.sh python
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser \
+    && mkdir -p /usr/src \
+    && ln -s /home/myuser /usr/src/app \
     # Install curl, firefox, jq, unzip, xvfb and dependencies of Chrome and its driver
     && apt update && \
     apt install -y --no-install-recommends \
@@ -106,6 +108,9 @@ RUN CHROME_DRIVER_URL="$( \
     curl --silent --show-error --location --output /tmp/chromedriver-linux64.zip "$CHROME_DRIVER_URL" && \
     unzip /tmp/chromedriver-linux64.zip -d /usr/local/bin/ && \
     rm -f /tmp/chromedriver-linux64.zip
+
+USER myuser
+WORKDIR /home/myuser
 
 ENV PATH="/home/myuser/.local/bin:$PATH"
 

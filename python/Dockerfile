@@ -41,7 +41,12 @@ RUN apt update && \
     wget \
     && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
-    && chown -R myuser:myuser /home/myuser
+    && chown -R myuser:myuser /home/myuser \
+    && mkdir -p /usr/src \
+    && ln -s /home/myuser /usr/src/app
+
+USER myuser
+WORKDIR /home/myuser
 
 ENV PATH="/home/myuser/.local/bin:$PATH"
 
