@@ -35,15 +35,8 @@ ENV PIP_ROOT_USER_ACTION=ignore
 # Set up XVFB
 ENV XVFB_WHD=1920x1080x24+32
 
-COPY warn-myuser.sh /build/warn-myuser.sh
-ONBUILD RUN /build/warn-myuser.sh python
-
-# Setup the less privileged user
-RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
-    && mkdir -p /home/myuser/Downloads \
-    && chown -R myuser:myuser /home/myuser \
-    # Install curl, firefox, jq, unzip, xvfb and dependencies of Chrome and its driver
-    && apt update && \
+# Install curl, firefox, jq, unzip, xvfb and dependencies of Chrome and its driver
+RUN apt update && \
     apt install -y --no-install-recommends \
     ca-certificates \
     curl \
@@ -107,8 +100,6 @@ RUN CHROME_DRIVER_URL="$( \
     unzip /tmp/chromedriver-linux64.zip -d /usr/local/bin/ && \
     rm -f /tmp/chromedriver-linux64.zip
 
-ENV PATH="/home/myuser/.local/bin:$PATH"
-
 # This instruction:
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
@@ -119,6 +110,10 @@ RUN pip install --upgrade \
     wheel \
     apify~=${APIFY_VERSION} \
     selenium~=${SELENIUM_VERSION}
+
+# Create app directory
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
 
 # Copy the dummy source code to the image
 COPY . .

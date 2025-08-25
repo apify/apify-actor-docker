@@ -1,30 +1,21 @@
 ARG NODE_VERSION=20
-FROM node:${NODE_VERSION}-alpine
+FROM --platform=linux/amd64 node:${NODE_VERSION}-alpine
 
 LABEL maintainer="support@apify.com" description="Base image for simple Apify Actors"
 
 # Globally disable the update-notifier.
-RUN npm config --global set update-notifier false \
-    # add user
-    && addgroup -S myuser \
-    && adduser -S -h /home/myuser -s /bin/sh -D myuser -G myuser \
-    && adduser myuser audio \
-    && adduser myuser video \
-    && mkdir -p /home/myuser/Downloads \
-    && chown -R myuser:myuser /home/myuser
+RUN npm config --global set update-notifier false
 
-COPY warn-myuser.sh /build/warn-myuser.sh
-ONBUILD RUN /build/warn-myuser.sh node
-
-# Run everything after as non-privileged user.
-USER myuser
-WORKDIR /home/myuser
+# Create app directory
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
 
 # Copy source code
-COPY --chown=myuser:myuser package.json main.js .
+COPY package.json main.js /usr/src/app/
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
+	&& npm config --global set update-notifier false \
 	&& npm install --omit=dev --omit=optional --no-package-lock --prefer-online \
 	&& echo "Installed NPM packages:" \
 	&& (npm list --omit=dev --omit=optional || true) \
@@ -45,4 +36,4 @@ ENV NODE_OPTIONS="--max_old_space_size=30000 --max-http-header-size=80000"
 # NOTEs:
 # - This needs to be compatible with CLI.
 # - Using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD ["npm", "start", "--silent"]
+CMD npm start --silent
