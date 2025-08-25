@@ -35,36 +35,13 @@ ENV PIP_ROOT_USER_ACTION=ignore
 # Set up XVFB
 ENV XVFB_WHD=1920x1080x24+32
 
-COPY warn-myuser.sh /build/warn-myuser.sh
-ONBUILD RUN /build/warn-myuser.sh python
-
 # Install xvfb and xauth
 RUN apt update \
-    && apt install -y xvfb xauth git procps curl wget --no-install-recommends \
-    # Install playwright browser dependencies
-    && python3 -m pip install --user playwright~=${PLAYWRIGHT_VERSION} \
-    && python3 -m playwright install-deps \
-    # Install browsers in a specific path
-    && PLAYWRIGHT_BROWSERS_PATH=/pw-browsers python3 -m playwright install \
-    && python3 -m pip uninstall -y playwright \
-    # Clean up
+    && apt install -y xvfb xauth --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
     && apt clean -y && apt autoremove -y \
-    && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix \
-    # Add user so we don't need --no-sandbox.
-    && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
-    && mkdir -p /home/myuser/Downloads \
-    && chown -R myuser:myuser /home/myuser \
-    && mkdir -p /usr/src \
-    && ln -s /home/myuser /usr/src/app
-
-USER myuser
-WORKDIR /home/myuser
-
-ENV PATH="/home/myuser/.local/bin:$PATH"
-
-ENV PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
+    && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
 
 # This instruction:
 # - Upgrades pip to the latest version
@@ -76,6 +53,14 @@ RUN pip install --upgrade \
     wheel \
     apify~=${APIFY_VERSION} \
     playwright~=${PLAYWRIGHT_VERSION}
+
+# Install Playwright and its dependencies
+RUN playwright install-deps && \
+    playwright install
+
+# Create app directory
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
 
 # Copy the dummy source code to the image
 COPY . .
