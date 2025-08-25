@@ -29,6 +29,22 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 # Disable warnings about running pip as root
 ENV PIP_ROOT_USER_ACTION=ignore
 
+COPY warn-myuser.sh /build/warn-myuser.sh
+ONBUILD RUN /build/warn-myuser.sh python
+
+# Setup the less privileged user
+RUN apt update && \
+    apt install -y --no-install-recommends \
+    curl \
+    git \
+    procps \
+    wget \
+    && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
+    && mkdir -p /home/myuser/Downloads \
+    && chown -R myuser:myuser /home/myuser
+
+ENV PATH="/home/myuser/.local/bin:$PATH"
+
 # This instruction:
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
@@ -38,10 +54,6 @@ RUN pip install --upgrade \
     setuptools \
     wheel \
     apify~=${APIFY_VERSION}
-
-# Create app directory
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
 
 # Copy the dummy source code to the image
 COPY . .
