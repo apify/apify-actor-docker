@@ -11,9 +11,7 @@ RUN npm config --global set update-notifier false \
     && adduser myuser audio \
     && adduser myuser video \
     && mkdir -p /home/myuser/Downloads \
-    && chown -R myuser:myuser /home/myuser \
-    && mkdir -p /usr/src \
-    && ln -s /home/myuser /usr/src/app
+    && chown -R myuser:myuser /home/myuser
 
 COPY warn-myuser.sh /build/warn-myuser.sh
 ONBUILD RUN /build/warn-myuser.sh node
