@@ -19,17 +19,6 @@ ALL_TESTS = test-node test-playwright test-playwright-chrome test-playwright-fir
 ALL_NODE_TESTS = test-node test-playwright test-playwright-chrome test-playwright-firefox test-playwright-webkit test-puppeteer-chrome test-playwright-camoufox
 ALL_PYTHON_TESTS = test-python test-python-playwright test-python-selenium
 
-IMAGES_THAT_NEED_MYUSER_SCRIPT = node python python-playwright python-selenium
-
-copy-myuser-script:
-	chmod +x scripts/warn-myuser.sh
-
-	@for image in $(IMAGES_THAT_NEED_MYUSER_SCRIPT); do \
-		echo "Copying myuser script to $$image"; \
-		cp scripts/warn-myuser.sh $$image/warn-myuser.sh; \
-		chmod +x $$image/warn-myuser.sh; \
-	done
-
 what-tests:
 	@echo "Available tests:"
 	@for test in $(ALL_TESTS); do \
