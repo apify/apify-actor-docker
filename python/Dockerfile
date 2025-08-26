@@ -43,7 +43,11 @@ RUN apt update && \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser \
     && mkdir -p /usr/src \
-    && ln -s /home/myuser /usr/src/app
+    && chmod -R myuser:myuser /usr/src \
+    && ln -s /home/myuser /usr/src/app \
+    && apt autoremove -yqq --purge \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/* /var/log/*
 
 WORKDIR /home/myuser
 

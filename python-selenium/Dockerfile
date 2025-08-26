@@ -43,10 +43,11 @@ RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser \
     && mkdir -p /usr/src \
+    && chmod -R myuser:myuser /usr/src \
     && ln -s /home/myuser /usr/src/app \
     # Install curl, firefox, jq, unzip, xvfb and dependencies of Chrome and its driver
-    && apt update && \
-    apt install -y --no-install-recommends \
+    && apt update \
+    && apt install -y --no-install-recommends \
     ca-certificates \
     curl \
     firefox-esr \
@@ -78,10 +79,10 @@ RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     unzip \
     xdg-utils \
     xvfb \
-    xauth && \
-    apt autoremove -yqq --purge && \
-    apt clean && \
-    rm -rf /var/lib/apt/lists/* /var/log/*
+    xauth \
+    && apt autoremove -yqq --purge \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/* /var/log/*
 
 # Download and install Geckodriver
 RUN GECKO_DRIVER_URL="https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz" && \
