@@ -59,7 +59,6 @@ RUN apt update \
     && mkdir -p /usr/src \
     && ln -s /home/myuser /usr/src/app
 
-USER myuser
 WORKDIR /home/myuser
 
 ENV PATH="/home/myuser/.local/bin:$PATH"

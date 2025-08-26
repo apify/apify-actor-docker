@@ -1,4 +1,4 @@
-ARG NODE_VERSION=20
+ARG NODE_VERSION=22
 FROM node:${NODE_VERSION}-alpine
 
 LABEL maintainer="support@apify.com" description="Base image for simple Apify Actors"
@@ -18,8 +18,6 @@ RUN npm config --global set update-notifier false \
 COPY warn-myuser.sh /build/warn-myuser.sh
 ONBUILD RUN /build/warn-myuser.sh node
 
-# Run everything after as non-privileged user.
-USER myuser
 WORKDIR /home/myuser
 
 # Copy source code

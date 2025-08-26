@@ -109,7 +109,6 @@ RUN CHROME_DRIVER_URL="$( \
     unzip /tmp/chromedriver-linux64.zip -d /usr/local/bin/ && \
     rm -f /tmp/chromedriver-linux64.zip
 
-USER myuser
 WORKDIR /home/myuser
 
 ENV PATH="/home/myuser/.local/bin:$PATH"
