@@ -139,7 +139,7 @@ jobs:
 
       - name: Prepare image tags
         id: prepare-tags
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         env:
           CURRENT_PYTHON: ${{ matrix.python-version }}
           LATEST_PYTHON: ${{ matrix.latest-python-version }}

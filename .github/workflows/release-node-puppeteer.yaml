@@ -154,7 +154,7 @@ jobs:
 
       - name: Prepare image tags
         id: prepare-tags
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         env:
           CURRENT_NODE: ${{ matrix.node-version }}
           LATEST_NODE: ${{ matrix.latest-node-version }}
