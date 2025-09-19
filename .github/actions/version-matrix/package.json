@@ -24,8 +24,8 @@
 		"semver": "^7.7.2"
 	},
 	"volta": {
-		"node": "24.7.0",
-		"yarn": "4.9.4"
+		"node": "24.8.0",
+		"yarn": "4.10.0"
 	},
-	"packageManager": "yarn@4.9.4"
+	"packageManager": "yarn@4.10.0"
 }
