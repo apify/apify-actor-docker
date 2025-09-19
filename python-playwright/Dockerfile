@@ -37,9 +37,6 @@ ENV XVFB_WHD=1920x1080x24+32
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
 
-COPY warn-myuser.sh /build/warn-myuser.sh
-ONBUILD RUN /build/warn-myuser.sh python
-
 # Install xvfb and xauth
 RUN apt update \
     && apt install -y xvfb xauth git procps curl wget --no-install-recommends \
@@ -54,17 +51,17 @@ RUN apt update \
     && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser \
-    && mkdir -p /usr/src \
-    && chown -R myuser:myuser /usr/src \
-    && ln -s /home/myuser /usr/src/app \
+    && mkdir -p /usr/src/app \
+    && chown -R myuser:myuser /usr/src/app \
+    && ln -s /usr/src/app /home/myuser \
     # Clean up
     && apt autoremove -yqq --purge \
     && apt clean \
     && rm -rf /var/lib/apt/lists/* /var/log/*
 
-WORKDIR /home/myuser
+WORKDIR /usr/src/app
 
-ENV PATH="/home/myuser/.local/bin:$PATH"
+ENV PATH="/usr/src/app/.local/bin:$PATH"
 
 # This instruction:
 # - Upgrades pip to the latest version
@@ -78,7 +75,7 @@ RUN pip install --upgrade \
     playwright~=${PLAYWRIGHT_VERSION}
 
 # Copy the dummy source code to the image
-COPY . .
+COPY --chown=myuser:myuser . .
 
 # NOTE: This needs to be compatible with how Apify CLI launches Actors
 ENTRYPOINT ["./xvfb-entrypoint.sh"]

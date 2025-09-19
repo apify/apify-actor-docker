@@ -35,16 +35,13 @@ ENV PIP_ROOT_USER_ACTION=ignore
 # Set up XVFB
 ENV XVFB_WHD=1920x1080x24+32
 
-COPY warn-myuser.sh /build/warn-myuser.sh
-ONBUILD RUN /build/warn-myuser.sh python
-
 # Setup the less privileged user
 RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser \
-    && mkdir -p /usr/src \
+    && mkdir -p /usr/src/app \
     && chown -R myuser:myuser /usr/src \
-    && ln -s /home/myuser /usr/src/app \
+    && ln -s /usr/src/app /home/myuser \
     # Install curl, firefox, jq, unzip, xvfb and dependencies of Chrome and its driver
     && apt update \
     && apt install -y --no-install-recommends \
@@ -110,9 +107,9 @@ RUN CHROME_DRIVER_URL="$( \
     unzip /tmp/chromedriver-linux64.zip -d /usr/local/bin/ && \
     rm -f /tmp/chromedriver-linux64.zip
 
-WORKDIR /home/myuser
+WORKDIR /usr/src/app
 
-ENV PATH="/home/myuser/.local/bin:$PATH"
+ENV PATH="/usr/src/app/.local/bin:$PATH"
 
 # This instruction:
 # - Upgrades pip to the latest version
@@ -126,7 +123,7 @@ RUN pip install --upgrade \
     selenium~=${SELENIUM_VERSION}
 
 # Copy the dummy source code to the image
-COPY . .
+COPY --chown=myuser:myuser . .
 
 # NOTE: This needs to be compatible with how Apify CLI launches Actors
 ENTRYPOINT ["./xvfb-entrypoint.sh"]
