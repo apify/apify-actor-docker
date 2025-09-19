@@ -35,9 +35,16 @@ ENV PIP_ROOT_USER_ACTION=ignore
 # Set up XVFB
 ENV XVFB_WHD=1920x1080x24+32
 
-# Install curl, firefox, jq, unzip, xvfb and dependencies of Chrome and its driver
-RUN apt update && \
-    apt install -y --no-install-recommends \
+# Setup the less privileged user
+RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
+    && mkdir -p /home/myuser/Downloads \
+    && chown -R myuser:myuser /home/myuser \
+    && mkdir -p /usr/src/app \
+    && chown -R myuser:myuser /usr/src/app \
+    && ln -s /usr/src/app /home/myuser \
+    # Install curl, firefox, jq, unzip, xvfb and dependencies of Chrome and its driver
+    && apt update \
+    && apt install -y --no-install-recommends \
     ca-certificates \
     curl \
     firefox-esr \
@@ -69,10 +76,10 @@ RUN apt update && \
     unzip \
     xdg-utils \
     xvfb \
-    xauth && \
-    apt autoremove -yqq --purge && \
-    apt clean && \
-    rm -rf /var/lib/apt/lists/* /var/log/*
+    xauth \
+    && apt autoremove -yqq --purge \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/* /var/log/*
 
 # Download and install Geckodriver
 RUN GECKO_DRIVER_URL="https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz" && \
@@ -100,6 +107,10 @@ RUN CHROME_DRIVER_URL="$( \
     unzip /tmp/chromedriver-linux64.zip -d /usr/local/bin/ && \
     rm -f /tmp/chromedriver-linux64.zip
 
+WORKDIR /usr/src/app
+
+ENV PATH="/usr/src/app/.local/bin:$PATH"
+
 # This instruction:
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
@@ -111,12 +122,8 @@ RUN pip install --upgrade \
     apify~=${APIFY_VERSION} \
     selenium~=${SELENIUM_VERSION}
 
-# Create app directory
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-
 # Copy the dummy source code to the image
-COPY . .
+COPY --chown=myuser:myuser . .
 
 # NOTE: This needs to be compatible with how Apify CLI launches Actors
 ENTRYPOINT ["./xvfb-entrypoint.sh"]

@@ -29,6 +29,27 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 # Disable warnings about running pip as root
 ENV PIP_ROOT_USER_ACTION=ignore
 
+# Setup the less privileged user
+RUN apt update && \
+    apt install -y --no-install-recommends \
+    curl \
+    git \
+    procps \
+    wget \
+    && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
+    && mkdir -p /home/myuser/Downloads \
+    && chown -R myuser:myuser /home/myuser \
+    && mkdir -p /usr/src/app \
+    && chown -R myuser:myuser /usr/src/app \
+    && ln -s /usr/src/app /home/myuser \
+    && apt autoremove -yqq --purge \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/* /var/log/*
+
+WORKDIR /usr/src/app
+
+ENV PATH="/usr/src/app/.local/bin:$PATH"
+
 # This instruction:
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
@@ -39,12 +60,8 @@ RUN pip install --upgrade \
     wheel \
     apify~=${APIFY_VERSION}
 
-# Create app directory
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-
 # Copy the dummy source code to the image
-COPY . .
+COPY --chown=myuser:myuser . .
 
 # Set default startup command, using CMD instead of ENTRYPOINT, to allow manual overriding
 CMD ["python3", "-m", "src"]
