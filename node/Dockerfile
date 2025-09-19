@@ -13,6 +13,7 @@ RUN npm config --global set update-notifier false \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser \
     && mkdir -p /usr/src/app \
+    && chown -R myuser:myuser /usr/src/app \
     && ln -s /usr/src/app /home/myuser
 
 WORKDIR /usr/src/app

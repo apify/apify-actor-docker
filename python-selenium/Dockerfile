@@ -40,7 +40,7 @@ RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser \
     && mkdir -p /usr/src/app \
-    && chown -R myuser:myuser /usr/src \
+    && chown -R myuser:myuser /usr/src/app \
     && ln -s /usr/src/app /home/myuser \
     # Install curl, firefox, jq, unzip, xvfb and dependencies of Chrome and its driver
     && apt update \

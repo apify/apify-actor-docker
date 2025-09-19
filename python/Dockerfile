@@ -40,7 +40,7 @@ RUN apt update && \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser \
     && mkdir -p /usr/src/app \
-    && chown -R myuser:myuser /usr/src \
+    && chown -R myuser:myuser /usr/src/app \
     && ln -s /usr/src/app /home/myuser \
     && apt autoremove -yqq --purge \
     && apt clean \
