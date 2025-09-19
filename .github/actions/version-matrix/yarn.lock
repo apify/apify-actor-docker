@@ -57,17 +57,17 @@ __metadata:
   linkType: hard
 
 "@biomejs/biome@npm:^2.0.0":
-  version: 2.2.3
-  resolution: "@biomejs/biome@npm:2.2.3"
+  version: 2.2.4
+  resolution: "@biomejs/biome@npm:2.2.4"
   dependencies:
-    "@biomejs/cli-darwin-arm64": "npm:2.2.3"
-    "@biomejs/cli-darwin-x64": "npm:2.2.3"
-    "@biomejs/cli-linux-arm64": "npm:2.2.3"
-    "@biomejs/cli-linux-arm64-musl": "npm:2.2.3"
-    "@biomejs/cli-linux-x64": "npm:2.2.3"
-    "@biomejs/cli-linux-x64-musl": "npm:2.2.3"
-    "@biomejs/cli-win32-arm64": "npm:2.2.3"
-    "@biomejs/cli-win32-x64": "npm:2.2.3"
+    "@biomejs/cli-darwin-arm64": "npm:2.2.4"
+    "@biomejs/cli-darwin-x64": "npm:2.2.4"
+    "@biomejs/cli-linux-arm64": "npm:2.2.4"
+    "@biomejs/cli-linux-arm64-musl": "npm:2.2.4"
+    "@biomejs/cli-linux-x64": "npm:2.2.4"
+    "@biomejs/cli-linux-x64-musl": "npm:2.2.4"
+    "@biomejs/cli-win32-arm64": "npm:2.2.4"
+    "@biomejs/cli-win32-x64": "npm:2.2.4"
   dependenciesMeta:
     "@biomejs/cli-darwin-arm64":
       optional: true
@@ -87,62 +87,62 @@ __metadata:
       optional: true
   bin:
     biome: bin/biome
-  checksum: 10/06a645c08bf599cf6bf48e41ed99373b1773cd677061ab5e4b4827ab596cb9246efd55f49c8424fce21718af023e788c2c73316751db8af4e0f5dba42d5e9223
+  checksum: 10/051ffd0109868eba6746f9f07022cfabf77c76149b040ad22f18c10fda9185b9923f1722600ef8eb7cef6101af1c6345cd3587b8e0f665207662990acefce48e
   languageName: node
   linkType: hard
 
-"@biomejs/cli-darwin-arm64@npm:2.2.3":
-  version: 2.2.3
-  resolution: "@biomejs/cli-darwin-arm64@npm:2.2.3"
+"@biomejs/cli-darwin-arm64@npm:2.2.4":
+  version: 2.2.4
+  resolution: "@biomejs/cli-darwin-arm64@npm:2.2.4"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@biomejs/cli-darwin-x64@npm:2.2.3":
-  version: 2.2.3
-  resolution: "@biomejs/cli-darwin-x64@npm:2.2.3"
+"@biomejs/cli-darwin-x64@npm:2.2.4":
+  version: 2.2.4
+  resolution: "@biomejs/cli-darwin-x64@npm:2.2.4"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-arm64-musl@npm:2.2.3":
-  version: 2.2.3
-  resolution: "@biomejs/cli-linux-arm64-musl@npm:2.2.3"
+"@biomejs/cli-linux-arm64-musl@npm:2.2.4":
+  version: 2.2.4
+  resolution: "@biomejs/cli-linux-arm64-musl@npm:2.2.4"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-arm64@npm:2.2.3":
-  version: 2.2.3
-  resolution: "@biomejs/cli-linux-arm64@npm:2.2.3"
+"@biomejs/cli-linux-arm64@npm:2.2.4":
+  version: 2.2.4
+  resolution: "@biomejs/cli-linux-arm64@npm:2.2.4"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-x64-musl@npm:2.2.3":
-  version: 2.2.3
-  resolution: "@biomejs/cli-linux-x64-musl@npm:2.2.3"
+"@biomejs/cli-linux-x64-musl@npm:2.2.4":
+  version: 2.2.4
+  resolution: "@biomejs/cli-linux-x64-musl@npm:2.2.4"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-x64@npm:2.2.3":
-  version: 2.2.3
-  resolution: "@biomejs/cli-linux-x64@npm:2.2.3"
+"@biomejs/cli-linux-x64@npm:2.2.4":
+  version: 2.2.4
+  resolution: "@biomejs/cli-linux-x64@npm:2.2.4"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@biomejs/cli-win32-arm64@npm:2.2.3":
-  version: 2.2.3
-  resolution: "@biomejs/cli-win32-arm64@npm:2.2.3"
+"@biomejs/cli-win32-arm64@npm:2.2.4":
+  version: 2.2.4
+  resolution: "@biomejs/cli-win32-arm64@npm:2.2.4"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@biomejs/cli-win32-x64@npm:2.2.3":
-  version: 2.2.3
-  resolution: "@biomejs/cli-win32-x64@npm:2.2.3"
+"@biomejs/cli-win32-x64@npm:2.2.4":
+  version: 2.2.4
+  resolution: "@biomejs/cli-win32-x64@npm:2.2.4"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -275,11 +275,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:^22.15.18":
-  version: 22.18.1
-  resolution: "@types/node@npm:22.18.1"
+  version: 22.18.6
+  resolution: "@types/node@npm:22.18.6"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10/da67f3c3fa4107fbca704e7a71fee36c27f3b6f44af1c466cd5c71eab76a9ffcd6a16f3b97d1e757b9763f1fa1085eebb60cb648c272e36794aca7305b2a15d9
+  checksum: 10/d816882476fa4f2d2db238139e9d65299414ac54bf81aa85dae850589b480cfe0c1722dc845295d446e2babd6ddfe64b79a8c56d771bf5345ddb1c48950f029e
   languageName: node
   linkType: hard
 
