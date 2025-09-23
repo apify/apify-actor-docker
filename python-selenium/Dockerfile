@@ -109,7 +109,7 @@ RUN CHROME_DRIVER_URL="$( \
 
 WORKDIR /usr/src/app
 
-ENV PATH="/usr/src/app/.local/bin:$PATH"
+ENV PATH="/root/.local/bin:/home/myuser/.local/bin:$PATH"
 
 # This instruction:
 # - Upgrades pip to the latest version
