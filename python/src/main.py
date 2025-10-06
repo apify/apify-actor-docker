@@ -8,7 +8,7 @@ async def main():
     async with Actor:
         print('Testing Docker image...')
         try:
-            assert Actor.config.is_at_home is False
+            assert Actor.configuration.is_at_home is False
 
             apify_user = await Actor.apify_client.user('apify').get()
             assert apify_user is not None
