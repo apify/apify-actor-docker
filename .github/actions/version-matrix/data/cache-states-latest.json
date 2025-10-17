@@ -16,8 +16,8 @@
 		"hashEntries": "APIFY_VERSION=3.0.1;PYTHON_VERSION=3.10,3.11,3.12,3.13"
 	},
 	"python:playwright": {
-		"hash": "4df0eba883d62543c23dc80e472b45ba71317290d1ecfef432e7e291877bfbe3",
-		"hashEntries": "APIFY_VERSION=3.0.1;PLAYWRIGHT_VERSION=1.51.0,1.52.0,1.53.0,1.54.0,1.55.0;PYTHON_VERSION=3.10,3.11,3.12,3.13"
+		"hash": "d886287e13eb53db0aadc432cf5d3288a7e9bddf21d8da64aa9cee65bc54a350",
+		"hashEntries": "APIFY_VERSION=3.0.2;PLAYWRIGHT_VERSION=1.51.0,1.52.0,1.53.0,1.54.0,1.55.0;PYTHON_VERSION=3.10,3.11,3.12,3.13"
 	},
 	"python:selenium": {
 		"hash": "636e24bf6f23d1edb371817b68f490b9bb815e423cea104b9cf6b41d9e6d336b",
