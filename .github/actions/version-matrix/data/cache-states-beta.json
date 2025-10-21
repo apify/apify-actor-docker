@@ -1,7 +1,7 @@
 {
 	"node:normal": {
-		"hash": "bd71813acf59903169bf9f53388927aa51c2ddd461613f46f7a06bf79101955f",
-		"hashEntries": "APIFY_VERSION=3.5.1;CRAWLEE_VERSION=3.15.2-beta.16;NODE_VERSION=18,20,22,24"
+		"hash": "42bb4477739d742901c2f7f35d479993574bb039adf12f429b443556e382cc9a",
+		"hashEntries": "APIFY_VERSION=3.5.1;CRAWLEE_VERSION=3.15.2-beta.17;NODE_VERSION=18,20,22,24"
 	},
 	"node:playwright": {
 		"hash": "e215cfa94dfe364370aea15c736df24ab9fd813573908d3883b8218f7782f75f",
