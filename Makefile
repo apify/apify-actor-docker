@@ -9,7 +9,7 @@ PUPPETEER_VERSION ?= 22.6.2
 PKG_JSON_PW_VERSION = $(subst v,,$(subst -,,$(PLAYWRIGHT_VERSION)))
 
 # Python
-PYTHON_VERSION ?= 3.13
+PYTHON_VERSION ?= 3.14
 # Apify latest version (python does not support the 'latest' tag)
 PYTHON_APIFY_VERSION ?= 1.7.0
 PYTHON_PLAYWRIGHT_VERSION = $(subst v,,$(subst -,,$(PLAYWRIGHT_VERSION)))
@@ -193,4 +193,3 @@ test-python-selenium:
 
 	@# Delete docker image
 	docker rmi apify/python-selenium:local
-
