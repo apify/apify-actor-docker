@@ -30,7 +30,7 @@ RUN \
     procps \
     # Extras
     fonts-freefont-ttf \
-    fonts-kacst \
+    fonts-kacst-one \
     fonts-thai-tlwg \
     fonts-wqy-zenhei \
     --no-install-recommends \
