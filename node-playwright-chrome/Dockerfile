@@ -14,8 +14,12 @@ RUN \
     mkdir -p /etc/default && echo 'repo_add_once=false' > /etc/default/google-chrome \
     && apt update \
     && apt install -y wget gnupg unzip ca-certificates xvfb xauth --no-install-recommends \
-    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+    # Add Google Linux signing key
+    && wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub \
+        | gpg --dearmor \
+        | tee /usr/share/keyrings/google-linux-signing.gpg > /dev/null \
+    # Add Google Chrome APT repo
+    && sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list' \
     && sh -c 'echo "deb http://ftp.us.debian.org/debian trixie main non-free" >> /etc/apt/sources.list.d/fonts.list' \
     && apt update \
     && apt purge --auto-remove -y wget unzip \

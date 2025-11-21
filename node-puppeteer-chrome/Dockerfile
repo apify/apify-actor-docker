@@ -11,8 +11,12 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Note: this also installs the necessary libs to make the bundled version of Chromium that Puppeteer installs work.
 RUN apt update \
     && apt install -y wget gnupg unzip ca-certificates --no-install-recommends \
-    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+    # Add Google Linux signing key
+    && wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub \
+        | gpg --dearmor \
+        | tee /usr/share/keyrings/google-linux-signing.gpg > /dev/null \
+    # Add Google Chrome APT repo
+    && sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list' \
     && sh -c 'echo "deb http://ftp.us.debian.org/debian trixie main non-free" >> /etc/apt/sources.list.d/fonts.list' \
     && apt update \
     && apt purge --auto-remove -y unzip \
