@@ -23,7 +23,7 @@ RUN apt update \
     && apt install -y \
     fonts-freefont-ttf \
     fonts-ipafont-gothic \
-    fonts-kacst \
+    fonts-kacst-one \
     fonts-liberation \
     fonts-thai-tlwg \
     fonts-wqy-zenhei \
