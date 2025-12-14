@@ -14,4 +14,4 @@ export const latestPythonVersion = '3.14';
 /**
  * The version of Node to be considered as the "default" version for the built image tags.
  */
-export const latestNodeVersion = '24';
+export const latestNodeVersion = '22';
