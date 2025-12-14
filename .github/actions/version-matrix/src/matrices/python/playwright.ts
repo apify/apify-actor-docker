@@ -1,12 +1,13 @@
-import { fetchPackageVersions } from '../../shared/pypi.ts';
+import { satisfies } from 'semver';
+import { type CacheValues, needsToRunMatrixGeneration, updateCacheState } from '../../shared/cache.ts';
 import {
 	emptyMatrix,
 	latestPythonVersion,
+	setParametersForTriggeringUpdateWorkflowOnActorTemplates,
 	shouldUseLastFive,
 	supportedPythonVersions,
 } from '../../shared/constants.ts';
-import { needsToRunMatrixGeneration, updateCacheState, type CacheValues } from '../../shared/cache.ts';
-import { satisfies } from 'semver';
+import { fetchPackageVersions } from '../../shared/pypi.ts';
 
 /**
  * Certain playwright versions will not run on newer Python versions.
@@ -90,3 +91,4 @@ for (const pythonVersion of supportedPythonVersions) {
 console.log(JSON.stringify(matrix));
 
 await updateCacheState('python:playwright', cacheParams);
+await setParametersForTriggeringUpdateWorkflowOnActorTemplates('python', latestPlaywrightVersion);
