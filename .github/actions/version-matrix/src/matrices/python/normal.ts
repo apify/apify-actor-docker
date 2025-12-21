@@ -1,5 +1,10 @@
-import { needsToRunMatrixGeneration, updateCacheState, type CacheValues } from '../../shared/cache.ts';
-import { emptyMatrix, latestPythonVersion, supportedPythonVersions } from '../../shared/constants.ts';
+import { type CacheValues, needsToRunMatrixGeneration, updateCacheState } from '../../shared/cache.ts';
+import {
+	emptyMatrix,
+	latestPythonVersion,
+	setParametersForTriggeringUpdateWorkflowOnActorTemplates,
+	supportedPythonVersions,
+} from '../../shared/constants.ts';
 import { fetchPackageVersions } from '../../shared/pypi.ts';
 
 const apifyVersions = await fetchPackageVersions('apify');
@@ -47,3 +52,4 @@ for (const pythonVersion of supportedPythonVersions) {
 console.log(JSON.stringify(matrix));
 
 await updateCacheState('python:normal', cacheParams);
+await setParametersForTriggeringUpdateWorkflowOnActorTemplates('python');

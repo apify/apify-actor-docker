@@ -64,6 +64,7 @@ jobs:
           echo '${{ steps.set-matrix.outputs.matrix }}' | jq -e
 
       - name: Push updated matrix
+        id: push-matrix
         if: github.event_name != 'pull_request'
         run: |
           # Setup git user
@@ -73,12 +74,30 @@ jobs:
 
           # Add and commit if there are changes
           git add ./.github/actions/version-matrix/data/*.json
-          git diff-index --quiet HEAD || git commit -m "chore(docker): update ${{ env.RELEASE_TAG || 'latest' }} python:selenium cache"
+          if git diff-index --quiet HEAD; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore(docker): update ${{ env.RELEASE_TAG || 'latest' }} python:selenium cache"
+            echo "should-trigger=true" >> $GITHUB_OUTPUT
+          fi
 
           # Try to push 5 times, with pulls between retries
           for i in {1..5}; do
             git push && break || echo "Failed to push, retrying in 5 seconds..." && sleep 5 && git pull
           done
+
+      - name: Trigger workflow on actor-templates
+        if: steps.push-matrix.outputs.should-trigger == 'true' && steps.set-matrix.outputs.latest-runtime-version != ''
+        uses: peter-evans/repository-dispatch@v4
+        with:
+          token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
+          repository: apify/actor-templates
+          event-type: update-templates
+          client-payload: |-
+            {
+              "base_image": "apify/actor-python-selenium",
+              "default_runtime_version": "${{ steps.set-matrix.outputs.latest-runtime-version }}"
+            }
 
   # Build master images that are not dependent on existing builds.
   build-main:

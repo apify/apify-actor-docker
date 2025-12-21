@@ -1,7 +1,8 @@
-import { needsToRunMatrixGeneration, updateCacheState, type CacheValues } from '../../shared/cache.ts';
+import { type CacheValues, needsToRunMatrixGeneration, updateCacheState } from '../../shared/cache.ts';
 import {
 	emptyMatrix,
 	latestPythonVersion,
+	setParametersForTriggeringUpdateWorkflowOnActorTemplates,
 	shouldUseLastFive,
 	supportedPythonVersions,
 } from '../../shared/constants.ts';
@@ -68,3 +69,4 @@ for (const pythonVersion of supportedPythonVersions) {
 console.log(JSON.stringify(matrix));
 
 await updateCacheState('python:selenium', cacheParams);
+await setParametersForTriggeringUpdateWorkflowOnActorTemplates('python');

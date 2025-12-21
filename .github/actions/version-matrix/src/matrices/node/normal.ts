@@ -1,5 +1,10 @@
-import { needsToRunMatrixGeneration, updateCacheState, type CacheValues } from '../../shared/cache.ts';
-import { emptyMatrix, latestNodeVersion, supportedNodeVersions } from '../../shared/constants.ts';
+import { type CacheValues, needsToRunMatrixGeneration, updateCacheState } from '../../shared/cache.ts';
+import {
+	emptyMatrix,
+	latestNodeVersion,
+	setParametersForTriggeringUpdateWorkflowOnActorTemplates,
+	supportedNodeVersions,
+} from '../../shared/constants.ts';
 import { fetchPackageVersions } from '../../shared/npm.ts';
 
 const apifyVersions = await fetchPackageVersions('apify');
@@ -59,3 +64,4 @@ for (const nodeVersion of supportedNodeVersions) {
 console.log(JSON.stringify(matrix));
 
 await updateCacheState('node:normal', cacheParams);
+await setParametersForTriggeringUpdateWorkflowOnActorTemplates('node');
