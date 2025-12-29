@@ -96,7 +96,7 @@ jobs:
           client-payload: |-
             {
               "base_image": "apify/actor-python-playwright",
-              "module_version": "${{ steps.set-matrix.outputs.latest-module-version }}"
+              "module_version": "${{ steps.set-matrix.outputs.latest-module-version }}",
               "default_runtime_version": "${{ steps.set-matrix.outputs.latest-runtime-version }}"
             }
 

@@ -102,7 +102,7 @@ jobs:
           client-payload: |-
             {
               "base_image": "apify/actor-node-playwright,apify/actor-node-playwright-chrome,apify/actor-node-playwright-firefox,apify/actor-node-playwright-webkit,apify/actor-node-playwright-camoufox",
-              "module_version": "${{ steps.set-matrix.outputs.latest-module-version }}"
+              "module_version": "${{ steps.set-matrix.outputs.latest-module-version }}",
               "default_runtime_version": "${{ steps.set-matrix.outputs.latest-runtime-version }}"
             }
 
