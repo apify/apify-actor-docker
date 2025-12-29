@@ -1,5 +1,11 @@
-import { needsToRunMatrixGeneration, updateCacheState, type CacheValues } from '../../shared/cache.ts';
-import { emptyMatrix, latestNodeVersion, shouldUseLastFive, supportedNodeVersions } from '../../shared/constants.ts';
+import { type CacheValues, needsToRunMatrixGeneration, updateCacheState } from '../../shared/cache.ts';
+import {
+	emptyMatrix,
+	latestNodeVersion,
+	setParametersForTriggeringUpdateWorkflowOnActorTemplates,
+	shouldUseLastFive,
+	supportedNodeVersions,
+} from '../../shared/constants.ts';
 import { fetchPackageVersions } from '../../shared/npm.ts';
 
 const playwrightVersions = await fetchPackageVersions('playwright');
@@ -93,3 +99,4 @@ for (const nodeVersion of supportedNodeVersions) {
 console.log(JSON.stringify(matrix));
 
 await updateCacheState('node:playwright', cacheParams);
+await setParametersForTriggeringUpdateWorkflowOnActorTemplates('node', latestPlaywrightVersion);
