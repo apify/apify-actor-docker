@@ -88,7 +88,7 @@ test-node:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest node ./scripts/update-package-json.mjs ./node
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node/Dockerfile -t apify/node:local --load ./node
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node/Dockerfile -t apify/node:local --output type=image,oci-mediatypes=true ./node
 	docker run --rm -it --platform linux/amd64 apify/node:local
 
 	@# Restore package.json
@@ -106,7 +106,7 @@ test-node-playwright:
 	@# Copy Firefox certificates
 	$(call copy-firefox-certs,node-playwright)
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright/Dockerfile --tag apify/node-playwright:local --load ./node-playwright
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright/Dockerfile --tag apify/node-playwright:local --output type=image,oci-mediatypes=true ./node-playwright
 	docker run --rm -it --platform linux/amd64 apify/node-playwright:local
 
 	@# Restore package.json and cleanup certificates
@@ -122,8 +122,8 @@ test-node-playwright-chrome:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-chrome
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-chrome/Dockerfile --tag apify/node-playwright-chrome:local --load ./node-playwright-chrome
-	docker run --rm -it --platform linux/amd64 apify/node-playwright-chrome:local
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-chrome/Dockerfile --tag apify/playwright-chrome:local --load ./node-playwright-chrome
+	docker run --rm -it --platform linux/amd64 apify/playwright-chrome:local
 
 	@# Restore package.json
 	@git checkout ./node-playwright-chrome/package.json 1>/dev/null 2>&1
@@ -140,7 +140,7 @@ test-node-playwright-firefox:
 	@# Copy Firefox certificates
 	$(call copy-firefox-certs,node-playwright-firefox)
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-firefox/Dockerfile --tag apify/node-playwright-firefox:local --load ./node-playwright-firefox
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-firefox/Dockerfile --tag apify/node-playwright-firefox:local --output type=image,oci-mediatypes=true ./node-playwright-firefox
 	docker run --rm -it --platform linux/amd64 apify/node-playwright-firefox:local
 
 	@# Restore package.json and cleanup certificates
@@ -159,7 +159,7 @@ test-node-playwright-camoufox:
 	@# Copy Firefox certificates
 	$(call copy-firefox-certs,node-playwright-camoufox)
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-camoufox/Dockerfile --tag apify/node-playwright-camoufox:local --load ./node-playwright-camoufox
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-camoufox/Dockerfile --tag apify/node-playwright-camoufox:local --output type=image,oci-mediatypes=true ./node-playwright-camoufox
 	docker run --rm -it --platform linux/amd64 apify/node-playwright-camoufox:local
 
 	@# Restore package.json and cleanup certificates
@@ -175,7 +175,7 @@ test-node-playwright-webkit:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-webkit
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-webkit/Dockerfile --tag apify/node-playwright-webkit:local --load ./node-playwright-webkit
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-webkit/Dockerfile --tag apify/node-playwright-webkit:local --output type=image,oci-mediatypes=true ./node-playwright-webkit
 	docker run --rm -it --platform linux/amd64 apify/node-playwright-webkit:local
 
 	@# Restore package.json
@@ -190,7 +190,7 @@ test-node-puppeteer-chrome:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PUPPETEER_VERSION=$(PUPPETEER_VERSION) node ./scripts/update-package-json.mjs ./node-puppeteer-chrome
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-puppeteer-chrome/Dockerfile --tag apify/node-puppeteer-chrome:local --load ./node-puppeteer-chrome
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-puppeteer-chrome/Dockerfile --tag apify/node-puppeteer-chrome:local --output type=image,oci-mediatypes=true ./node-puppeteer-chrome
 	docker run --rm -it --platform linux/amd64 apify/node-puppeteer-chrome:local
 
 	@# Restore package.json
@@ -202,7 +202,7 @@ test-node-puppeteer-chrome:
 test-python:
 	@echo "Building python with version $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX)"
 
-	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --file ./python/Dockerfile --tag apify/python:local --load ./python
+	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --file ./python/Dockerfile --tag apify/python:local --output type=image,oci-mediatypes=true ./python
 	docker run --rm -it --platform linux/amd64 apify/python:local
 
 	@# Delete docker image
@@ -214,7 +214,7 @@ test-python-playwright:
 	@# Copy Firefox certificates
 	$(call copy-firefox-certs,python-playwright)
 
-	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --file ./python-playwright/Dockerfile --tag apify/python-playwright:local --load ./python-playwright
+	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --file ./python-playwright/Dockerfile --tag apify/python-playwright:local --output type=image,oci-mediatypes=true ./python-playwright
 	docker run --rm -it --platform linux/amd64 apify/python-playwright:local
 
 	@# Cleanup certificates
@@ -274,7 +274,7 @@ test-python-playwright-camoufox:
 test-python-selenium:
 	@echo "Building python-selenium with version $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX)"
 
-	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg SELENIUM_VERSION=$(PYTHON_SELENIUM_VERSION) --file ./python-selenium/Dockerfile --tag apify/python-selenium:local --load ./python-selenium
+	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg SELENIUM_VERSION=$(PYTHON_SELENIUM_VERSION) --file ./python-selenium/Dockerfile --tag apify/python-selenium:local --output type=image,oci-mediatypes=true ./python-selenium
 	docker run --rm -it --platform linux/amd64 apify/python-selenium:local
 
 	@# Delete docker image
