@@ -204,7 +204,7 @@ jobs:
           file: ./${{ matrix.image-name }}/Dockerfile
           build-args: NODE_VERSION=${{ matrix.node-version }}
           provenance: false
-          outputs: type=image,oci-mediatypes=true
+          outputs: type=docker,oci-mediatypes=true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
 
       - name: Test image

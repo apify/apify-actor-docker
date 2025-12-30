@@ -191,7 +191,7 @@ jobs:
             APIFY_VERSION=${{ env.APIFY_VERSION }}
             SELENIUM_VERSION=${{ matrix.selenium-version }}
           provenance: false
-          outputs: type=image,oci-mediatypes=true
+          outputs: type=docker,oci-mediatypes=true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
 
       - name: Test image

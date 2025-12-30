@@ -210,7 +210,7 @@ jobs:
             NODE_VERSION=${{ matrix.node-version }}
             PLAYWRIGHT_VERSION=${{ format('v{0}-', matrix.playwright-version) }}
           provenance: false
-          outputs: type=image,oci-mediatypes=true
+          outputs: type=docker,oci-mediatypes=true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
 
       - name: Test image

@@ -192,7 +192,7 @@ jobs:
             APIFY_VERSION=${{ env.APIFY_VERSION }}
             PLAYWRIGHT_VERSION=${{ matrix.playwright-version }}
           provenance: false
-          outputs: type=image,oci-mediatypes=true
+          outputs: type=docker,oci-mediatypes=true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
 
       - name: Test image

@@ -67,7 +67,7 @@ test-node:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest node ./scripts/update-package-json.mjs ./node
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node/Dockerfile -t apify/node:local --output type=image,oci-mediatypes=true ./node
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node/Dockerfile -t apify/node:local --output type=docker,oci-mediatypes=true ./node
 	docker run --rm -it --platform linux/amd64 apify/node:local
 
 	@# Restore package.json
@@ -82,7 +82,7 @@ test-playwright:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright/Dockerfile --tag apify/playwright:local --output type=image,oci-mediatypes=true ./node-playwright
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright/Dockerfile --tag apify/playwright:local --output type=docker,oci-mediatypes=true ./node-playwright
 	docker run --rm -it --platform linux/amd64 apify/playwright:local
 
 	@# Restore package.json
@@ -97,7 +97,7 @@ test-playwright-chrome:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-chrome
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-chrome/Dockerfile --tag apify/playwright-chrome:local --output type=image,oci-mediatypes=true ./node-playwright-chrome
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-chrome/Dockerfile --tag apify/playwright-chrome:local --output type=docker,oci-mediatypes=true ./node-playwright-chrome
 	docker run --rm -it --platform linux/amd64 apify/playwright-chrome:local
 
 	@# Restore package.json
@@ -113,7 +113,7 @@ test-playwright-firefox:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-firefox
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-firefox/Dockerfile --tag apify/playwright-firefox:local --output type=image,oci-mediatypes=true ./node-playwright-firefox
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-firefox/Dockerfile --tag apify/playwright-firefox:local --output type=docker,oci-mediatypes=true ./node-playwright-firefox
 	docker run --rm -it --platform linux/amd64 apify/playwright-firefox:local
 
 	@# Restore package.json
@@ -128,7 +128,7 @@ test-playwright-camoufox:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) CAMOUFOX_VERSION=$(CAMOUFOX_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-camoufox
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-camoufox/Dockerfile --tag apify/playwright-camoufox:local --output type=image,oci-mediatypes=true ./node-playwright-camoufox
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-camoufox/Dockerfile --tag apify/playwright-camoufox:local --output type=docker,oci-mediatypes=true ./node-playwright-camoufox
 	docker run --rm -it --platform linux/amd64 apify/playwright-camoufox:local
 
 	@# Restore package.json
@@ -143,7 +143,7 @@ test-playwright-webkit:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-webkit
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-webkit/Dockerfile --tag apify/playwright-webkit:local --output type=image,oci-mediatypes=true ./node-playwright-webkit
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-webkit/Dockerfile --tag apify/playwright-webkit:local --output type=docker,oci-mediatypes=true ./node-playwright-webkit
 	docker run --rm -it --platform linux/amd64 apify/playwright-webkit:local
 
 	@# Restore package.json
@@ -158,7 +158,7 @@ test-puppeteer-chrome:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PUPPETEER_VERSION=$(PUPPETEER_VERSION) node ./scripts/update-package-json.mjs ./node-puppeteer-chrome
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-puppeteer-chrome/Dockerfile --tag apify/puppeteer-chrome:local --output type=image,oci-mediatypes=true ./node-puppeteer-chrome
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-puppeteer-chrome/Dockerfile --tag apify/puppeteer-chrome:local --output type=docker,oci-mediatypes=true ./node-puppeteer-chrome
 	docker run --rm -it --platform linux/amd64 apify/puppeteer-chrome:local
 
 	@# Restore package.json
@@ -170,7 +170,7 @@ test-puppeteer-chrome:
 test-python:
 	@echo "Building python with version $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX)"
 
-	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --file ./python/Dockerfile --tag apify/python:local --output type=image,oci-mediatypes=true ./python
+	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --file ./python/Dockerfile --tag apify/python:local --output type=docker,oci-mediatypes=true ./python
 	docker run --rm -it --platform linux/amd64 apify/python:local
 
 	@# Delete docker image
@@ -179,7 +179,7 @@ test-python:
 test-python-playwright:
 	@echo "Building python-playwright with version $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX)"
 
-	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --file ./python-playwright/Dockerfile --tag apify/python-playwright:local --output type=image,oci-mediatypes=true ./python-playwright
+	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --file ./python-playwright/Dockerfile --tag apify/python-playwright:local --output type=docker,oci-mediatypes=true ./python-playwright
 	docker run --rm -it --platform linux/amd64 apify/python-playwright:local
 
 	@# Delete docker image
@@ -188,7 +188,7 @@ test-python-playwright:
 test-python-selenium:
 	@echo "Building python-selenium with version $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX)"
 
-	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --build-arg SELENIUM_VERSION=$(PYTHON_SELENIUM_VERSION) --file ./python-selenium/Dockerfile --tag apify/python-selenium:local --output type=image,oci-mediatypes=true ./python-selenium
+	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --build-arg SELENIUM_VERSION=$(PYTHON_SELENIUM_VERSION) --file ./python-selenium/Dockerfile --tag apify/python-selenium:local --output type=docker,oci-mediatypes=true ./python-selenium
 	docker run --rm -it --platform linux/amd64 apify/python-selenium:local
 
 	@# Delete docker image
