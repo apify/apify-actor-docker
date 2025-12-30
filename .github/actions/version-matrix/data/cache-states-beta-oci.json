@@ -1,0 +1,6 @@
+{
+	"node:normal": {
+		"hash": "326d8f05d19439edf63961843990b085817b5fe28c92ebe8327706b661b72485",
+		"hashEntries": "APIFY_VERSION=3.5.2;CRAWLEE_VERSION=3.15.3;NODE_VERSION=20,22,24"
+	}
+}
