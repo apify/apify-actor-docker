@@ -191,7 +191,8 @@ jobs:
             PYTHON_VERSION=${{ matrix.python-version }}
             APIFY_VERSION=${{ env.APIFY_VERSION }}
             PLAYWRIGHT_VERSION=${{ matrix.playwright-version }}
-          load: true
+          provenance: false
+          outputs: type=image,oci-mediatypes=true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
 
       - name: Test image
