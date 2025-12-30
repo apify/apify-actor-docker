@@ -191,15 +191,18 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and tag image
+      - name: Build and tag image for testing
         uses: docker/build-push-action@v6
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
           build-args: NODE_VERSION=${{ matrix.node-version }}
+          platforms: linux/amd64
           provenance: false
-          outputs: type=docker,oci-mediatypes=true
+          load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
+          cache-from: type=gha,scope=${{ matrix.image-name }}-${{ matrix.node-version }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image-name }}-${{ matrix.node-version }}
 
       - name: Test image
         run: docker run ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}
@@ -211,6 +214,16 @@ jobs:
           username: ${{ secrets.APIFY_SERVICE_ACCOUNT_DOCKERHUB_USERNAME }}
           password: ${{ secrets.APIFY_SERVICE_ACCOUNT_DOCKERHUB_TOKEN }}
 
-      - name: Push images
+      - name: Build and push OCI image
         if: github.event_name != 'pull_request'
-        run: docker push apify/actor-${{ matrix.image-name }} --all-tags
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.image-name }}
+          file: ./${{ matrix.image-name }}/Dockerfile
+          build-args: NODE_VERSION=${{ matrix.node-version }}
+          platforms: linux/amd64
+          provenance: true
+          push: true
+          tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
+          outputs: type=image,oci-mediatypes=true
+          cache-from: type=gha,scope=${{ matrix.image-name }}-${{ matrix.node-version }}
