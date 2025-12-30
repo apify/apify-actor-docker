@@ -164,7 +164,7 @@ jobs:
           build-args: |
             PYTHON_VERSION=${{ matrix.python-version }}
           provenance: false
-          outputs: type=image,oci-mediatypes=true
+          outputs: type=docker,oci-mediatypes=true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
 
       - name: Test image
