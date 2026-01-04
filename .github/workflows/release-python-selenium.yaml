@@ -13,6 +13,10 @@ on:
         description: "Rebuilds images even if the cache state matches the current state."
         required: false
         type: boolean
+      trigger_templates_pr:
+        description: "When set to true, always triggers the workflow on actor-templates."
+        required: false
+        type: boolean
 
   repository_dispatch:
     types: [build-python-images]
@@ -87,7 +91,7 @@ jobs:
           done
 
       - name: Trigger workflow on actor-templates
-        if: steps.push-matrix.outputs.should-trigger == 'true' && steps.set-matrix.outputs.latest-runtime-version != ''
+        if: (steps.push-matrix.outputs.should-trigger == 'true' || github.event.inputs.trigger_templates_pr == 'true') && steps.set-matrix.outputs.latest-runtime-version != ''
         uses: peter-evans/repository-dispatch@v4
         with:
           token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
