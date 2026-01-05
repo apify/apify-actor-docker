@@ -1,7 +1,7 @@
 {
 	"node:normal": {
-		"hash": "326d8f05d19439edf63961843990b085817b5fe28c92ebe8327706b661b72485",
-		"hashEntries": "APIFY_VERSION=3.5.2;CRAWLEE_VERSION=3.15.3;NODE_VERSION=20,22,24"
+		"hash": "77df827bb99b5cf8a5be47a75b36b069b6ecbc6dd55b1196bdba0e17f3861229",
+		"hashEntries": "APIFY_VERSION=3.5.3;CRAWLEE_VERSION=3.15.3;NODE_VERSION=20,22,24"
 	},
 	"node:puppeteer-chrome": {
 		"hash": "fdecb1e11eb769152d152ed8d0054644baad9cc71e434125b831427756e844b3",
