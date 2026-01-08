@@ -20,7 +20,7 @@ const playwrightPythonVersionConstraints = [
 	['>=3.13.x', '>=1.48.0'],
 ];
 
-const versions = await fetchPackageVersions('playwright');
+const playwrightVersions = await fetchPackageVersions('playwright');
 const apifyVersions = await fetchPackageVersions('apify');
 const camoufoxVersions = await fetchPackageVersions('camoufox');
 
@@ -28,12 +28,12 @@ if (!shouldUseLastFive) {
 	console.warn('Testing with only the latest version of playwright to speed up CI');
 }
 
-const lastFivePlaywrightVersions = versions.slice(shouldUseLastFive ? -5 : -1);
-const latestPlaywrightVersion = lastFivePlaywrightVersions.at(-1)!;
+const latestFivePlaywrightVersions = playwrightVersions.slice(shouldUseLastFive ? -5 : -1);
+const latestPlaywrightVersion = latestFivePlaywrightVersions.at(-1)!;
 let latestApifyVersion = apifyVersions.at(-1)!;
 let latestCamoufoxVersion = camoufoxVersions.at(-1)!;
 
-console.error('Last five versions:', lastFivePlaywrightVersions);
+console.error('Last five versions:', latestFivePlaywrightVersions);
 console.error('Latest playwright version:', latestPlaywrightVersion);
 console.error('Latest apify version:', latestApifyVersion);
 console.error('Latest camoufox version:', latestCamoufoxVersion);
@@ -45,8 +45,8 @@ if (process.env.APIFY_VERSION) {
 
 const cacheParams: CacheValues = {
 	PYTHON_VERSION: supportedPythonVersions,
+	PLAYWRIGHT_VERSION: latestFivePlaywrightVersions,
 	APIFY_VERSION: [latestApifyVersion],
-	PLAYWRIGHT_VERSION: lastFivePlaywrightVersions,
 	CAMOUFOX_VERSION: [latestCamoufoxVersion],
 };
 
@@ -85,7 +85,7 @@ for (const pythonVersion of supportedPythonVersions) {
 		return satisfies(`${pythonVersion}.0`, constraint);
 	})?.[1];
 
-	for (const playwrightVersion of lastFivePlaywrightVersions) {
+	for (const playwrightVersion of latestFivePlaywrightVersions) {
 		if (maybePlaywrightVersionConstraint) {
 			if (!satisfies(playwrightVersion, maybePlaywrightVersionConstraint)) {
 				continue;

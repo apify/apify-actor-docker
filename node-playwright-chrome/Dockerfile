@@ -22,7 +22,6 @@ RUN \
     && sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list' \
     && sh -c 'echo "deb http://ftp.us.debian.org/debian trixie main non-free" >> /etc/apt/sources.list.d/fonts.list' \
     && apt update \
-    && apt purge --auto-remove -y wget unzip \
     && apt install -y \
     git \
     google-chrome-stable \
@@ -68,10 +67,10 @@ COPY --chown=myuser:myuser package.json main.js check-playwright-version.mjs chr
 # Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
 ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
 
-# Tell the crawlee cli that we already have browers installed, so it skips installing them
+# Tell the crawlee cli that we already have browsers installed, so it skips installing them
 ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 
-# Tell Node.js this is a production environemnt
+# Tell Node.js this is a production environment
 ENV NODE_ENV=production
 
 # Enable Node.js process to use a lot of memory (Actor has limit of 32GB)
