@@ -235,7 +235,7 @@ jobs:
           build-args: |
             NODE_VERSION=${{ matrix.node-version }}
             PLAYWRIGHT_VERSION=${{ format('v{0}-', matrix.playwright-version) }}
-          platforms: linux/amd64
+          platforms: linux/amd64${{ (matrix.image-name != 'node-playwright' && matrix.image-name != 'node-playwright-chrome' && ',linux/arm64') || '' }}
           provenance: true
           push: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}

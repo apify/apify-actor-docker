@@ -214,7 +214,7 @@ jobs:
           build-args: |
             PYTHON_VERSION=${{ matrix.python-version }}
             APIFY_VERSION=${{ env.APIFY_VERSION }}
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           provenance: true
           push: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}

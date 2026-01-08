@@ -1,6 +1,6 @@
-ARG NODE_VERSION=20
+ARG NODE_VERSION=22
 # Use trixie to be consistent across node versions.
-FROM --platform=linux/amd64 node:${NODE_VERSION}-trixie-slim
+FROM node:${NODE_VERSION}-trixie-slim
 
 LABEL maintainer="support@apify.com" description="Base image for Apify Actors using Firefox"
 ENV DEBIAN_FRONTEND=noninteractive

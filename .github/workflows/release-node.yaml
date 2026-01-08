@@ -221,7 +221,7 @@ jobs:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
           build-args: NODE_VERSION=${{ matrix.node-version }}
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           provenance: true
           push: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
