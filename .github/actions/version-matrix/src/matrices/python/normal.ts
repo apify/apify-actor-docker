@@ -23,6 +23,8 @@ const cacheParams: CacheValues = {
 	APIFY_VERSION: [latestApifyVersion],
 };
 
+await setParametersForTriggeringUpdateWorkflowOnActorTemplates('python');
+
 if (!(await needsToRunMatrixGeneration('python:normal', cacheParams))) {
 	console.error('Matrix is up to date, skipping new image building');
 
@@ -52,4 +54,3 @@ for (const pythonVersion of supportedPythonVersions) {
 console.log(JSON.stringify(matrix));
 
 await updateCacheState('python:normal', cacheParams);
-await setParametersForTriggeringUpdateWorkflowOnActorTemplates('python');

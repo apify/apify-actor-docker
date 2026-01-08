@@ -34,6 +34,8 @@ const cacheParams: CacheValues = {
 	SELENIUM_VERSION: lastFiveSeleniumVersions,
 };
 
+await setParametersForTriggeringUpdateWorkflowOnActorTemplates('python');
+
 if (!(await needsToRunMatrixGeneration('python:selenium', cacheParams))) {
 	console.error('Matrix generation is not needed, exiting.');
 
@@ -69,4 +71,3 @@ for (const pythonVersion of supportedPythonVersions) {
 console.log(JSON.stringify(matrix));
 
 await updateCacheState('python:selenium', cacheParams);
-await setParametersForTriggeringUpdateWorkflowOnActorTemplates('python');

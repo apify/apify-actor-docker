@@ -46,6 +46,8 @@ const cacheParams: CacheValues = {
 	CAMOUFOX_VERSION: [latestCamoufoxVersion],
 };
 
+await setParametersForTriggeringUpdateWorkflowOnActorTemplates('node', latestPlaywrightVersion);
+
 if (!(await needsToRunMatrixGeneration('node:playwright', cacheParams))) {
 	console.error('Matrix generation is not needed, exiting.');
 
@@ -99,4 +101,3 @@ for (const nodeVersion of supportedNodeVersions) {
 console.log(JSON.stringify(matrix));
 
 await updateCacheState('node:playwright', cacheParams);
-await setParametersForTriggeringUpdateWorkflowOnActorTemplates('node', latestPlaywrightVersion);
