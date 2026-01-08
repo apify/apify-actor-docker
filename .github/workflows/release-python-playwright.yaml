@@ -218,8 +218,7 @@ jobs:
             PYTHON_VERSION=${{ matrix.python-version }}
             APIFY_VERSION=${{ env.APIFY_VERSION }}
             PLAYWRIGHT_VERSION=${{ matrix.playwright-version }}
-          # TODO: linux/arm64 will only work if we do NOT install google-chrome like we did in node-playwright(-chrome)
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           provenance: true
           push: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
