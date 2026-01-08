@@ -42,6 +42,8 @@ const cacheParams: CacheValues = {
 	CRAWLEE_VERSION: [latestCrawleeVersion],
 };
 
+await setParametersForTriggeringUpdateWorkflowOnActorTemplates('node', latestPuppeteerVersion);
+
 if (!(await needsToRunMatrixGeneration('node:puppeteer-chrome', cacheParams))) {
 	console.error('Matrix generation is not needed, exiting.');
 
@@ -79,4 +81,3 @@ for (const nodeVersion of supportedNodeVersions) {
 console.log(JSON.stringify(matrix));
 
 await updateCacheState('node:puppeteer-chrome', cacheParams);
-await setParametersForTriggeringUpdateWorkflowOnActorTemplates('node', latestPuppeteerVersion);

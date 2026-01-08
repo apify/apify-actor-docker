@@ -46,6 +46,8 @@ const cacheParams: CacheValues = {
 	PLAYWRIGHT_VERSION: lastFivePlaywrightVersions,
 };
 
+await setParametersForTriggeringUpdateWorkflowOnActorTemplates('python', latestPlaywrightVersion);
+
 if (!(await needsToRunMatrixGeneration('python:playwright', cacheParams))) {
 	console.error('Matrix is up to date, skipping new image building');
 
@@ -91,4 +93,3 @@ for (const pythonVersion of supportedPythonVersions) {
 console.log(JSON.stringify(matrix));
 
 await updateCacheState('python:playwright', cacheParams);
-await setParametersForTriggeringUpdateWorkflowOnActorTemplates('python', latestPlaywrightVersion);

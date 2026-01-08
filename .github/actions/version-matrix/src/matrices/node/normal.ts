@@ -32,6 +32,8 @@ const cacheParams: CacheValues = {
 	CRAWLEE_VERSION: [latestCrawleeVersion],
 };
 
+await setParametersForTriggeringUpdateWorkflowOnActorTemplates('node');
+
 if (!(await needsToRunMatrixGeneration('node:normal', cacheParams))) {
 	console.error('Matrix generation is not needed, exiting.');
 
@@ -64,4 +66,3 @@ for (const nodeVersion of supportedNodeVersions) {
 console.log(JSON.stringify(matrix));
 
 await updateCacheState('node:normal', cacheParams);
-await setParametersForTriggeringUpdateWorkflowOnActorTemplates('node');
