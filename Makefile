@@ -11,13 +11,14 @@ PKG_JSON_PW_VERSION = $(subst v,,$(subst -,,$(PLAYWRIGHT_VERSION)))
 # Python
 PYTHON_VERSION ?= 3.14
 # Apify latest version (python does not support the 'latest' tag)
-PYTHON_APIFY_VERSION ?= 1.7.0
+PYTHON_APIFY_VERSION ?= 3.1.0
 PYTHON_PLAYWRIGHT_VERSION = $(subst v,,$(subst -,,$(PLAYWRIGHT_VERSION)))
 PYTHON_SELENIUM_VERSION ?= 4.14.0
+PYTHON_CAMOUFOX_VERSION ?= 0.4.11
 
-ALL_TESTS = test-node test-playwright test-playwright-chrome test-playwright-firefox test-playwright-webkit test-puppeteer-chrome test-python test-python-playwright test-python-selenium test-playwright-camoufox
+ALL_TESTS = test-node test-playwright test-playwright-chrome test-playwright-firefox test-playwright-webkit test-puppeteer-chrome test-python test-python-playwright test-python-playwright-chrome test-python-playwright-firefox test-python-playwright-webkit test-python-playwright-camoufox test-python-selenium test-playwright-camoufox
 ALL_NODE_TESTS = test-node test-playwright test-playwright-chrome test-playwright-firefox test-playwright-webkit test-puppeteer-chrome test-playwright-camoufox
-ALL_PYTHON_TESTS = test-python test-python-playwright test-python-selenium
+ALL_PYTHON_TESTS = test-python test-python-playwright test-python-playwright-chrome test-python-playwright-firefox test-python-playwright-webkit test-python-playwright-camoufox test-python-selenium
 
 what-tests:
 	@echo "Available tests:"
@@ -184,6 +185,42 @@ test-python-playwright:
 
 	@# Delete docker image
 	docker rmi apify/python-playwright:local
+
+test-python-playwright-chrome:
+	@echo "Building python-playwright-chrome with Python $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX) and Playwright $(PYTHON_PLAYWRIGHT_VERSION)"
+
+	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --file ./python-playwright-chrome/Dockerfile --tag apify/python-playwright-chrome:local --load ./python-playwright-chrome
+	docker run --rm -it --platform linux/amd64 apify/python-playwright-chrome:local
+
+	@# Delete docker image
+	docker rmi apify/python-playwright-chrome:local
+
+test-python-playwright-firefox:
+	@echo "Building python-playwright-firefox with Python $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX) and Playwright $(PYTHON_PLAYWRIGHT_VERSION)"
+
+	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --file ./python-playwright-firefox/Dockerfile --tag apify/python-playwright-firefox:local --load ./python-playwright-firefox
+	docker run --rm -it --platform linux/amd64 apify/python-playwright-firefox:local
+
+	@# Delete docker image
+	docker rmi apify/python-playwright-firefox:local
+
+test-python-playwright-webkit:
+	@echo "Building python-playwright-webkit with Python $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX) and Playwright $(PYTHON_PLAYWRIGHT_VERSION)"
+
+	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --file ./python-playwright-webkit/Dockerfile --tag apify/python-playwright-webkit:local --load ./python-playwright-webkit
+	docker run --rm -it --platform linux/amd64 apify/python-playwright-webkit:local
+
+	@# Delete docker image
+	docker rmi apify/python-playwright-webkit:local
+
+test-python-playwright-camoufox:
+	@echo "Building python-playwright-camoufox with Python $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX), Playwright $(PYTHON_PLAYWRIGHT_VERSION) and Camoufox $(PYTHON_CAMOUFOX_VERSION)"
+
+	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --build-arg CAMOUFOX_VERSION=$(PYTHON_CAMOUFOX_VERSION) --file ./python-playwright-camoufox/Dockerfile --tag apify/python-playwright-camoufox:local --load ./python-playwright-camoufox
+	docker run --rm -it --platform linux/amd64 apify/python-playwright-camoufox:local
+
+	@# Delete docker image
+	docker rmi apify/python-playwright-camoufox:local
 
 test-python-selenium:
 	@echo "Building python-selenium with version $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX)"

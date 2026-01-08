@@ -61,7 +61,8 @@ jobs:
 
       - name: Print matrix
         run: |
-          echo '${{ steps.set-matrix.outputs.matrix }}' | jq -r '.include[] | "python-version=\(.["python-version"]) playwright-version=\(.["playwright-version"]) apify-version=\(.["apify-version"]) is-latest=\(.["is-latest"])"'
+          echo "Matrix:"
+          echo '${{ steps.set-matrix.outputs.matrix }}' | jq -r '.include[] | "python-version=\(.["python-version"]) playwright-version=\(.["playwright-version"]) apify-version=\(.["apify-version"]) camoufox-version=\(.["camoufox-version"]) is-latest=\(.["is-latest"]) image-name=\(.["image-name"])"'
           echo ""
           echo "Raw matrix:"
           echo ""
@@ -99,7 +100,7 @@ jobs:
           event-type: update-templates
           client-payload: |-
             {
-              "base_image": "apify/actor-python-playwright",
+              "base_image": "apify/actor-python-playwright,apify/actor-python-playwright-chrome,apify/actor-python-playwright-firefox,apify/actor-python-playwright-webkit,apify/actor-python-playwright-camoufox",
               "module_version": "${{ steps.set-matrix.outputs.latest-module-version }}",
               "default_runtime_version": "${{ steps.set-matrix.outputs.latest-runtime-version }}"
             }
@@ -115,7 +116,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}
 
-    name: "py: ${{ matrix.python-version }}, pw: ${{ matrix.playwright-version }}, apify: ${{ matrix.apify-version }}, is-latest: ${{ matrix.is-latest }}"
+    name: "img: ${{ matrix.image-name }} py: ${{ matrix.python-version }}, pw: ${{ matrix.playwright-version }}, apify: ${{ matrix.apify-version }}, cf: ${{ matrix.camoufox-version }}, is-latest: ${{ matrix.is-latest }}"
 
     steps:
       - name: Set default inputs if event is pull request
@@ -191,6 +192,7 @@ jobs:
             PYTHON_VERSION=${{ matrix.python-version }}
             APIFY_VERSION=${{ env.APIFY_VERSION }}
             PLAYWRIGHT_VERSION=${{ matrix.playwright-version }}
+            CAMOUFOX_VERSION=${{ matrix.camoufox-version }}
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
 

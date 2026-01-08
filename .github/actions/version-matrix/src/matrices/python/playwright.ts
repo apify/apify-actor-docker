@@ -22,6 +22,7 @@ const playwrightPythonVersionConstraints = [
 
 const versions = await fetchPackageVersions('playwright');
 const apifyVersions = await fetchPackageVersions('apify');
+const camoufoxVersions = await fetchPackageVersions('camoufox');
 
 if (!shouldUseLastFive) {
 	console.warn('Testing with only the latest version of playwright to speed up CI');
@@ -30,10 +31,12 @@ if (!shouldUseLastFive) {
 const lastFivePlaywrightVersions = versions.slice(shouldUseLastFive ? -5 : -1);
 const latestPlaywrightVersion = lastFivePlaywrightVersions.at(-1)!;
 let latestApifyVersion = apifyVersions.at(-1)!;
+let latestCamoufoxVersion = camoufoxVersions.at(-1)!;
 
 console.error('Last five versions:', lastFivePlaywrightVersions);
 console.error('Latest playwright version:', latestPlaywrightVersion);
 console.error('Latest apify version:', latestApifyVersion);
+console.error('Latest camoufox version:', latestCamoufoxVersion);
 
 if (process.env.APIFY_VERSION) {
 	console.error('Using custom apify version:', process.env.APIFY_VERSION);
@@ -44,6 +47,7 @@ const cacheParams: CacheValues = {
 	PYTHON_VERSION: supportedPythonVersions,
 	APIFY_VERSION: [latestApifyVersion],
 	PLAYWRIGHT_VERSION: lastFivePlaywrightVersions,
+	CAMOUFOX_VERSION: [latestCamoufoxVersion],
 };
 
 await setParametersForTriggeringUpdateWorkflowOnActorTemplates('python', latestPlaywrightVersion);
@@ -56,12 +60,21 @@ if (!(await needsToRunMatrixGeneration('python:playwright', cacheParams))) {
 	process.exit(0);
 }
 
+const imageNames = [
+	'python-playwright',
+	'python-playwright-chrome',
+	'python-playwright-firefox',
+	'python-playwright-webkit',
+	'python-playwright-camoufox',
+] as const;
+
 const matrix = {
 	include: [] as {
-		'image-name': 'python-playwright';
+		'image-name': (typeof imageNames)[number];
 		'python-version': string;
 		'playwright-version': string;
 		'apify-version': string;
+		'camoufox-version': string;
 		'is-latest': 'true' | 'false';
 		'latest-python-version': string;
 	}[],
@@ -79,14 +92,22 @@ for (const pythonVersion of supportedPythonVersions) {
 			}
 		}
 
-		matrix.include.push({
-			'image-name': 'python-playwright',
-			'python-version': pythonVersion,
-			'playwright-version': playwrightVersion,
-			'apify-version': latestApifyVersion,
-			'is-latest': playwrightVersion === latestPlaywrightVersion ? 'true' : 'false',
-			'latest-python-version': latestPythonVersion,
-		});
+		for (const imageName of imageNames) {
+			// Skip camoufox for Python 3.9 (requires Python 3.10+)
+			if (imageName.includes('camoufox') && pythonVersion === '3.9') {
+				continue;
+			}
+
+			matrix.include.push({
+				'image-name': imageName,
+				'python-version': pythonVersion,
+				'playwright-version': playwrightVersion,
+				'apify-version': latestApifyVersion,
+				'camoufox-version': latestCamoufoxVersion,
+				'is-latest': playwrightVersion === latestPlaywrightVersion ? 'true' : 'false',
+				'latest-python-version': latestPythonVersion,
+			});
+		}
 	}
 }
 
