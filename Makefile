@@ -16,8 +16,8 @@ PYTHON_PLAYWRIGHT_VERSION = $(subst v,,$(subst -,,$(PLAYWRIGHT_VERSION)))
 PYTHON_SELENIUM_VERSION ?= 4.14.0
 PYTHON_CAMOUFOX_VERSION ?= 0.4.11
 
-ALL_TESTS = test-node test-playwright test-playwright-chrome test-playwright-firefox test-playwright-webkit test-puppeteer-chrome test-python test-python-playwright test-python-playwright-chrome test-python-playwright-firefox test-python-playwright-webkit test-python-playwright-camoufox test-python-selenium test-playwright-camoufox
-ALL_NODE_TESTS = test-node test-playwright test-playwright-chrome test-playwright-firefox test-playwright-webkit test-puppeteer-chrome test-playwright-camoufox
+ALL_TESTS = test-node test-node-playwright test-node-playwright-chrome test-node-playwright-firefox test-node-playwright-webkit test-node-playwright-camoufox test-node-puppeteer-chrome test-python test-python-playwright test-python-playwright-chrome test-python-playwright-firefox test-python-playwright-webkit test-python-playwright-camoufox test-python-selenium
+ALL_NODE_TESTS = test-node test-node-playwright test-node-playwright-chrome test-node-playwright-firefox test-node-playwright-webkit test-node-playwright-camoufox test-node-puppeteer-chrome
 ALL_PYTHON_TESTS = test-python test-python-playwright test-python-playwright-chrome test-python-playwright-firefox test-python-playwright-webkit test-python-playwright-camoufox test-python-selenium
 
 what-tests:
@@ -77,96 +77,96 @@ test-node:
 	@# Delete docker image
 	docker rmi apify/node:local
 
-test-playwright:
-	@echo "Building playwright with version $(PLAYWRIGHT_VERSION) (overwrite using PLAYWRIGHT_VERSION=v1.42.0-) and node version $(NODE_VERSION) (overwrite using NODE_VERSION=XX)"
+test-node-playwright:
+	@echo "Building node-playwright with version $(PLAYWRIGHT_VERSION) (overwrite using PLAYWRIGHT_VERSION=v1.42.0-) and node version $(NODE_VERSION) (overwrite using NODE_VERSION=XX)"
 
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright/Dockerfile --tag apify/playwright:local --load ./node-playwright
-	docker run --rm -it --platform linux/amd64 apify/playwright:local
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright/Dockerfile --tag apify/node-playwright:local --load ./node-playwright
+	docker run --rm -it --platform linux/amd64 apify/node-playwright:local
 
 	@# Restore package.json
 	@git checkout ./node-playwright/package.json 1>/dev/null 2>&1
 
 	@# Delete docker image
-	docker rmi apify/playwright:local
+	docker rmi apify/node-playwright:local
 
-test-playwright-chrome:
-	@echo "Building playwright-chrome with version $(PLAYWRIGHT_VERSION) (overwrite using PLAYWRIGHT_VERSION=v1.42.0-) and node version $(NODE_VERSION) (overwrite using NODE_VERSION=XX)"
+test-node-playwright-chrome:
+	@echo "Building node-playwright-chrome with version $(PLAYWRIGHT_VERSION) (overwrite using PLAYWRIGHT_VERSION=v1.42.0-) and node version $(NODE_VERSION) (overwrite using NODE_VERSION=XX)"
 
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-chrome
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-chrome/Dockerfile --tag apify/playwright-chrome:local --load ./node-playwright-chrome
-	docker run --rm -it --platform linux/amd64 apify/playwright-chrome:local
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-chrome/Dockerfile --tag apify/node-playwright-chrome:local --load ./node-playwright-chrome
+	docker run --rm -it --platform linux/amd64 apify/node-playwright-chrome:local
 
 	@# Restore package.json
 	@git checkout ./node-playwright-chrome/package.json 1>/dev/null 2>&1
 
 	@# Delete docker image
-	docker rmi apify/playwright-chrome:local
+	docker rmi apify/node-playwright-chrome:local
 
 
-test-playwright-firefox:
-	@echo "Building playwright-firefox with version $(PLAYWRIGHT_VERSION) (overwrite using PLAYWRIGHT_VERSION=v1.42.0-) and node version $(NODE_VERSION) (overwrite using NODE_VERSION=XX)"
+test-node-playwright-firefox:
+	@echo "Building node-playwright-firefox with version $(PLAYWRIGHT_VERSION) (overwrite using PLAYWRIGHT_VERSION=v1.42.0-) and node version $(NODE_VERSION) (overwrite using NODE_VERSION=XX)"
 
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-firefox
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-firefox/Dockerfile --tag apify/playwright-firefox:local --load ./node-playwright-firefox
-	docker run --rm -it --platform linux/amd64 apify/playwright-firefox:local
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-firefox/Dockerfile --tag apify/node-playwright-firefox:local --load ./node-playwright-firefox
+	docker run --rm -it --platform linux/amd64 apify/node-playwright-firefox:local
 
 	@# Restore package.json
 	@git checkout ./node-playwright-firefox/package.json 1>/dev/null 2>&1
 
 	@# Delete docker image
-	docker rmi apify/playwright-firefox:local
+	docker rmi apify/node-playwright-firefox:local
 
-test-playwright-camoufox:
-	@echo "Building playwright-camoufox with version $(PLAYWRIGHT_VERSION) (overwrite using PLAYWRIGHT_VERSION=v1.42.0-), Camoufox $(CAMOUFOX_VERSION) (overwrite using CAMOUFOX_VERSION=0.3.5) and node version $(NODE_VERSION) (overwrite using NODE_VERSION=XX)"
+test-node-playwright-camoufox:
+	@echo "Building node-playwright-camoufox with version $(PLAYWRIGHT_VERSION) (overwrite using PLAYWRIGHT_VERSION=v1.42.0-), Camoufox $(CAMOUFOX_VERSION) (overwrite using CAMOUFOX_VERSION=0.3.5) and node version $(NODE_VERSION) (overwrite using NODE_VERSION=XX)"
 
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) CAMOUFOX_VERSION=$(CAMOUFOX_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-camoufox
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-camoufox/Dockerfile --tag apify/playwright-camoufox:local --load ./node-playwright-camoufox
-	docker run --rm -it --platform linux/amd64 apify/playwright-camoufox:local
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-camoufox/Dockerfile --tag apify/node-playwright-camoufox:local --load ./node-playwright-camoufox
+	docker run --rm -it --platform linux/amd64 apify/node-playwright-camoufox:local
 
 	@# Restore package.json
 	@git checkout ./node-playwright-camoufox/package.json 1>/dev/null 2>&1
 
 	@# Delete docker image
-	docker rmi apify/playwright-camoufox:local
+	docker rmi apify/node-playwright-camoufox:local
 
-test-playwright-webkit:
-	@echo "Building playwright-webkit with version $(PLAYWRIGHT_VERSION) (overwrite using PLAYWRIGHT_VERSION=v1.42.0-) and node version $(NODE_VERSION) (overwrite using NODE_VERSION=XX)"
+test-node-playwright-webkit:
+	@echo "Building node-playwright-webkit with version $(PLAYWRIGHT_VERSION) (overwrite using PLAYWRIGHT_VERSION=v1.42.0-) and node version $(NODE_VERSION) (overwrite using NODE_VERSION=XX)"
 
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-webkit
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-webkit/Dockerfile --tag apify/playwright-webkit:local --load ./node-playwright-webkit
-	docker run --rm -it --platform linux/amd64 apify/playwright-webkit:local
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-webkit/Dockerfile --tag apify/node-playwright-webkit:local --load ./node-playwright-webkit
+	docker run --rm -it --platform linux/amd64 apify/node-playwright-webkit:local
 
 	@# Restore package.json
 	@git checkout ./node-playwright-webkit/package.json 1>/dev/null 2>&1
 
 	@# Delete docker image
-	docker rmi apify/playwright-webkit:local
+	docker rmi apify/node-playwright-webkit:local
 
-test-puppeteer-chrome:
-	@echo "Building puppeteer-chrome with version $(PUPPETEER_VERSION) (overwrite using PUPPETEER_VERSION=22.6.2) and node version $(NODE_VERSION) (overwrite using NODE_VERSION=XX)"
+test-node-puppeteer-chrome:
+	@echo "Building node-puppeteer-chrome with version $(PUPPETEER_VERSION) (overwrite using PUPPETEER_VERSION=22.6.2) and node version $(NODE_VERSION) (overwrite using NODE_VERSION=XX)"
 
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PUPPETEER_VERSION=$(PUPPETEER_VERSION) node ./scripts/update-package-json.mjs ./node-puppeteer-chrome
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-puppeteer-chrome/Dockerfile --tag apify/puppeteer-chrome:local --load ./node-puppeteer-chrome
-	docker run --rm -it --platform linux/amd64 apify/puppeteer-chrome:local
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-puppeteer-chrome/Dockerfile --tag apify/node-puppeteer-chrome:local --load ./node-puppeteer-chrome
+	docker run --rm -it --platform linux/amd64 apify/node-puppeteer-chrome:local
 
 	@# Restore package.json
 	@git checkout ./node-puppeteer-chrome/package.json 1>/dev/null 2>&1
 
 	@# Delete docker image
-	docker rmi apify/puppeteer-chrome:local
+	docker rmi apify/node-puppeteer-chrome:local
 
 test-python:
 	@echo "Building python with version $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX)"
