@@ -1,15 +1,15 @@
 # Get the Playwright version provided as a build argument
 ARG PLAYWRIGHT_VERSION=
 
-# Get the Node.js version provided as a build argument
-ARG NODE_VERSION=20
-
 # Extend from the latest Playwright image
-FROM --platform=linux/amd64 mcr.microsoft.com/playwright:${PLAYWRIGHT_VERSION}jammy
+FROM --platform=linux/amd64 mcr.microsoft.com/playwright:${PLAYWRIGHT_VERSION}noble
 
 # Add labels to the image to identify it as an Apify Actor
 LABEL maintainer="support@apify.com" \
     description="Base image for Apify Actors written in Node.js using Playwright with headless Chrome"
+
+# Get the Node.js version provided as a build argument
+ARG NODE_VERSION=
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -51,7 +51,7 @@ RUN apt update \
         | tee /usr/share/keyrings/google-linux-signing.gpg > /dev/null \
     # Add Google Chrome APT repo
     && sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing.gpg] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' \
-    && sh -c 'echo "deb http://ftp.us.debian.org/debian trixie main non-free" >> /etc/apt/sources.list.d/fonts.list' \
+    # && sh -c 'echo "deb http://ftp.us.debian.org/debian nobel main non-free" >> /etc/apt/sources.list.d/fonts.list' \
     && apt update \
     && apt install -y --no-install-recommends \
     # Install Node.js

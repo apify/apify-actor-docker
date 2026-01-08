@@ -1,18 +1,18 @@
 # Get the Python version provided as a build argument
 ARG PYTHON_VERSION=
 
-# Get the Apify Python SDK version provided as a build argument
-ARG APIFY_VERSION=
-
-# Get the Playwright version provided as a build argument
-ARG PLAYWRIGHT_VERSION=
-
 # Extend from the latest Debian and its slim version to keep the image as small as possible
 FROM --platform=linux/amd64 python:${PYTHON_VERSION}-slim-trixie
 
 # Add labels to the image to identify it as an Apify Actor
 LABEL maintainer="support@apify.com" \
     description="Base image for Apify Actors written in Python using Playwright with headless Chrome"
+
+# Get the Apify Python SDK version provided as a build argument
+ARG APIFY_VERSION=
+
+# Get the Playwright version provided as a build argument
+ARG PLAYWRIGHT_VERSION=
 
 ENV DEBIAN_FRONTEND=noninteractive
 
