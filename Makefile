@@ -1,6 +1,6 @@
 # Environment values
 # Node
-NODE_VERSION ?= 20
+NODE_VERSION ?= 22
 # Tag must have format: v1.42.0-
 PLAYWRIGHT_VERSION ?= v1.57.0-
 CAMOUFOX_VERSION ?= 0.3.5
@@ -106,7 +106,6 @@ test-node-playwright-chrome:
 
 	@# Delete docker image
 	docker rmi apify/node-playwright-chrome:local
-
 
 test-node-playwright-firefox:
 	@echo "Building node-playwright-firefox with version $(PLAYWRIGHT_VERSION) (overwrite using PLAYWRIGHT_VERSION=v1.42.0-) and node version $(NODE_VERSION) (overwrite using NODE_VERSION=XX)"

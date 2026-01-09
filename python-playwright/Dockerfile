@@ -126,7 +126,7 @@ RUN pip install --upgrade \
     wheel \
     apify~=${APIFY_VERSION} \
     playwright~=${PLAYWRIGHT_VERSION} \
-    && bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version"
+    && echo "Google Chrome version: $(bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version")"
 
 # Copy the dummy source code to the image
 COPY --chown=myuser:myuser . .

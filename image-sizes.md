@@ -1,0 +1,2 @@
+- node-playwright-chrome: ~2.1 GB
+- python-playwright-chrome: ~1.9 GB
