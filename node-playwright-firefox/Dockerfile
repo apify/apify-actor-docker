@@ -1,26 +1,56 @@
-ARG NODE_VERSION=20
+# Get the Node.js version provided as a build argument
+ARG NODE_VERSION=
+
 # Use trixie to be consistent across node versions.
 FROM --platform=linux/amd64 node:${NODE_VERSION}-trixie-slim
 
-LABEL maintainer="support@apify.com" description="Base image for Apify Actors using Firefox"
+LABEL maintainer="support@apify.com" \
+    description="Base image for Apify Actors written in Node.js using Playwright with Firefox"
+
 ENV DEBIAN_FRONTEND=noninteractive
+
+# Set the shell to use /bin/bash with specific options (see Hadolint DL4006)
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Set up XVFB
+ENV XVFB_WHD=1920x1080x24+32
+
+# Tells playwright where to install and where to find the browsers
+ENV PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
+
+# Tell the crawlee cli that we already have browers installed, so it skips installing them
+ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
+
+ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/firefox
+
+# Prevent installing of browsers by future `npm install`.
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 
 COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
 
-# Install Firefox dependencies + tools
-RUN sh -c 'echo "deb http://ftp.us.debian.org/debian trixie main non-free" >> /etc/apt/sources.list.d/fonts.list' \
-    && apt update \
-    && apt install -y --no-install-recommends \
+RUN apt update \
+    && apt install --fix-missing -yq --no-install-recommends \
+    # Install xvfb, xauth, wget, curl, git
+    xvfb xauth wget curl git \
+    # The following packages are needed for the intermediate certificates to work in Firefox.
+    ca-certificates jq p11-kit \
     # Found this in other images, not sure whether it's needed, it does not come from Playwright deps
     procps \
-    # The following packages are needed for the intermediate certificates to work in Firefox.
-    ca-certificates \
-    jq \
-    wget \
-    p11-kit \
-    xauth \
+    # Extras
+    fonts-freefont-ttf \
+    fonts-kacst-one \
+    fonts-thai-tlwg \
+    fonts-wqy-zenhei \
+    # Install playwright browser dependencies and browsers for chrome
+    && npx playwright install-deps firefox \
+    && npx playwright install firefox \
+    # symlink the firefox binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
+    && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/firefox-*/firefox/firefox ${PLAYWRIGHT_BROWSERS_PATH}/ \
+    # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
+    && rm -f $PLAYWRIGHT_BROWSERS_PATH/firefox-*/firefox/libnssckbi.so \
+    && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so $(ls -d $PLAYWRIGHT_BROWSERS_PATH/firefox-*)/firefox/libnssckbi.so \
     \
-    # Register cerificates
+    # Register certificates
     && chmod +x ./register_intermediate_certs.sh \
     && ./register_intermediate_certs.sh \
     \
@@ -31,9 +61,6 @@ RUN sh -c 'echo "deb http://ftp.us.debian.org/debian trixie main non-free" >> /e
     \
     # Globally disable the update-notifier.
     && npm config --global set update-notifier false \
-    \
-    # Install all required playwright dependencies for firefox
-    && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm_config_ignore_scripts=1 npx playwright install-deps firefox \
     \
     # Cleanup time
     && rm -rf /var/lib/apt/lists/* \
@@ -47,15 +74,10 @@ RUN sh -c 'echo "deb http://ftp.us.debian.org/debian trixie main non-free" >> /e
 USER myuser
 WORKDIR /home/myuser
 
-ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
-
-# Tell the crawlee cli that we already have browers installed, so it skips installing them
-ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
-
 # Copy source code and xvfb script
 COPY --chown=myuser:myuser package.json main.js check-playwright-version.mjs firefox_test.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh xvfb-entrypoint.sh /home/myuser/
 
-# Tell Node.js this is a production environemnt
+# Tell Node.js this is a production environment
 ENV NODE_ENV=production
 
 # Enable Node.js process to use a lot of memory (Actor has limit of 32GB)
@@ -74,23 +96,8 @@ RUN npm --quiet set progress=false \
     && echo "NPM version:" \
     && npm --version \
     \
-    # symlink the firefox binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
-    && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/firefox-*/firefox/firefox ${PLAYWRIGHT_BROWSERS_PATH}/ \
-    \
     # Playwright allows downloading only one browser through separate package with same export. So we rename it to just playwright.
-    && mv ./node_modules/playwright-firefox ./node_modules/playwright && rm -rf ./node_modules/playwright-firefox \
-    \
-    # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
-    && rm -f $PLAYWRIGHT_BROWSERS_PATH/firefox-*/firefox/libnssckbi.so \
-    && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so $(ls -d $PLAYWRIGHT_BROWSERS_PATH/firefox-*)/firefox/libnssckbi.so
-
-ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/firefox
-
-# Prevent installing of browsers by future `npm install`.
-ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-
-# Set up xvfb
-ENV XVFB_WHD=1920x1080x24+32
+    && mv ./node_modules/playwright-firefox ./node_modules/playwright && rm -rf ./node_modules/playwright-firefox
 
 # The entrypoint script will be the one handling the CMD passed in, and will always wrap it into xvfb-run
 ENTRYPOINT ["/home/myuser/xvfb-entrypoint.sh"]

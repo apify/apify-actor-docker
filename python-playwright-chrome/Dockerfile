@@ -125,7 +125,7 @@ RUN pip install --upgrade \
 # Copy the dummy source code to the image
 COPY --chown=myuser:myuser . .
 
-# NOTE: This needs to be compatible with how Apify CLI launches Actors
+# The entrypoint script will be the one handling the CMD passed in, and will always wrap it into xvfb-run
 ENTRYPOINT ["./xvfb-entrypoint.sh"]
 
 CMD ["python3", "-m", "src"]
