@@ -2,7 +2,7 @@
 ARG PYTHON_VERSION
 
 # Extend from the latest Debian and its slim version to keep the image as small as possible
-FROM python:${PYTHON_VERSION}-slim-trixie
+FROM --platform=linux/amd64 python:${PYTHON_VERSION}-slim-trixie
 
 # Add labels to the image to identify it as an Apify Actor
 LABEL maintainer="support@apify.com" \
@@ -82,7 +82,7 @@ RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && rm -rf /var/lib/apt/lists/* /var/log/*
 
 # Download and install Geckodriver
-RUN GECKO_DRIVER_URL="https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz" && \
+RUN GECKO_DRIVER_URL="https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-linux64.tar.gz" && \
     curl --silent --show-error --location --output /tmp/geckodriver.tar.gz "$GECKO_DRIVER_URL" && \
     tar --gzip --extract --file=/tmp/geckodriver.tar.gz --directory=/usr/local/bin && \
     rm -f /tmp/geckodriver.tar.gz
