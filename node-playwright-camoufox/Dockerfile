@@ -42,6 +42,7 @@ RUN apt update \
     fonts-kacst-one \
     fonts-thai-tlwg \
     fonts-wqy-zenhei \
+    \
     # Install playwright browser dependencies for firefox (camoufox is firefox-based)
     && npx playwright install-deps firefox \
     \
