@@ -54,6 +54,7 @@ RUN apt update \
     fonts-kacst-one \
     fonts-thai-tlwg \
     fonts-wqy-zenhei \
+    \
     # Install playwright browser dependencies and browsers for chrome
     && npx playwright install-deps chrome \
     && npx playwright install chrome \
