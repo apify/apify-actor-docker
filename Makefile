@@ -3,7 +3,7 @@
 NODE_VERSION ?= 22
 # Tag must have format: v1.42.0-
 PLAYWRIGHT_VERSION ?= v1.57.0-
-CAMOUFOX_VERSION ?= 0.3.5
+CAMOUFOX_VERSION ?= 0.8.5
 # Tag must have format: 22.6.2
 PUPPETEER_VERSION ?= 22.6.2
 PKG_JSON_PW_VERSION = $(subst v,,$(subst -,,$(PLAYWRIGHT_VERSION)))
