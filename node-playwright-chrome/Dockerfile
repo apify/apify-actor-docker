@@ -18,7 +18,7 @@ ENV XVFB_WHD=1920x1080x24+32
 # Tells playwright where to install and where to find the browsers
 ENV PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
 
-# Tell the crawlee cli that we already have browers installed, so it skips installing them
+# Tell the crawlee cli that we already have browsers installed, so it skips installing them
 ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 
 # Sets path to Chrome executable, this is used by Apify.launchPuppeteer()

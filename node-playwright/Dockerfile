@@ -22,7 +22,7 @@ ENV XVFB_WHD=1920x1080x24+32
 # Point playwright to the preincluded browsers - moving browsers around increases the image size a *lot*
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
-# Tell the crawlee cli that we already have browers installed, so it skips installing them
+# Tell the crawlee cli that we already have browsers installed, so it skips installing them
 ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 
 # Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
@@ -51,7 +51,7 @@ RUN apt update \
         | tee /usr/share/keyrings/google-linux-signing.gpg > /dev/null \
     # Add Google Chrome APT repo
     && sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing.gpg] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' \
-    # && sh -c 'echo "deb http://ftp.us.debian.org/debian nobel main non-free" >> /etc/apt/sources.list.d/fonts.list' \
+    # && sh -c 'echo "deb http://ftp.us.debian.org/debian noble main non-free" >> /etc/apt/sources.list.d/fonts.list' \
     && apt update \
     && apt install -y --no-install-recommends \
     # Install Node.js

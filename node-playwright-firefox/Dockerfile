@@ -18,7 +18,7 @@ ENV XVFB_WHD=1920x1080x24+32
 # Tells playwright where to install and where to find the browsers
 ENV PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
 
-# Tell the crawlee cli that we already have browers installed, so it skips installing them
+# Tell the crawlee cli that we already have browsers installed, so it skips installing them
 ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 
 ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/firefox
