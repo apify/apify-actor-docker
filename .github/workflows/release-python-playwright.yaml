@@ -144,6 +144,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Copy Firefox certificates to image folder
+        run: |
+          if [ -f "./certificates/firefox-certificates.zip" ]; then
+            mkdir -p ./${{ matrix.image-name }}/firefox-certs
+            unzip -q -o ./certificates/firefox-certificates.zip -d ./${{ matrix.image-name }}/firefox-certs
+            echo "Extracted $(ls -1 ./${{ matrix.image-name }}/firefox-certs/*.crt | wc -l) certificates"
+          else
+            mkdir -p ./${{ matrix.image-name }}/firefox-certs
+            echo "No certificate archive found, created empty folder"
+          fi
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:

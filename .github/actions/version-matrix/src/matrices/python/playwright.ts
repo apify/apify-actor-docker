@@ -1,5 +1,10 @@
 import { satisfies } from 'semver';
-import { type CacheValues, needsToRunMatrixGeneration, updateCacheState } from '../../shared/cache.ts';
+import {
+	type CacheValues,
+	getCertificatesUpdatedAt,
+	needsToRunMatrixGeneration,
+	updateCacheState,
+} from '../../shared/cache.ts';
 import {
 	emptyMatrix,
 	latestPythonVersion,
@@ -33,10 +38,13 @@ const latestPlaywrightVersion = latestFivePlaywrightVersions.at(-1)!;
 let latestApifyVersion = apifyVersions.at(-1)!;
 let latestCamoufoxVersion = camoufoxVersions.at(-1)!;
 
+const certificatesUpdatedAt = await getCertificatesUpdatedAt();
+
 console.error('Last five versions:', latestFivePlaywrightVersions);
 console.error('Latest playwright version:', latestPlaywrightVersion);
 console.error('Latest apify version:', latestApifyVersion);
 console.error('Latest camoufox version:', latestCamoufoxVersion);
+console.error('Certificates updated at:', certificatesUpdatedAt || '(not available)');
 
 if (process.env.APIFY_VERSION) {
 	console.error('Using custom apify version:', process.env.APIFY_VERSION);
@@ -48,6 +56,7 @@ const cacheParams: CacheValues = {
 	PLAYWRIGHT_VERSION: latestFivePlaywrightVersions,
 	APIFY_VERSION: [latestApifyVersion],
 	CAMOUFOX_VERSION: [latestCamoufoxVersion],
+	CERTIFICATES_UPDATED_AT: certificatesUpdatedAt ? [certificatesUpdatedAt] : [],
 };
 
 await setParametersForTriggeringUpdateWorkflowOnActorTemplates('python', latestPlaywrightVersion);

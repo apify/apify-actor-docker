@@ -28,8 +28,9 @@ ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 # Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
 ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
 
-# Copy the script for registering intermediate certificates.
+# Copy the script for registering intermediate certificates and the pre-downloaded certificates
 COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
+COPY ./firefox-certs /usr/local/share/ca-certificates/firefox
 
 RUN apt update \
     && apt install --fix-missing -yq --no-install-recommends \

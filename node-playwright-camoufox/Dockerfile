@@ -27,7 +27,9 @@ ENV APIFY_DEFAULT_BROWSER_PATH=/home/myuser/.cache/camoufox/camoufox-bin
 # Prevent installing of browsers by future `npm install`.
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 
+# Copy the script for registering intermediate certificates and the pre-downloaded certificates
 COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
+COPY ./firefox-certs /usr/local/share/ca-certificates/firefox
 
 RUN apt update \
     && apt install --fix-missing -yq --no-install-recommends \
