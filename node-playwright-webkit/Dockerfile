@@ -1,5 +1,5 @@
-FROM --platform=linux/amd64 ubuntu:jammy
-ARG NODE_VERSION=20
+FROM ubuntu:jammy
+ARG NODE_VERSION=22
 
 LABEL maintainer="support@apify.com" description="Base image for Apify Actors using Webkit"
 ENV DEBIAN_FRONTEND=noninteractive
