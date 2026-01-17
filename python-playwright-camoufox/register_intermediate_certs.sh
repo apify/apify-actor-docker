@@ -2,18 +2,23 @@
 set -e
 
 # This script installs Firefox intermediate certificates
-# It first checks for pre-downloaded certificates in the destination directory,
+# It first checks for pre-downloaded certificates in /tmp/firefox-certs,
 # and falls back to downloading if none found
 
+CERTS_SOURCE="/tmp/firefox-certs"
 CERTS_DEST="/usr/local/share/ca-certificates/firefox"
 
-# Create destination directory if it doesn't exist
+# Create destination directory
 mkdir -p "$CERTS_DEST"
 
-# Check if pre-downloaded certificates exist in the destination directory
-if [ -n "$(ls -A $CERTS_DEST/*.crt 2>/dev/null)" ]; then
+# Check if pre-downloaded certificates exist
+if [ -d "$CERTS_SOURCE" ] && [ -n "$(ls -A $CERTS_SOURCE/*.crt 2>/dev/null)" ]; then
     echo "Found pre-downloaded Firefox intermediate certificates..."
-    echo "Found $(ls -1 $CERTS_DEST/*.crt | wc -l) certificates"
+
+    # Move certificates to destination
+    mv "$CERTS_SOURCE"/*.crt "$CERTS_DEST/"
+
+    echo "Moved $(ls -1 $CERTS_DEST/*.crt | wc -l) certificates"
 else
     echo "No pre-downloaded certificates found, downloading from Mozilla..."
 
@@ -44,5 +49,8 @@ chmod 755 "$CERTS_DEST"
 
 # Update CA certificates
 update-ca-certificates
+
+# Cleanup temp directory
+rm -rf "$CERTS_SOURCE"
 
 echo "Successfully installed certificates"

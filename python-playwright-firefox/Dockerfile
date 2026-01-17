@@ -47,7 +47,7 @@ ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/firefox
 
 # Copy the script for registering intermediate certificates and the pre-downloaded certificates
 COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
-COPY ./firefox-certs /usr/local/share/ca-certificates/firefox
+COPY ./firefox-certs /tmp/firefox-certs
 
 RUN apt update \
     && apt install --fix-missing -yq --no-install-recommends \
