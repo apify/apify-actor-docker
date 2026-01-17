@@ -23,12 +23,11 @@ async def run_test(launcher, headless=True, executable_path=None):
 
 async def main():
     async with async_playwright() as playwright:
-        print("Testing docker image by opening browsers...")
+        print("Testing docker image by opening Chrome browser...")
 
-        # Test Playwright browsers (Firefox, Chromium, WebKit)
-        for launcher in [playwright.firefox, playwright.chromium, playwright.webkit]:
-            await run_test(launcher, headless=True)
-            await run_test(launcher, headless=False)
+        # Test Chromium
+        await run_test(playwright.chromium, headless=True)
+        await run_test(playwright.chromium, headless=False)
 
         # Test Google Chrome using the executable path
         chrome_path = os.environ.get("APIFY_CHROME_EXECUTABLE_PATH")

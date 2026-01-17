@@ -8,6 +8,7 @@ export const SELENIUM_VERSION_MARKER = 'SELENIUM_VERSION';
 export const PLAYWRIGHT_VERSION_MARKER = 'PLAYWRIGHT_VERSION';
 export const CRAWLEE_VERSION_MARKER = 'CRAWLEE_VERSION';
 export const CAMOUFOX_VERSION_MARKER = 'CAMOUFOX_VERSION';
+export const CERTIFICATES_UPDATED_AT_MARKER = 'CERTIFICATES_UPDATED_AT';
 
 const cacheStateFile = new URL(`../../data/cache-states-${process.env.RELEASE_TAG || 'latest'}.json`, import.meta.url);
 
@@ -33,10 +34,23 @@ export type CacheValues = Partial<
 		| typeof SELENIUM_VERSION_MARKER
 		| typeof PLAYWRIGHT_VERSION_MARKER
 		| typeof CRAWLEE_VERSION_MARKER
-		| typeof CAMOUFOX_VERSION_MARKER,
+		| typeof CAMOUFOX_VERSION_MARKER
+		| typeof CERTIFICATES_UPDATED_AT_MARKER,
 		string[]
 	>
 >;
+
+const certificatesTimestampFile = new URL('../../../../../certificates/.last-updated-at', import.meta.url);
+
+export async function getCertificatesUpdatedAt(): Promise<string> {
+	try {
+		const timestamp = (await readFile(certificatesTimestampFile, 'utf8')).trim();
+		return timestamp;
+	} catch {
+		// If file doesn't exist, return empty string (will trigger download fallback in Docker)
+		return '';
+	}
+}
 
 export async function needsToRunMatrixGeneration(name: string, values: CacheValues) {
 	// For pull requests, we always want to run the matrix generation.

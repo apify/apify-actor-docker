@@ -1,0 +1,72 @@
+name: Update Firefox Intermediate Certificates
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Run every hour
+    - cron: "0 * * * *"
+
+jobs:
+  update-certificates:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq wget zip
+
+      - name: Download certificates
+        run: |
+          chmod +x ./certificates/download-certificates.sh
+          ./certificates/download-certificates.sh
+
+      - name: Check for changes
+        id: check-changes
+        run: |
+          git add ./certificates/firefox-certificates.zip
+          if git diff --cached --quiet; then
+            echo "No changes detected in certificates"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected in certificates"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update timestamp and commit
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          # Update the last-updated-at file
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > ./certificates/.last-updated-at
+
+          # Setup git user
+          git config --global user.email "noreply@apify.com"
+          git config --global user.name "Apify CI Bot"
+          git config pull.rebase true
+
+          # Stage all certificate changes
+          git add ./certificates/
+
+          # Commit and push
+          git commit -m "chore(certificates): update Firefox intermediate certificates"
+
+          # Try to push with retries
+          for i in {1..5}; do
+            git push && break || echo "Failed to push, retrying in 5 seconds..." && sleep 5 && git pull --rebase
+          done
+
+      - name: Summary
+        run: |
+          if [ "${{ steps.check-changes.outputs.has_changes }}" == "true" ]; then
+            echo "✅ Certificates updated successfully"
+            echo "Last updated: $(cat ./certificates/.last-updated-at)"
+          else
+            echo "ℹ️ No certificate changes detected"
+          fi
+          echo "Total certificates in archive: $(unzip -l ./certificates/firefox-certificates.zip 2>/dev/null | grep -c '\.crt$' || echo 0)"
