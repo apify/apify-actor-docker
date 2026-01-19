@@ -127,4 +127,4 @@ COPY --chown=myuser:myuser . .
 
 # NOTE: This needs to be compatible with how Apify CLI launches Actors
 ENTRYPOINT ["./xvfb-entrypoint.sh"]
-CMD ["python3", "-m", "src"]
+CMD ["python", "-m", "src"]

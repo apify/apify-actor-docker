@@ -88,10 +88,10 @@ RUN apt update \
     && echo '{ "ComponentUpdatesEnabled": false }' > /etc/opt/chrome/policies/managed/component_update.json \
     \
     # Install Playwright browser dependencies and browsers
-    && python3 -m pip install --user playwright \
-    && python3 -m playwright install-deps \
-    && python3 -m playwright install \
-    && python3 -m pip uninstall -y playwright \
+    && python -m pip install --user playwright \
+    && python -m playwright install-deps \
+    && python -m playwright install \
+    && python -m pip uninstall -y playwright \
     \
     # Add user so we don't need --no-sandbox.
     && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
@@ -135,4 +135,4 @@ COPY --chown=myuser:myuser . .
 # The entrypoint script will be the one handling the CMD passed in, and will always wrap it into xvfb-run
 ENTRYPOINT ["./xvfb-entrypoint.sh"]
 
-CMD ["python3", "-m", "src"]
+CMD ["python", "-m", "src"]

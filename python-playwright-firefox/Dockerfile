@@ -67,10 +67,10 @@ RUN apt update \
     fonts-wqy-zenhei \
     \
     # Install Playwright browser dependencies and browsers
-    && python3 -m pip install --user playwright \
-    && python3 -m playwright install-deps firefox \
-    && python3 -m playwright install firefox \
-    && python3 -m pip uninstall -y playwright \
+    && python -m pip install --user playwright \
+    && python -m playwright install-deps firefox \
+    && python -m playwright install firefox \
+    && python -m pip uninstall -y playwright \
     # symlink the firefox binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
     && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/firefox-*/firefox/firefox ${PLAYWRIGHT_BROWSERS_PATH}/ \
     # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
@@ -117,4 +117,4 @@ COPY --chown=myuser:myuser . .
 # The entrypoint script will be the one handling the CMD passed in, and will always wrap it into xvfb-run
 ENTRYPOINT ["./xvfb-entrypoint.sh"]
 
-CMD ["python3", "-m", "src"]
+CMD ["python", "-m", "src"]

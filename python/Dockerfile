@@ -64,4 +64,4 @@ RUN pip install --upgrade \
 COPY --chown=myuser:myuser . .
 
 # Set default startup command, using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD ["python3", "-m", "src"]
+CMD ["python", "-m", "src"]

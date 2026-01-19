@@ -62,10 +62,10 @@ RUN apt update \
     fonts-wqy-zenhei \
     \
     # Install Playwright browser dependencies and browsers
-    && python3 -m pip install --user playwright \
-    && python3 -m playwright install-deps webkit \
-    && python3 -m playwright install webkit \
-    && python3 -m pip uninstall -y playwright \
+    && python -m pip install --user playwright \
+    && python -m playwright install-deps webkit \
+    && python -m playwright install webkit \
+    && python -m pip uninstall -y playwright \
     # symlink the webkit binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
     && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/webkit-*/minibrowser-gtk/MiniBrowser ${PLAYWRIGHT_BROWSERS_PATH}/ \
     \
@@ -105,4 +105,4 @@ COPY --chown=myuser:myuser . .
 # The entrypoint script will be the one handling the CMD passed in, and will always wrap it into xvfb-run
 ENTRYPOINT ["./xvfb-entrypoint.sh"]
 
-CMD ["python3", "-m", "src"]
+CMD ["python", "-m", "src"]

@@ -71,10 +71,10 @@ RUN apt update \
     fonts-wqy-zenhei \
     \
     # Install Playwright browser dependencies for firefox (camoufox is firefox-based)
-    && python3 -m pip install --user playwright camoufox~=${CAMOUFOX_VERSION} \
-    && python3 -m playwright install-deps firefox \
-    && python3 -m camoufox fetch \
-    && python3 -m pip uninstall -y playwright camoufox \
+    && python -m pip install --user playwright camoufox~=${CAMOUFOX_VERSION} \
+    && python -m playwright install-deps firefox \
+    && python -m camoufox fetch \
+    && python -m pip uninstall -y playwright camoufox \
     # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
     && rm -f /root/.cache/camoufox/libnssckbi.so \
     && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so /root/.cache/camoufox/libnssckbi.so \
@@ -121,4 +121,4 @@ COPY --chown=myuser:myuser . .
 # The entrypoint script will be the one handling the CMD passed in, and will always wrap it into xvfb-run
 ENTRYPOINT ["./xvfb-entrypoint.sh"]
 
-CMD ["python3", "-m", "src"]
+CMD ["python", "-m", "src"]

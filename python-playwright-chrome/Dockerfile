@@ -82,11 +82,11 @@ RUN apt update \
     && echo '{ "ComponentUpdatesEnabled": false }' > /etc/opt/chrome/policies/managed/component_update.json \
     \
     # Install Playwright browser dependencies and browsers
-    && python3 -m pip install --user playwright \
-    && python3 -m playwright install-deps chrome \
-    && python3 -m playwright install chrome \
-    && python3 -m playwright install chromium \
-    && python3 -m pip uninstall -y playwright \
+    && python -m pip install --user playwright \
+    && python -m playwright install-deps chrome \
+    && python -m playwright install chrome \
+    && python -m playwright install chromium \
+    && python -m pip uninstall -y playwright \
     # symlink the chromium binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
     && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/chromium-*/chrome-linux*/chrome ${PLAYWRIGHT_BROWSERS_PATH}/ \
     \
@@ -128,4 +128,4 @@ COPY --chown=myuser:myuser . .
 # The entrypoint script will be the one handling the CMD passed in, and will always wrap it into xvfb-run
 ENTRYPOINT ["./xvfb-entrypoint.sh"]
 
-CMD ["python3", "-m", "src"]
+CMD ["python", "-m", "src"]
