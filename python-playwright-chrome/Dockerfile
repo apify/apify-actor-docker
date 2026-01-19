@@ -82,7 +82,7 @@ RUN apt update \
     && echo '{ "ComponentUpdatesEnabled": false }' > /etc/opt/chrome/policies/managed/component_update.json \
     \
     # Install Playwright browser dependencies and browsers
-    && python -m pip install --user playwright \
+    && python -m pip install --user playwright~=${PLAYWRIGHT_VERSION} \
     && python -m playwright install-deps chrome \
     && python -m playwright install chrome \
     && python -m playwright install chromium \

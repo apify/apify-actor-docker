@@ -62,7 +62,7 @@ RUN apt update \
     fonts-wqy-zenhei \
     \
     # Install Playwright browser dependencies and browsers
-    && python -m pip install --user playwright \
+    && python -m pip install --user playwright~=${PLAYWRIGHT_VERSION} \
     && python -m playwright install-deps webkit \
     && python -m playwright install webkit \
     && python -m pip uninstall -y playwright \
