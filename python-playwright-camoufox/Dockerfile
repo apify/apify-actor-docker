@@ -71,7 +71,7 @@ RUN apt update \
     fonts-wqy-zenhei \
     \
     # Install Playwright browser dependencies for firefox (camoufox is firefox-based)
-    && python3 -m pip install --user playwright~=${PLAYWRIGHT_VERSION} camoufox~=${CAMOUFOX_VERSION} \
+    && python3 -m pip install --user playwright camoufox~=${CAMOUFOX_VERSION} \
     && python3 -m playwright install-deps firefox \
     && python3 -m camoufox fetch \
     && python3 -m pip uninstall -y playwright camoufox \
