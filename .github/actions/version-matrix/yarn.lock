@@ -24,28 +24,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@actions/github@npm:^6.0.1":
-  version: 6.0.1
-  resolution: "@actions/github@npm:6.0.1"
+"@actions/github@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "@actions/github@npm:7.0.0"
   dependencies:
-    "@actions/http-client": "npm:^2.2.0"
+    "@actions/http-client": "npm:^3.0.1"
     "@octokit/core": "npm:^5.0.1"
     "@octokit/plugin-paginate-rest": "npm:^9.2.2"
     "@octokit/plugin-rest-endpoint-methods": "npm:^10.4.0"
     "@octokit/request": "npm:^8.4.1"
     "@octokit/request-error": "npm:^5.1.1"
     undici: "npm:^5.28.5"
-  checksum: 10/ba6a162a5727dea2f3f3fc450e02c5b336ceb65a0e26ba9ad9c62b20f4f5b2625ca347a9311a4905ef3c92378ca022caba841a283cb7f2e4175d79e3d1ecaf12
-  languageName: node
-  linkType: hard
-
-"@actions/http-client@npm:^2.2.0":
-  version: 2.2.3
-  resolution: "@actions/http-client@npm:2.2.3"
-  dependencies:
-    tunnel: "npm:^0.0.6"
-    undici: "npm:^5.25.4"
-  checksum: 10/0c0a540c79e50f795d214f696710bb9c50bdf5bb1458be288140f2aae3686adec73fdb464c43da5ef94f985ac7736273efef21cb5ba5a3b09e85b403d852c04b
+  checksum: 10/829c6402f927839714692f4e1f48359d306be0fd21ef3843feaf3db6541e5e7f85447b0bf794beeebad0b8f4a2644f7f92143cb4a8311541b29f5ddfc585cec1
   languageName: node
   linkType: hard
 
@@ -328,7 +318,7 @@ __metadata:
   resolution: "python-matrix@workspace:."
   dependencies:
     "@actions/core": "npm:^2.0.0"
-    "@actions/github": "npm:^6.0.1"
+    "@actions/github": "npm:^7.0.0"
     "@biomejs/biome": "npm:^2.0.0"
     "@types/node": "npm:^24.0.0"
     "@types/semver": "npm:^7.7.0"
@@ -380,7 +370,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:^5.25.4, undici@npm:^5.28.5":
+"undici@npm:^5.28.5":
   version: 5.29.0
   resolution: "undici@npm:5.29.0"
   dependencies:
