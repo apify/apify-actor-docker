@@ -24,9 +24,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@actions/github@npm:^8.0.0":
-  version: 8.0.1
-  resolution: "@actions/github@npm:8.0.1"
+"@actions/github@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "@actions/github@npm:9.0.0"
   dependencies:
     "@actions/http-client": "npm:^3.0.2"
     "@octokit/core": "npm:^7.0.6"
@@ -35,7 +35,7 @@ __metadata:
     "@octokit/request": "npm:^10.0.7"
     "@octokit/request-error": "npm:^7.1.0"
     undici: "npm:^6.23.0"
-  checksum: 10/7f374d46ecb86acce26b5a18de6212e5ba4609ec3b0e837cbf698911c466f0c604f5dcdc28734bff543a02553da9637479f223005825df8038d99a0723735b6a
+  checksum: 10/5d3b2790f7b67cb7b0ec4416e8b666fde69621bac5fff5e59737c8233f8ad09829471b5cab2c50faea60da39554c69d5e7e51e5ffc8e2c899fba32f47db15b9b
   languageName: node
   linkType: hard
 
@@ -302,7 +302,7 @@ __metadata:
   resolution: "python-matrix@workspace:."
   dependencies:
     "@actions/core": "npm:^2.0.0"
-    "@actions/github": "npm:^8.0.0"
+    "@actions/github": "npm:^9.0.0"
     "@biomejs/biome": "npm:^2.0.0"
     "@types/node": "npm:^24.0.0"
     "@types/semver": "npm:^7.7.0"
