@@ -26,7 +26,6 @@ const playwrightPythonVersionConstraints = [
 ];
 
 const playwrightVersions = await fetchPackageVersions('playwright');
-const apifyVersions = await fetchPackageVersions('apify');
 const camoufoxVersions = await fetchPackageVersions('camoufox');
 
 if (!shouldUseLastFive) {
@@ -35,26 +34,18 @@ if (!shouldUseLastFive) {
 
 const latestFivePlaywrightVersions = playwrightVersions.slice(shouldUseLastFive ? -5 : -1);
 const latestPlaywrightVersion = latestFivePlaywrightVersions.at(-1)!;
-let latestApifyVersion = apifyVersions.at(-1)!;
-let latestCamoufoxVersion = camoufoxVersions.at(-1)!;
+const latestCamoufoxVersion = camoufoxVersions.at(-1)!;
 
 const certificatesUpdatedAt = await getCertificatesUpdatedAt();
 
 console.error('Last five versions:', latestFivePlaywrightVersions);
 console.error('Latest playwright version:', latestPlaywrightVersion);
-console.error('Latest apify version:', latestApifyVersion);
 console.error('Latest camoufox version:', latestCamoufoxVersion);
 console.error('Certificates updated at:', certificatesUpdatedAt || '(not available)');
-
-if (process.env.APIFY_VERSION) {
-	console.error('Using custom apify version:', process.env.APIFY_VERSION);
-	latestApifyVersion = process.env.APIFY_VERSION;
-}
 
 const cacheParams: CacheValues = {
 	PYTHON_VERSION: supportedPythonVersions,
 	PLAYWRIGHT_VERSION: latestFivePlaywrightVersions,
-	APIFY_VERSION: [latestApifyVersion],
 	CAMOUFOX_VERSION: [latestCamoufoxVersion],
 	CERTIFICATES_UPDATED_AT: certificatesUpdatedAt ? [certificatesUpdatedAt] : [],
 };
@@ -82,7 +73,6 @@ const matrix = {
 		'image-name': (typeof imageNames)[number];
 		'python-version': string;
 		'playwright-version': string;
-		'apify-version': string;
 		'camoufox-version': string;
 		'is-latest': 'true' | 'false';
 		'latest-python-version': string;
@@ -111,7 +101,6 @@ for (const pythonVersion of supportedPythonVersions) {
 				'image-name': imageName,
 				'python-version': pythonVersion,
 				'playwright-version': playwrightVersion,
-				'apify-version': latestApifyVersion,
 				'camoufox-version': latestCamoufoxVersion,
 				'is-latest': playwrightVersion === latestPlaywrightVersion ? 'true' : 'false',
 				'latest-python-version': latestPythonVersion,

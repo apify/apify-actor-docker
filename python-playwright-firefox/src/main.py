@@ -1,19 +1,16 @@
-from playwright.async_api import async_playwright
+import os
 
 
-async def run_test(launcher, headless=True):
-    print(f'Testing {launcher.name} with {headless=}')
-    browser = await launcher.launch(headless=headless)
-    page = await browser.new_page()
-    await page.goto('http://example.com')
-    if 'Example Domain' != await page.title():
-        raise Exception(f'Playwright failed to load! ({launcher.name}, {headless=})')
-    await browser.close()
-
-
-async def main():
-    async with async_playwright() as playwright:
-        print('Testing docker image by opening Firefox browser...')
-        await run_test(playwright.firefox, headless=True)
-        await run_test(playwright.firefox, headless=False)
-        print('Testing finished successfully.')
+def main():
+    print("=" * 60)
+    print("WARNING: If you see this message, it means you did not")
+    print("set up your Docker image correctly. Please replace this")
+    print("file with your actual application code.")
+    print("=" * 60)
+    print()
+    print("Environment variables set in this image:")
+    print("-" * 60)
+    for key, value in sorted(os.environ.items()):
+        if key.startswith(("PYTHON", "PIP", "PATH", "APIFY", "CRAWLEE", "PLAYWRIGHT", "XVFB")):
+            print(f"  {key}={value}")
+    print("-" * 60)

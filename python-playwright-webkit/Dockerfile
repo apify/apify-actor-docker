@@ -8,9 +8,6 @@ FROM --platform=linux/amd64 python:${PYTHON_VERSION}-slim-trixie
 LABEL maintainer="support@apify.com" \
     description="Base image for Apify Actors written in Python using Playwright with only WebKit"
 
-# Get the Apify Python SDK version provided as a build argument
-ARG APIFY_VERSION=
-
 # Get the Playwright version provided as a build argument
 ARG PLAYWRIGHT_VERSION=
 
@@ -62,10 +59,10 @@ RUN apt update \
     fonts-wqy-zenhei \
     \
     # Install Playwright browser dependencies and browsers
-    && python -m pip install --user playwright~=${PLAYWRIGHT_VERSION} \
+    && python -m pip install playwright~=${PLAYWRIGHT_VERSION} \
     && python -m playwright install-deps webkit \
+    && apt install -y libgtk-3-0 \
     && python -m playwright install webkit \
-    && python -m pip uninstall -y playwright \
     # symlink the webkit binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
     && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/webkit-*/minibrowser-gtk/MiniBrowser ${PLAYWRIGHT_BROWSERS_PATH}/ \
     \
@@ -91,13 +88,11 @@ ENV PATH="/root/.local/bin:/home/myuser/.local/bin:$PATH"
 # This instruction:
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
-# - Installs the specified version of the Apify Python SDK and Playwright
+# - Installs the specified version of Playwright
 RUN pip install --upgrade \
     pip \
     setuptools \
-    wheel \
-    apify~=${APIFY_VERSION} \
-    playwright~=${PLAYWRIGHT_VERSION}
+    wheel
 
 # Copy the dummy source code to the image
 COPY --chown=myuser:myuser . .

@@ -8,9 +8,6 @@ FROM --platform=linux/amd64 python:${PYTHON_VERSION}-slim-trixie
 LABEL maintainer="support@apify.com" \
     description="Base image for Apify Actors written in Python using Playwright with only Firefox"
 
-# Get the Apify Python SDK version provided as a build argument
-ARG APIFY_VERSION=
-
 # Get the Playwright version provided as a build argument
 ARG PLAYWRIGHT_VERSION=
 
@@ -67,10 +64,9 @@ RUN apt update \
     fonts-wqy-zenhei \
     \
     # Install Playwright browser dependencies and browsers
-    && python -m pip install --user playwright~=${PLAYWRIGHT_VERSION} \
+    && python -m pip install playwright~=${PLAYWRIGHT_VERSION} \
     && python -m playwright install-deps firefox \
     && python -m playwright install firefox \
-    && python -m pip uninstall -y playwright \
     # symlink the firefox binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
     && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/firefox-*/firefox/firefox ${PLAYWRIGHT_BROWSERS_PATH}/ \
     # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
@@ -103,13 +99,11 @@ ENV PATH="/root/.local/bin:/home/myuser/.local/bin:$PATH"
 # This instruction:
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
-# - Installs the specified version of the Apify Python SDK and Playwright
+# - Installs the specified version of Playwright
 RUN pip install --upgrade \
     pip \
     setuptools \
-    wheel \
-    apify~=${APIFY_VERSION} \
-    playwright~=${PLAYWRIGHT_VERSION}
+    wheel
 
 # Copy the dummy source code to the image
 COPY --chown=myuser:myuser . .

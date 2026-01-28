@@ -8,9 +8,6 @@ FROM --platform=linux/amd64 python:${PYTHON_VERSION}-slim-trixie
 LABEL maintainer="support@apify.com" \
     description="Base image for Apify Actors written in Python using Playwright with only Camoufox"
 
-# Get the Apify Python SDK version provided as a build argument
-ARG APIFY_VERSION=
-
 # Get the Playwright version provided as a build argument
 ARG PLAYWRIGHT_VERSION=
 
@@ -71,10 +68,9 @@ RUN apt update \
     fonts-wqy-zenhei \
     \
     # Install Playwright browser dependencies for firefox (camoufox is firefox-based)
-    && python -m pip install --user playwright~=${PLAYWRIGHT_VERSION} camoufox~=${CAMOUFOX_VERSION} \
+    && python -m pip install playwright~=${PLAYWRIGHT_VERSION} camoufox~=${CAMOUFOX_VERSION} \
     && python -m playwright install-deps firefox \
     && python -m camoufox fetch \
-    && python -m pip uninstall -y playwright camoufox \
     # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
     && rm -f /root/.cache/camoufox/libnssckbi.so \
     && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so /root/.cache/camoufox/libnssckbi.so \
@@ -105,15 +101,11 @@ ENV PATH="/root/.local/bin:/home/myuser/.local/bin:$PATH"
 # This instruction:
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
-# - Installs the specified version of the Apify Python SDK, Playwright and Camoufox
-# - Fetches the Camoufox browser
+# - Installs the specified version of Playwright and Camoufox
 RUN pip install --upgrade \
     pip \
     setuptools \
-    wheel \
-    apify~=${APIFY_VERSION} \
-    playwright~=${PLAYWRIGHT_VERSION} \
-    camoufox~=${CAMOUFOX_VERSION}
+    wheel
 
 # Copy the dummy source code to the image
 COPY --chown=myuser:myuser . .

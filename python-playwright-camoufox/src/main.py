@@ -1,17 +1,16 @@
-from camoufox.async_api import AsyncCamoufox
+import os
 
 
-async def run_test(headless=True):
-    print(f'Testing Camoufox with {headless=}')
-    async with AsyncCamoufox(headless=headless) as browser:
-        page = await browser.new_page()
-        await page.goto('http://example.com')
-        if 'Example Domain' != await page.title():
-            raise Exception(f'Camoufox failed to load! ({headless=})')
-
-
-async def main():
-    print('Testing docker image by opening Camoufox browser...')
-    await run_test(headless=True)
-    await run_test(headless=False)
-    print('Testing finished successfully.')
+def main():
+    print("=" * 60)
+    print("WARNING: If you see this message, it means you did not")
+    print("set up your Docker image correctly. Please replace this")
+    print("file with your actual application code.")
+    print("=" * 60)
+    print()
+    print("Environment variables set in this image:")
+    print("-" * 60)
+    for key, value in sorted(os.environ.items()):
+        if key.startswith(("PYTHON", "PIP", "PATH", "APIFY", "CRAWLEE", "PLAYWRIGHT", "XVFB")):
+            print(f"  {key}={value}")
+    print("-" * 60)

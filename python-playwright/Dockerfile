@@ -8,9 +8,6 @@ FROM --platform=linux/amd64 python:${PYTHON_VERSION}-slim-trixie
 LABEL maintainer="support@apify.com" \
     description="Base image for Apify Actors written in Python using Playwright with headless Chrome"
 
-# Get the Apify Python SDK version provided as a build argument
-ARG APIFY_VERSION=
-
 # Get the Playwright version provided as a build argument
 ARG PLAYWRIGHT_VERSION=
 
@@ -88,10 +85,9 @@ RUN apt update \
     && echo '{ "ComponentUpdatesEnabled": false }' > /etc/opt/chrome/policies/managed/component_update.json \
     \
     # Install Playwright browser dependencies and browsers
-    && python -m pip install --user playwright~=${PLAYWRIGHT_VERSION} \
+    && python -m pip install playwright~=${PLAYWRIGHT_VERSION} \
     && python -m playwright install-deps \
     && python -m playwright install \
-    && python -m pip uninstall -y playwright \
     \
     # Add user so we don't need --no-sandbox.
     && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
@@ -119,14 +115,11 @@ ENV PATH="/root/.local/bin:/home/myuser/.local/bin:$PATH"
 # This instruction:
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
-# - Installs the specified version of the Apify Python SDK and Playwright
 # - Prints out the Google Chrome version
 RUN pip install --upgrade \
     pip \
     setuptools \
     wheel \
-    apify~=${APIFY_VERSION} \
-    playwright~=${PLAYWRIGHT_VERSION} \
     && echo "Google Chrome version: $(bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version")"
 
 # Copy the dummy source code to the image

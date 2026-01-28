@@ -10,8 +10,6 @@ PKG_JSON_PW_VERSION = $(subst v,,$(subst -,,$(PLAYWRIGHT_VERSION)))
 
 # Python
 PYTHON_VERSION ?= 3.14
-# Apify latest version (python does not support the 'latest' tag)
-PYTHON_APIFY_VERSION ?= 3.1.0
 PYTHON_PLAYWRIGHT_VERSION = $(subst v,,$(subst -,,$(PLAYWRIGHT_VERSION)))
 PYTHON_SELENIUM_VERSION ?= 4.14.0
 PYTHON_CAMOUFOX_VERSION ?= 0.4.11
@@ -204,7 +202,7 @@ test-node-puppeteer-chrome:
 test-python:
 	@echo "Building python with version $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX)"
 
-	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --file ./python/Dockerfile --tag apify/python:local --load ./python
+	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --file ./python/Dockerfile --tag apify/python:local --load ./python
 	docker run --rm -it --platform linux/amd64 apify/python:local
 
 	@# Delete docker image
@@ -216,7 +214,7 @@ test-python-playwright:
 	@# Copy Firefox certificates
 	$(call copy-firefox-certs,python-playwright)
 
-	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --file ./python-playwright/Dockerfile --tag apify/python-playwright:local --load ./python-playwright
+	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --file ./python-playwright/Dockerfile --tag apify/python-playwright:local --load ./python-playwright
 	docker run --rm -it --platform linux/amd64 apify/python-playwright:local
 
 	@# Cleanup certificates
@@ -228,7 +226,7 @@ test-python-playwright:
 test-python-playwright-chrome:
 	@echo "Building python-playwright-chrome with Python $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX) and Playwright $(PYTHON_PLAYWRIGHT_VERSION)"
 
-	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --file ./python-playwright-chrome/Dockerfile --tag apify/python-playwright-chrome:local --load ./python-playwright-chrome
+	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --file ./python-playwright-chrome/Dockerfile --tag apify/python-playwright-chrome:local --load ./python-playwright-chrome
 	docker run --rm -it --platform linux/amd64 apify/python-playwright-chrome:local
 
 	@# Delete docker image
@@ -240,7 +238,7 @@ test-python-playwright-firefox:
 	@# Copy Firefox certificates
 	$(call copy-firefox-certs,python-playwright-firefox)
 
-	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --file ./python-playwright-firefox/Dockerfile --tag apify/python-playwright-firefox:local --load ./python-playwright-firefox
+	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --file ./python-playwright-firefox/Dockerfile --tag apify/python-playwright-firefox:local --load ./python-playwright-firefox
 	docker run --rm -it --platform linux/amd64 apify/python-playwright-firefox:local
 
 	@# Cleanup certificates
@@ -252,7 +250,7 @@ test-python-playwright-firefox:
 test-python-playwright-webkit:
 	@echo "Building python-playwright-webkit with Python $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX) and Playwright $(PYTHON_PLAYWRIGHT_VERSION)"
 
-	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --file ./python-playwright-webkit/Dockerfile --tag apify/python-playwright-webkit:local --load ./python-playwright-webkit
+	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --file ./python-playwright-webkit/Dockerfile --tag apify/python-playwright-webkit:local --load ./python-playwright-webkit
 	docker run --rm -it --platform linux/amd64 apify/python-playwright-webkit:local
 
 	@# Delete docker image
@@ -264,7 +262,7 @@ test-python-playwright-camoufox:
 	@# Copy Firefox certificates
 	$(call copy-firefox-certs,python-playwright-camoufox)
 
-	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --build-arg CAMOUFOX_VERSION=$(PYTHON_CAMOUFOX_VERSION) --file ./python-playwright-camoufox/Dockerfile --tag apify/python-playwright-camoufox:local --load ./python-playwright-camoufox
+	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --build-arg CAMOUFOX_VERSION=$(PYTHON_CAMOUFOX_VERSION) --file ./python-playwright-camoufox/Dockerfile --tag apify/python-playwright-camoufox:local --load ./python-playwright-camoufox
 	docker run --rm -it --platform linux/amd64 apify/python-playwright-camoufox:local
 
 	@# Cleanup certificates
@@ -276,7 +274,7 @@ test-python-playwright-camoufox:
 test-python-selenium:
 	@echo "Building python-selenium with version $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX)"
 
-	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg APIFY_VERSION=$(PYTHON_APIFY_VERSION) --build-arg SELENIUM_VERSION=$(PYTHON_SELENIUM_VERSION) --file ./python-selenium/Dockerfile --tag apify/python-selenium:local --load ./python-selenium
+	docker buildx build --platform linux/amd64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg SELENIUM_VERSION=$(PYTHON_SELENIUM_VERSION) --file ./python-selenium/Dockerfile --tag apify/python-selenium:local --load ./python-selenium
 	docker run --rm -it --platform linux/amd64 apify/python-selenium:local
 
 	@# Delete docker image

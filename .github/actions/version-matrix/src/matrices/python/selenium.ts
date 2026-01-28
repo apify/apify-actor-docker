@@ -9,7 +9,6 @@ import {
 import { fetchPackageVersions } from '../../shared/pypi.ts';
 
 const versions = await fetchPackageVersions('selenium');
-const apifyVersions = await fetchPackageVersions('apify');
 
 if (!shouldUseLastFive) {
 	console.warn('Testing with only the latest version of selenium to speed up CI');
@@ -17,20 +16,12 @@ if (!shouldUseLastFive) {
 
 const lastFiveSeleniumVersions = versions.slice(shouldUseLastFive ? -5 : -1);
 const latestSeleniumVersion = lastFiveSeleniumVersions.at(-1)!;
-let latestApifyVersion = apifyVersions.at(-1)!;
 
 console.error('Last five versions:', lastFiveSeleniumVersions);
 console.error('Latest selenium version:', latestSeleniumVersion);
-console.error('Latest apify version:', latestApifyVersion);
-
-if (process.env.APIFY_VERSION) {
-	console.error('Using custom apify version:', process.env.APIFY_VERSION);
-	latestApifyVersion = process.env.APIFY_VERSION;
-}
 
 const cacheParams: CacheValues = {
 	PYTHON_VERSION: supportedPythonVersions,
-	APIFY_VERSION: [latestApifyVersion],
 	SELENIUM_VERSION: lastFiveSeleniumVersions,
 };
 
@@ -49,7 +40,6 @@ const matrix = {
 		'image-name': 'python-selenium';
 		'python-version': string;
 		'selenium-version': string;
-		'apify-version': string;
 		'is-latest': 'true' | 'false';
 		'latest-python-version': string;
 	}[],
@@ -61,7 +51,6 @@ for (const pythonVersion of supportedPythonVersions) {
 			'image-name': 'python-selenium',
 			'python-version': pythonVersion,
 			'selenium-version': seleniumVersion,
-			'apify-version': latestApifyVersion,
 			'is-latest': seleniumVersion === latestSeleniumVersion ? 'true' : 'false',
 			'latest-python-version': latestPythonVersion,
 		});
