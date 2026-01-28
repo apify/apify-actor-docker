@@ -83,6 +83,7 @@ RUN apt update \
     && python -m playwright install-deps chrome \
     && python -m playwright install chrome \
     && python -m playwright install chromium \
+    && python -m pip uninstall -y playwright \
     # symlink the chromium binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
     && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/chromium-*/chrome-linux*/chrome ${PLAYWRIGHT_BROWSERS_PATH}/ \
     \
@@ -114,6 +115,7 @@ RUN pip install --upgrade \
     pip \
     setuptools \
     wheel \
+    playwright~=${PLAYWRIGHT_VERSION} \
     && echo "Google Chrome version: $(bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version")"
 
 # Copy the dummy source code to the image

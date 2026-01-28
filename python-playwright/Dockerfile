@@ -85,9 +85,10 @@ RUN apt update \
     && echo '{ "ComponentUpdatesEnabled": false }' > /etc/opt/chrome/policies/managed/component_update.json \
     \
     # Install Playwright browser dependencies and browsers
-    && python -m pip install playwright~=${PLAYWRIGHT_VERSION} \
+    && python -m pip install playwright \
     && python -m playwright install-deps \
     && python -m playwright install \
+    && python -m pip uninstall -y playwright \
     \
     # Add user so we don't need --no-sandbox.
     && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
@@ -115,11 +116,13 @@ ENV PATH="/root/.local/bin:/home/myuser/.local/bin:$PATH"
 # This instruction:
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
+# - Installs the specified version of Playwright
 # - Prints out the Google Chrome version
 RUN pip install --upgrade \
     pip \
     setuptools \
     wheel \
+    playwright~=${PLAYWRIGHT_VERSION} \
     && echo "Google Chrome version: $(bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version")"
 
 # Copy the dummy source code to the image

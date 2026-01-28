@@ -71,6 +71,7 @@ RUN apt update \
     && python -m pip install playwright~=${PLAYWRIGHT_VERSION} camoufox~=${CAMOUFOX_VERSION} \
     && python -m playwright install-deps firefox \
     && python -m camoufox fetch \
+    && python -m pip uninstall -y playwright \
     # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
     && rm -f /root/.cache/camoufox/libnssckbi.so \
     && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so /root/.cache/camoufox/libnssckbi.so \
@@ -105,7 +106,8 @@ ENV PATH="/root/.local/bin:/home/myuser/.local/bin:$PATH"
 RUN pip install --upgrade \
     pip \
     setuptools \
-    wheel
+    wheel \
+    playwright~=${PLAYWRIGHT_VERSION}
 
 # Copy the dummy source code to the image
 COPY --chown=myuser:myuser . .

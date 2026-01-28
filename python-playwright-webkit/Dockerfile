@@ -63,6 +63,7 @@ RUN apt update \
     && python -m playwright install-deps webkit \
     && apt install -y libgtk-3-0 \
     && python -m playwright install webkit \
+    && python -m pip uninstall -y playwright \
     # symlink the webkit binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
     && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/webkit-*/minibrowser-gtk/MiniBrowser ${PLAYWRIGHT_BROWSERS_PATH}/ \
     \
@@ -92,7 +93,8 @@ ENV PATH="/root/.local/bin:/home/myuser/.local/bin:$PATH"
 RUN pip install --upgrade \
     pip \
     setuptools \
-    wheel
+    wheel \
+    playwright~=${PLAYWRIGHT_VERSION}
 
 # Copy the dummy source code to the image
 COPY --chown=myuser:myuser . .

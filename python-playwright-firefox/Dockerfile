@@ -67,6 +67,7 @@ RUN apt update \
     && python -m pip install playwright~=${PLAYWRIGHT_VERSION} \
     && python -m playwright install-deps firefox \
     && python -m playwright install firefox \
+    && python -m pip uninstall -y playwright \
     # symlink the firefox binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
     && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/firefox-*/firefox/firefox ${PLAYWRIGHT_BROWSERS_PATH}/ \
     # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
@@ -103,7 +104,8 @@ ENV PATH="/root/.local/bin:/home/myuser/.local/bin:$PATH"
 RUN pip install --upgrade \
     pip \
     setuptools \
-    wheel
+    wheel \
+    playwright~=${PLAYWRIGHT_VERSION}
 
 # Copy the dummy source code to the image
 COPY --chown=myuser:myuser . .
