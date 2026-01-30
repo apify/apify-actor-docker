@@ -1,15 +1,18 @@
 # Get the Python version provided as a build argument
 ARG PYTHON_VERSION=
 
-# Extend from the latest Debian and its slim version to keep the image as small as possible
+# Use trixie-slim to be consistent across python versions
 FROM --platform=linux/amd64 python:${PYTHON_VERSION}-slim-trixie
 
 # Add labels to the image to identify it as an Apify Actor
 LABEL maintainer="support@apify.com" \
-    description="Base image for Apify Actors written in Python using Playwright with headless Chrome"
+    description="Base image for Apify Actors written in Python using Playwright with only Camoufox"
 
 # Get the Playwright version provided as a build argument
 ARG PLAYWRIGHT_VERSION=
+
+# Get the Camoufox version provided as a build argument
+ARG CAMOUFOX_VERSION=
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -40,8 +43,8 @@ ENV PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
 # Tell the crawlee cli that we already have browsers installed, so it skips installing them
 ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 
-# Sets path to Chrome executable
-ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
+# Camoufox stores its browser in ~/.cache/camoufox
+ENV APIFY_DEFAULT_BROWSER_PATH=/root/.cache/camoufox/camoufox-bin
 
 # Copy the script for registering intermediate certificates and the pre-downloaded certificates
 COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
@@ -55,40 +58,27 @@ RUN apt update \
     ca-certificates jq p11-kit \
     # Found this in other images, not sure whether it's needed, it does not come from Playwright deps
     procps \
-    # Packages for Google signing key
-    gnupg unzip \
-     # Add Google Linux signing key
-    && wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub \
-        | gpg --dearmor \
-        | tee /usr/share/keyrings/google-linux-signing.gpg > /dev/null \
-    # Add Google Chrome APT repo
-    && sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing.gpg] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' \
     && sh -c 'echo "deb http://ftp.us.debian.org/debian trixie main non-free" >> /etc/apt/sources.list.d/fonts.list' \
     && apt update \
     && apt install -y --no-install-recommends \
-    # Install Google Chrome
-    google-chrome-stable \
     # Extras
     fonts-freefont-ttf \
     fonts-kacst-one \
     fonts-thai-tlwg \
     fonts-wqy-zenhei \
     \
+    # Install Playwright browser dependencies for firefox (camoufox is firefox-based)
+    && python -m pip install playwright~=${PLAYWRIGHT_VERSION} camoufox~=${CAMOUFOX_VERSION} \
+    && python -m playwright install-deps firefox \
+    && python -m camoufox fetch \
+    && python -m pip uninstall -y playwright \
+    # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
+    && rm -f /root/.cache/camoufox/libnssckbi.so \
+    && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so /root/.cache/camoufox/libnssckbi.so \
+    \
     # Register certificates
     && chmod +x ./register_intermediate_certs.sh \
     && ./register_intermediate_certs.sh \
-    \
-    # Disable chrome auto updates, based on https://support.google.com/chrome/a/answer/9052345
-    && mkdir -p /etc/default && echo 'repo_add_once=false' > /etc/default/google-chrome \
-    && mkdir -p /etc/opt/chrome/policies/managed \
-    && echo '{ "CommandLineFlagSecurityWarningsEnabled": false }' > /etc/opt/chrome/policies/managed/managed_policies.json \
-    && echo '{ "ComponentUpdatesEnabled": false }' > /etc/opt/chrome/policies/managed/component_update.json \
-    \
-    # Install Playwright browser dependencies and browsers
-    && python -m pip install playwright \
-    && python -m playwright install-deps \
-    && python -m playwright install \
-    && python -m pip uninstall -y playwright \
     \
     # Add user so we don't need --no-sandbox.
     && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
@@ -103,11 +93,7 @@ RUN apt update \
     && rm -rf /src/*.deb \
     && apt clean -y && apt autoremove -y \
     # This is needed to remove an annoying error message when running headful.
-    && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix \
-    \
-    # Override the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
-    && rm -f $PLAYWRIGHT_BROWSERS_PATH/firefox-*/firefox/libnssckbi.so \
-    && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so $(ls -d $PLAYWRIGHT_BROWSERS_PATH/firefox-*)/firefox/libnssckbi.so
+    && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
 
 WORKDIR /usr/src/app
 
@@ -116,14 +102,12 @@ ENV PATH="/root/.local/bin:/home/myuser/.local/bin:$PATH"
 # This instruction:
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
-# - Installs the specified version of Playwright
-# - Prints out the Google Chrome version
+# - Installs the specified version of Playwright and Camoufox
 RUN pip install --upgrade \
     pip \
     setuptools \
     wheel \
-    playwright~=${PLAYWRIGHT_VERSION} \
-    && echo "Google Chrome version: $(bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version")"
+    playwright~=${PLAYWRIGHT_VERSION}
 
 # Copy the dummy source code to the image
 COPY --chown=myuser:myuser . .

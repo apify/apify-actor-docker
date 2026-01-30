@@ -2,3 +2,9 @@
 npm-debug.log
 node_modules
 .DS_Store
+
+# Temporary Firefox certificates copied to image folders during build
+*/firefox-certs/
+
+# Individual certificate files (we track the zip archive instead)
+certificates/certs/

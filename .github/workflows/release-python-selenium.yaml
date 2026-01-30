@@ -6,9 +6,6 @@ on:
       release_tag:
         description: 'Tag for the images (e.g.: "latest" or "beta")'
         required: true
-      apify_version:
-        description: 'Apify Python SDK version (e.g.: "1.0.0"). If missing, the latest version will be used.'
-        required: false
       rebuild_images:
         description: "Rebuilds images even if the cache state matches the current state."
         required: false
@@ -28,7 +25,6 @@ on:
 
 env:
   RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag }}
-  APIFY_VERSION: ${{ github.event.inputs.apify_version || github.event.client_payload.apify_version }}
   SHOULD_USE_LAST_FIVE: ${{ github.event_name != 'pull_request' }}
   SKIP_CACHE_CHECK: ${{ github.event_name == 'pull_request' || github.event.inputs.rebuild_images == 'true' }}
 
@@ -61,7 +57,7 @@ jobs:
 
       - name: Print matrix
         run: |
-          echo '${{ steps.set-matrix.outputs.matrix }}' | jq -r '.include[] | "python-version=\(.["python-version"]) selenium-version=\(.["selenium-version"]) apify-version=\(.["apify-version"]) is-latest=\(.["is-latest"])"'
+          echo '${{ steps.set-matrix.outputs.matrix }}' | jq -r '.include[] | "python-version=\(.["python-version"]) selenium-version=\(.["selenium-version"]) is-latest=\(.["is-latest"])"'
           echo ""
           echo "Raw matrix:"
           echo ""
@@ -114,51 +110,25 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}
 
-    name: "py: ${{ matrix.python-version }}, selenium: ${{ matrix.selenium-version }}, apify: ${{ matrix.apify-version }}, is-latest: ${{ matrix.is-latest }}"
+    name: "py: ${{ matrix.python-version }}, selenium: ${{ matrix.selenium-version }}, is-latest: ${{ matrix.is-latest }}"
 
     steps:
       - name: Set default inputs if event is pull request
         if: github.event_name == 'pull_request'
         run: |
           if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=CI_TEST" >> $GITHUB_ENV; fi
-          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=${{ matrix.apify-version }}" >> $GITHUB_ENV; fi
 
       - name: Set default inputs if event is schedule
         if: github.event_name == 'schedule'
         run: |
           if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=latest" >> $GITHUB_ENV; fi
-          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=${{ matrix.apify-version }}" >> $GITHUB_ENV; fi
-
-      - name: Set default inputs if event is workflow_dispatch or repository_dispatch
-        if: github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch'
-        run: |
-          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION=${{ matrix.apify-version }}" >> $GITHUB_ENV; fi
 
       - name: Check if inputs are set correctly
         run: |
           if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG input is empty!" >&2; exit 1; fi
-          if [[ -z "$APIFY_VERSION" ]]; then echo "APIFY_VERSION input is empty!" >&2; exit 1; fi
 
       - name: Checkout
         uses: actions/checkout@v6
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Update pip
-        run: python -m pip install --upgrade pip
-
-      - # It seems that it takes a few minutes before a newly published version
-        # becomes available in the PyPI registry. We wait before starting the image builds.
-        name: Wait For Package Registry
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 2 # timeout for a single attempt
-          max_attempts: 3
-          retry_wait_seconds: 60 # wait between retries
-          command: pip install apify~=$APIFY_VERSION
 
       - name: Prepare image tags
         id: prepare-tags
@@ -188,7 +158,6 @@ jobs:
           file: ./${{ matrix.image-name }}/Dockerfile
           build-args: |
             PYTHON_VERSION=${{ matrix.python-version }}
-            APIFY_VERSION=${{ env.APIFY_VERSION }}
             SELENIUM_VERSION=${{ matrix.selenium-version }}
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}

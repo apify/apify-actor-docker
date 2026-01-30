@@ -11,9 +11,6 @@ LABEL maintainer="support@apify.com" \
 # Set the shell to use /bin/bash with specific options (see Hadolint DL4006)
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# Get the Apify Python SDK version provided as a build argument
-ARG APIFY_VERSION
-
 # Don't store bytecode, the Python app will be only run once
 ENV PYTHONDONTWRITEBYTECODE=1
 
@@ -53,15 +50,13 @@ ENV PATH="/root/.local/bin:/home/myuser/.local/bin:$PATH"
 # This instruction:
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
-# - Installs the specified version of the Apify Python SDK
 RUN pip install --upgrade \
     pip \
     setuptools \
-    wheel \
-    apify~=${APIFY_VERSION}
+    wheel
 
 # Copy the dummy source code to the image
 COPY --chown=myuser:myuser . .
 
 # Set default startup command, using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD ["python3", "-m", "src"]
+CMD ["python", "-m", "src"]

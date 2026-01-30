@@ -1,16 +1,35 @@
-# Get the Node.js version provided as a build argument
-ARG NODE_VERSION=
+# Get the Python version provided as a build argument
+ARG PYTHON_VERSION=
 
-# Use trixie to be consistent across node versions.
-FROM --platform=linux/amd64 node:${NODE_VERSION}-trixie-slim
+# Use trixie-slim to be consistent across python versions
+FROM --platform=linux/amd64 python:${PYTHON_VERSION}-slim-trixie
 
+# Add labels to the image to identify it as an Apify Actor
 LABEL maintainer="support@apify.com" \
-    description="Base image for Apify Actors written in Node.js using Playwright with Firefox"
+    description="Base image for Apify Actors written in Python using Playwright with only Firefox"
+
+# Get the Playwright version provided as a build argument
+ARG PLAYWRIGHT_VERSION=
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Set the shell to use /bin/bash with specific options (see Hadolint DL4006)
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Don't store bytecode, the Python app will be only run once
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Don't buffer output and flush it straight away
+ENV PYTHONUNBUFFERED=1
+
+# Don't use a cache dir
+ENV PIP_NO_CACHE_DIR=1
+
+# Disable warnings about outdated pip
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Disable warnings about running pip as root
+ENV PIP_ROOT_USER_ACTION=ignore
 
 # Set up XVFB
 ENV XVFB_WHD=1920x1080x24+32
@@ -23,30 +42,32 @@ ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 
 ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/firefox
 
-# Prevent installing of browsers by future `npm install`.
-ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-
 # Copy the script for registering intermediate certificates and the pre-downloaded certificates
 COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
 COPY ./firefox-certs /tmp/firefox-certs
 
 RUN apt update \
     && apt install --fix-missing -yq --no-install-recommends \
-    # Install xvfb, xauth, wget, curl, git
-    xvfb xauth wget curl git \
+    # Install xvfb, xauth, wget, git
+    xvfb xauth wget git \
     # The following packages are needed for the intermediate certificates to work in Firefox.
     ca-certificates jq p11-kit \
     # Found this in other images, not sure whether it's needed, it does not come from Playwright deps
     procps \
+    && sh -c 'echo "deb http://ftp.us.debian.org/debian trixie main non-free" >> /etc/apt/sources.list.d/fonts.list' \
+    && apt update \
+    && apt install -y --no-install-recommends \
     # Extras
     fonts-freefont-ttf \
     fonts-kacst-one \
     fonts-thai-tlwg \
     fonts-wqy-zenhei \
     \
-    # Install playwright browser dependencies and browsers for chrome
-    && npx playwright install-deps firefox \
-    && npx playwright install firefox \
+    # Install Playwright browser dependencies and browsers
+    && python -m pip install playwright~=${PLAYWRIGHT_VERSION} \
+    && python -m playwright install-deps firefox \
+    && python -m playwright install firefox \
+    && python -m pip uninstall -y playwright \
     # symlink the firefox binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
     && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/firefox-*/firefox/firefox ${PLAYWRIGHT_BROWSERS_PATH}/ \
     # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
@@ -61,51 +82,35 @@ RUN apt update \
     && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser \
-    \
-    # Globally disable the update-notifier.
-    && npm config --global set update-notifier false \
+    && mkdir -p /usr/src/app \
+    && chown -R myuser:myuser /usr/src/app \
+    && ln -s /usr/src/app /home/myuser \
     \
     # Cleanup time
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
     && apt clean -y && apt autoremove -y \
-    && rm -rf /root/.npm \
     # This is needed to remove an annoying error message when running headful.
     && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
 
-# Run everything after as non-privileged user.
-USER myuser
-WORKDIR /home/myuser
+WORKDIR /usr/src/app
 
-# Copy source code and xvfb script
-COPY --chown=myuser:myuser package.json main.js check-playwright-version.mjs firefox_test.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh xvfb-entrypoint.sh /home/myuser/
+ENV PATH="/root/.local/bin:/home/myuser/.local/bin:$PATH"
 
-# Tell Node.js this is a production environment
-ENV NODE_ENV=production
+# This instruction:
+# - Upgrades pip to the latest version
+# - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
+# - Installs the specified version of Playwright
+RUN pip install --upgrade \
+    pip \
+    setuptools \
+    wheel \
+    playwright~=${PLAYWRIGHT_VERSION}
 
-# Enable Node.js process to use a lot of memory (Actor has limit of 32GB)
-# Increases default size of headers. The original limit was 80kb, but from node 10+ they decided to lower it to 8kb.
-# However they did not think about all the sites there with large headers,
-# so we put back the old limit of 80kb, which seems to work just fine.
-ENV NODE_OPTIONS="--max_old_space_size=30000 --max-http-header-size=80000"
-
-# Install default dependencies, print versions of everything
-RUN npm --quiet set progress=false \
-    && npm install --omit=dev --omit=optional --no-package-lock --prefer-online \
-    && echo "Installed NPM packages:" \
-    && (npm list --omit=dev --omit=optional || true) \
-    && echo "Node.js version:" \
-    && node --version \
-    && echo "NPM version:" \
-    && npm --version \
-    \
-    # Playwright allows downloading only one browser through separate package with same export. So we rename it to just playwright.
-    && mv ./node_modules/playwright-firefox ./node_modules/playwright && rm -rf ./node_modules/playwright-firefox
+# Copy the dummy source code to the image
+COPY --chown=myuser:myuser . .
 
 # The entrypoint script will be the one handling the CMD passed in, and will always wrap it into xvfb-run
-ENTRYPOINT ["/home/myuser/xvfb-entrypoint.sh"]
+ENTRYPOINT ["./xvfb-entrypoint.sh"]
 
-# NOTEs:
-# - This needs to be compatible with CLI.
-# - Using CMD instead of ENTRYPOINT, to allow manual overriding
-CMD ["npm", "start", "--silent"]
+CMD ["python", "-m", "src"]

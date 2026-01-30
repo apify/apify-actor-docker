@@ -1,5 +1,10 @@
 import { satisfies } from 'semver';
-import { type CacheValues, needsToRunMatrixGeneration, updateCacheState } from '../../shared/cache.ts';
+import {
+	type CacheValues,
+	getCertificatesUpdatedAt,
+	needsToRunMatrixGeneration,
+	updateCacheState,
+} from '../../shared/cache.ts';
 import {
 	emptyMatrix,
 	latestPythonVersion,
@@ -20,30 +25,29 @@ const playwrightPythonVersionConstraints = [
 	['>=3.13.x', '>=1.48.0'],
 ];
 
-const versions = await fetchPackageVersions('playwright');
-const apifyVersions = await fetchPackageVersions('apify');
+const playwrightVersions = await fetchPackageVersions('playwright');
+const camoufoxVersions = await fetchPackageVersions('camoufox');
 
 if (!shouldUseLastFive) {
 	console.warn('Testing with only the latest version of playwright to speed up CI');
 }
 
-const lastFivePlaywrightVersions = versions.slice(shouldUseLastFive ? -5 : -1);
-const latestPlaywrightVersion = lastFivePlaywrightVersions.at(-1)!;
-let latestApifyVersion = apifyVersions.at(-1)!;
+const latestFivePlaywrightVersions = playwrightVersions.slice(shouldUseLastFive ? -5 : -1);
+const latestPlaywrightVersion = latestFivePlaywrightVersions.at(-1)!;
+const latestCamoufoxVersion = camoufoxVersions.at(-1)!;
 
-console.error('Last five versions:', lastFivePlaywrightVersions);
+const certificatesUpdatedAt = await getCertificatesUpdatedAt();
+
+console.error('Last five versions:', latestFivePlaywrightVersions);
 console.error('Latest playwright version:', latestPlaywrightVersion);
-console.error('Latest apify version:', latestApifyVersion);
-
-if (process.env.APIFY_VERSION) {
-	console.error('Using custom apify version:', process.env.APIFY_VERSION);
-	latestApifyVersion = process.env.APIFY_VERSION;
-}
+console.error('Latest camoufox version:', latestCamoufoxVersion);
+console.error('Certificates updated at:', certificatesUpdatedAt || '(not available)');
 
 const cacheParams: CacheValues = {
 	PYTHON_VERSION: supportedPythonVersions,
-	APIFY_VERSION: [latestApifyVersion],
-	PLAYWRIGHT_VERSION: lastFivePlaywrightVersions,
+	PLAYWRIGHT_VERSION: latestFivePlaywrightVersions,
+	CAMOUFOX_VERSION: [latestCamoufoxVersion],
+	CERTIFICATES_UPDATED_AT: certificatesUpdatedAt ? [certificatesUpdatedAt] : [],
 };
 
 await setParametersForTriggeringUpdateWorkflowOnActorTemplates('python', latestPlaywrightVersion);
@@ -56,12 +60,20 @@ if (!(await needsToRunMatrixGeneration('python:playwright', cacheParams))) {
 	process.exit(0);
 }
 
+const imageNames = [
+	'python-playwright',
+	'python-playwright-chrome',
+	'python-playwright-firefox',
+	'python-playwright-webkit',
+	'python-playwright-camoufox',
+] as const;
+
 const matrix = {
 	include: [] as {
-		'image-name': 'python-playwright';
+		'image-name': (typeof imageNames)[number];
 		'python-version': string;
 		'playwright-version': string;
-		'apify-version': string;
+		'camoufox-version': string;
 		'is-latest': 'true' | 'false';
 		'latest-python-version': string;
 	}[],
@@ -72,21 +84,28 @@ for (const pythonVersion of supportedPythonVersions) {
 		return satisfies(`${pythonVersion}.0`, constraint);
 	})?.[1];
 
-	for (const playwrightVersion of lastFivePlaywrightVersions) {
+	for (const playwrightVersion of latestFivePlaywrightVersions) {
 		if (maybePlaywrightVersionConstraint) {
 			if (!satisfies(playwrightVersion, maybePlaywrightVersionConstraint)) {
 				continue;
 			}
 		}
 
-		matrix.include.push({
-			'image-name': 'python-playwright',
-			'python-version': pythonVersion,
-			'playwright-version': playwrightVersion,
-			'apify-version': latestApifyVersion,
-			'is-latest': playwrightVersion === latestPlaywrightVersion ? 'true' : 'false',
-			'latest-python-version': latestPythonVersion,
-		});
+		for (const imageName of imageNames) {
+			// Skip camoufox for Python 3.9 (requires Python 3.10+)
+			if (imageName.includes('camoufox') && pythonVersion === '3.9') {
+				continue;
+			}
+
+			matrix.include.push({
+				'image-name': imageName,
+				'python-version': pythonVersion,
+				'playwright-version': playwrightVersion,
+				'camoufox-version': latestCamoufoxVersion,
+				'is-latest': playwrightVersion === latestPlaywrightVersion ? 'true' : 'false',
+				'latest-python-version': latestPythonVersion,
+			});
+		}
 	}
 }
 
