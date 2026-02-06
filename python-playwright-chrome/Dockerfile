@@ -1,12 +1,12 @@
 # Get the Python version provided as a build argument
 ARG PYTHON_VERSION=
 
-# Extend from the latest Debian and its slim version to keep the image as small as possible
+# Use trixie-slim to be consistent across python versions
 FROM --platform=linux/amd64 python:${PYTHON_VERSION}-slim-trixie
 
 # Add labels to the image to identify it as an Apify Actor
 LABEL maintainer="support@apify.com" \
-    description="Base image for Apify Actors written in Python using Playwright with headless Chrome"
+    description="Base image for Apify Actors written in Python using Playwright with only Chrome/Chromium"
 
 # Get the Playwright version provided as a build argument
 ARG PLAYWRIGHT_VERSION=
@@ -43,9 +43,7 @@ ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 # Sets path to Chrome executable
 ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
 
-# Copy the script for registering intermediate certificates and the pre-downloaded certificates
-COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
-COPY ./firefox-certs /tmp/firefox-certs
+ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/chrome
 
 RUN apt update \
     && apt install --fix-missing -yq --no-install-recommends \
@@ -74,10 +72,6 @@ RUN apt update \
     fonts-thai-tlwg \
     fonts-wqy-zenhei \
     \
-    # Register certificates
-    && chmod +x ./register_intermediate_certs.sh \
-    && ./register_intermediate_certs.sh \
-    \
     # Disable chrome auto updates, based on https://support.google.com/chrome/a/answer/9052345
     && mkdir -p /etc/default && echo 'repo_add_once=false' > /etc/default/google-chrome \
     && mkdir -p /etc/opt/chrome/policies/managed \
@@ -85,10 +79,13 @@ RUN apt update \
     && echo '{ "ComponentUpdatesEnabled": false }' > /etc/opt/chrome/policies/managed/component_update.json \
     \
     # Install Playwright browser dependencies and browsers
-    && python -m pip install playwright \
-    && python -m playwright install-deps \
-    && python -m playwright install \
+    && python -m pip install playwright~=${PLAYWRIGHT_VERSION} \
+    && python -m playwright install-deps chrome \
+    && python -m playwright install chrome \
+    && python -m playwright install chromium \
     && python -m pip uninstall -y playwright \
+    # symlink the chromium binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
+    && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/chromium-*/chrome-linux*/chrome ${PLAYWRIGHT_BROWSERS_PATH}/ \
     \
     # Add user so we don't need --no-sandbox.
     && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
@@ -103,11 +100,7 @@ RUN apt update \
     && rm -rf /src/*.deb \
     && apt clean -y && apt autoremove -y \
     # This is needed to remove an annoying error message when running headful.
-    && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix \
-    \
-    # Override the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
-    && rm -f $PLAYWRIGHT_BROWSERS_PATH/firefox-*/firefox/libnssckbi.so \
-    && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so $(ls -d $PLAYWRIGHT_BROWSERS_PATH/firefox-*)/firefox/libnssckbi.so
+    && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
 
 WORKDIR /usr/src/app
 

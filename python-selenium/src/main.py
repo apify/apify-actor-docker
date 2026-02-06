@@ -1,25 +1,16 @@
-from selenium.webdriver.chrome.options import Options as ChromeOptions
-from selenium.webdriver.firefox.options import Options as FirefoxOptions
-from selenium import webdriver
+import os
+
 
 def main():
-    print('Testing Docker image...')
-
-    for (browser_name, driver_class, options_class) in [('Chrome', webdriver.Chrome, ChromeOptions), ('Firefox', webdriver.Firefox, FirefoxOptions)]:
-        for headless in [True, False]:
-            print(f'Testing {browser_name}, {headless=}...')
-
-            options = options_class()
-            options.add_argument('--no-sandbox')
-            options.add_argument('--disable-dev-shm-usage')
-            if headless:
-                options.add_argument('--headless')
-
-            driver = driver_class(options=options)
-
-            driver.get('http://www.example.com')
-            assert driver.title == 'Example Domain'
-
-            driver.quit()
-
-    print('Tests succeeded!')
+    print("=" * 60)
+    print("WARNING: If you see this message, it means you did not")
+    print("set up your Docker image correctly. Please replace this")
+    print("file with your actual application code.")
+    print("=" * 60)
+    print()
+    print("Environment variables set in this image:")
+    print("-" * 60)
+    for key, value in sorted(os.environ.items()):
+        if key.startswith(("PYTHON", "PIP", "PATH", "APIFY", "CRAWLEE", "XVFB")):
+            print(f"  {key}={value}")
+    print("-" * 60)

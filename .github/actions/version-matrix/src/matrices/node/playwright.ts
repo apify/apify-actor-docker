@@ -1,4 +1,9 @@
-import { type CacheValues, needsToRunMatrixGeneration, updateCacheState } from '../../shared/cache.ts';
+import {
+	type CacheValues,
+	getCertificatesUpdatedAt,
+	needsToRunMatrixGeneration,
+	updateCacheState,
+} from '../../shared/cache.ts';
 import {
 	emptyMatrix,
 	latestNodeVersion,
@@ -23,10 +28,13 @@ let latestApifyVersion = apifyVersions.at(-1)!;
 let latestCrawleeVersion = crawleeVersions.at(-1)!;
 let latestCamoufoxVersion = camoufoxVersions.at(-1)!;
 
+const certificatesUpdatedAt = await getCertificatesUpdatedAt();
+
 console.error('Latest five versions', latestFivePlaywrightVersions);
 console.error('Latest apify version', latestApifyVersion);
 console.error('Latest crawlee version', latestCrawleeVersion);
 console.error('Latest camoufox version', latestCamoufoxVersion);
+console.error('Certificates updated at', certificatesUpdatedAt || '(not available)');
 
 if (process.env.CRAWLEE_VERSION) {
 	console.error('Using custom crawlee version:', process.env.CRAWLEE_VERSION);
@@ -44,6 +52,7 @@ const cacheParams: CacheValues = {
 	APIFY_VERSION: [latestApifyVersion],
 	CRAWLEE_VERSION: [latestCrawleeVersion],
 	CAMOUFOX_VERSION: [latestCamoufoxVersion],
+	CERTIFICATES_UPDATED_AT: certificatesUpdatedAt ? [certificatesUpdatedAt] : [],
 };
 
 await setParametersForTriggeringUpdateWorkflowOnActorTemplates('node', latestPlaywrightVersion);

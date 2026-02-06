@@ -1,42 +1,64 @@
-FROM --platform=linux/amd64 ubuntu:jammy
-ARG NODE_VERSION=20
+# Get the Node.js version provided as a build argument
+ARG NODE_VERSION=
 
-LABEL maintainer="support@apify.com" description="Base image for Apify Actors using Webkit"
+# Use trixie to be consistent across node versions.
+FROM --platform=linux/amd64 node:${NODE_VERSION}-trixie-slim
+
+LABEL maintainer="support@apify.com" \
+    description="Base image for Apify Actors written in Node.js using Playwright with WebKit"
+
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install WebKit dependencies
+# Set the shell to use /bin/bash with specific options (see Hadolint DL4006)
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Set up XVFB
+ENV XVFB_WHD=1920x1080x24+32
+
+# Tells playwright where to install and where to find the browsers
+ENV PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
+
+# Tell the crawlee cli that we already have browsers installed, so it skips installing them
+ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
+
+ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/MiniBrowser
+
+# Prevent installing of browsers by future `npm install`.
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+
 RUN apt update \
-    && apt install -y --no-install-recommends \
-    git \
+    && apt install --fix-missing -yq --no-install-recommends \
+    # Install xvfb, xauth, wget, curl, git
+    xvfb xauth wget curl git \
+    # Found this in other images, not sure whether it's needed, it does not come from Playwright deps
     procps \
-    xvfb \
-    xauth \
-    # Install node
-    && apt update && apt install -y curl \
-    && curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
-    && apt install -y nodejs \
-    # Feature-parity with Node.js base images.
-    # From: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal
-    && apt update && apt install -y --no-install-recommends git ssh \
-    && npm install -g yarn \
+    ca-certificates \
+    # Extras
+    fonts-freefont-ttf \
+    fonts-kacst-one \
+    fonts-thai-tlwg \
+    fonts-wqy-zenhei \
+    \
+    # Install playwright browser dependencies and browsers for webkit
+    && npx playwright install-deps webkit \
+    && apt install -y libgtk-3-0 \
+    && npx playwright install webkit \
+    # symlink the webkit binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
+    && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/webkit-*/minibrowser-gtk/MiniBrowser ${PLAYWRIGHT_BROWSERS_PATH}/ \
     \
     # Add user so we don't need --no-sandbox.
     && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser \
+    \
     # Globally disable the update-notifier.
     && npm config --global set update-notifier false \
-    \
-    # Install all required playwright dependencies for webkit
-    && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm_config_ignore_scripts=1 npx playwright install-deps webkit \
-    && apt install -y libgtk-3-0 \
     \
     # Cleanup time
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
     && apt clean -y && apt autoremove -y \
     && rm -rf /root/.npm \
-    \
     # This is needed to remove an annoying error message when running headful.
     && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
 
@@ -44,15 +66,10 @@ RUN apt update \
 USER myuser
 WORKDIR /home/myuser
 
-ENV PLAYWRIGHT_BROWSERS_PATH=/home/myuser/pw-browsers
-
-# Tell the crawlee cli that we already have browers installed, so it skips installing them
-ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
-
 # Copy source code and xvfb script
 COPY --chown=myuser:myuser package.json main.js check-playwright-version.mjs webkit_test.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh xvfb-entrypoint.sh /home/myuser/
 
-# Tell Node.js this is a production environemnt
+# Tell Node.js this is a production environment
 ENV NODE_ENV=production
 
 # Enable Node.js process to use a lot of memory (Actor has limit of 32GB)
@@ -70,18 +87,9 @@ RUN npm --quiet set progress=false \
     && node --version \
     && echo "NPM version:" \
     && npm --version \
-    # symlink the webkit binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
-    && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/webkit-*/minibrowser-gtk/MiniBrowser ${PLAYWRIGHT_BROWSERS_PATH}/ \
-    # Playwright allows donwloading only one browser through separate package with same export. So we rename it to just playwright.
+    \
+    # Playwright allows downloading only one browser through separate package with same export. So we rename it to just playwright.
     && mv ./node_modules/playwright-webkit ./node_modules/playwright && rm -rf ./node_modules/playwright-webkit
-
-ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/MiniBrowser
-
-# Prevent installing of browsers by future `npm install`.
-ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-
-# Set up xvfb
-ENV XVFB_WHD=1920x1080x24+32
 
 # The entrypoint script will be the one handling the CMD passed in, and will always wrap it into xvfb-run
 ENTRYPOINT ["/home/myuser/xvfb-entrypoint.sh"]

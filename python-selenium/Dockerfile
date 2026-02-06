@@ -11,9 +11,6 @@ LABEL maintainer="support@apify.com" \
 # Set the shell to use /bin/bash with specific options (see Hadolint DL4006)
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# Get the Apify Python SDK version provided as a build argument
-ARG APIFY_VERSION
-
 # Get the Selenium version provided as a build argument
 ARG SELENIUM_VERSION
 
@@ -114,12 +111,11 @@ ENV PATH="/root/.local/bin:/home/myuser/.local/bin:$PATH"
 # This instruction:
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
-# - Installs the specified version of the Apify Python SDK and Selenium
+# - Installs the specified version of Selenium
 RUN pip install --upgrade \
     pip \
     setuptools \
     wheel \
-    apify~=${APIFY_VERSION} \
     selenium~=${SELENIUM_VERSION}
 
 # Copy the dummy source code to the image
@@ -127,4 +123,4 @@ COPY --chown=myuser:myuser . .
 
 # NOTE: This needs to be compatible with how Apify CLI launches Actors
 ENTRYPOINT ["./xvfb-entrypoint.sh"]
-CMD ["python3", "-m", "src"]
+CMD ["python", "-m", "src"]
