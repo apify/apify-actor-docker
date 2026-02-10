@@ -26,6 +26,17 @@ on:
       - build-node-images
 
   pull_request:
+    paths:
+      - "node-playwright/**"
+      - "node-playwright-chrome/**"
+      - "node-playwright-firefox/**"
+      - "node-playwright-webkit/**"
+      - "node-playwright-camoufox/**"
+      - "certificates/**"
+      - ".github/workflows/release-node-playwright.yaml"
+      - ".github/actions/version-matrix/**"
+      - ".github/scripts/prepare-node-image-tags.js"
+      - "Makefile"
 
   schedule:
     - cron: 0 */2 * * *

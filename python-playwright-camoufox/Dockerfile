@@ -43,6 +43,9 @@ ENV PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
 # Tell the crawlee cli that we already have browsers installed, so it skips installing them
 ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 
+# Prevent playwright from downloading browsers when users install playwright via pip
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+
 # Camoufox stores its browser in ~/.cache/camoufox
 ENV APIFY_DEFAULT_BROWSER_PATH=/root/.cache/camoufox/camoufox-bin
 
@@ -67,14 +70,10 @@ RUN apt update \
     fonts-thai-tlwg \
     fonts-wqy-zenhei \
     \
-    # Install Playwright browser dependencies for firefox (camoufox is firefox-based)
-    && python -m pip install playwright camoufox~=${CAMOUFOX_VERSION} \
+    # Install Playwright browser OS dependencies for firefox (camoufox is firefox-based)
+    && python -m pip install playwright \
     && python -m playwright install-deps firefox \
-    && python -m camoufox fetch \
     && python -m pip uninstall -y playwright \
-    # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
-    && rm -f /root/.cache/camoufox/libnssckbi.so \
-    && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so /root/.cache/camoufox/libnssckbi.so \
     \
     # Register certificates
     && chmod +x ./register_intermediate_certs.sh \
@@ -103,11 +102,18 @@ ENV PATH="/root/.local/bin:/home/myuser/.local/bin:$PATH"
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
 # - Installs the specified version of Playwright and Camoufox
+# - Fetches the Camoufox browser
 RUN python -m pip install --upgrade \
     pip \
     setuptools \
     wheel \
-    playwright~=${PLAYWRIGHT_VERSION}
+    playwright~=${PLAYWRIGHT_VERSION} \
+    camoufox~=${CAMOUFOX_VERSION} \
+    # Fetch the Camoufox browser
+    && python -m camoufox fetch \
+    # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
+    && rm -f /root/.cache/camoufox/libnssckbi.so \
+    && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so /root/.cache/camoufox/libnssckbi.so
 
 # Copy the dummy source code to the image
 COPY --chown=myuser:myuser . .

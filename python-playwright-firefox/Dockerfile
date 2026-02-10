@@ -40,6 +40,9 @@ ENV PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
 # Tell the crawlee cli that we already have browsers installed, so it skips installing them
 ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 
+# Prevent playwright from downloading browsers when users install playwright via pip
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+
 ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/firefox
 
 # Copy the script for registering intermediate certificates and the pre-downloaded certificates
@@ -63,16 +66,10 @@ RUN apt update \
     fonts-thai-tlwg \
     fonts-wqy-zenhei \
     \
-    # Install Playwright browser dependencies and browsers
+    # Install Playwright browser OS dependencies
     && python -m pip install playwright \
     && python -m playwright install-deps firefox \
-    && python -m playwright install firefox \
     && python -m pip uninstall -y playwright \
-    # symlink the firefox binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
-    && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/firefox-*/firefox/firefox ${PLAYWRIGHT_BROWSERS_PATH}/ \
-    # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
-    && rm -f $PLAYWRIGHT_BROWSERS_PATH/firefox-*/firefox/libnssckbi.so \
-    && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so $(ls -d $PLAYWRIGHT_BROWSERS_PATH/firefox-*)/firefox/libnssckbi.so \
     \
     # Register certificates
     && chmod +x ./register_intermediate_certs.sh \
@@ -105,7 +102,14 @@ RUN python -m pip install --upgrade \
     pip \
     setuptools \
     wheel \
-    playwright~=${PLAYWRIGHT_VERSION}
+    playwright~=${PLAYWRIGHT_VERSION} \
+    # Install Playwright browsers
+    && python -m playwright install firefox \
+    # symlink the firefox binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
+    && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/firefox-*/firefox/firefox ${PLAYWRIGHT_BROWSERS_PATH}/ \
+    # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
+    && rm -f $PLAYWRIGHT_BROWSERS_PATH/firefox-*/firefox/libnssckbi.so \
+    && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so $(ls -d $PLAYWRIGHT_BROWSERS_PATH/firefox-*)/firefox/libnssckbi.so
 
 # Copy the dummy source code to the image
 COPY --chown=myuser:myuser . .

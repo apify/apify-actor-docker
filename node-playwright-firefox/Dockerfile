@@ -44,7 +44,7 @@ RUN apt update \
     fonts-thai-tlwg \
     fonts-wqy-zenhei \
     \
-    # Install playwright browser dependencies and browsers for chrome
+    # Install playwright browser dependencies and browsers for firefox
     && npx playwright install-deps firefox \
     && npx playwright install firefox \
     # symlink the firefox binary to the root folder in order to bypass the versioning and resulting browser launch crashes.

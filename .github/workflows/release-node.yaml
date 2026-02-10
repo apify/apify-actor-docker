@@ -26,6 +26,12 @@ on:
       - build-node-images
 
   pull_request:
+    paths:
+      - "node/**"
+      - ".github/workflows/release-node.yaml"
+      - ".github/actions/version-matrix/**"
+      - ".github/scripts/prepare-node-image-tags.js"
+      - "Makefile"
 
   schedule:
     - cron: 0 */2 * * *

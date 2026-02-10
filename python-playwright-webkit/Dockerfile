@@ -40,6 +40,9 @@ ENV PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
 # Tell the crawlee cli that we already have browsers installed, so it skips installing them
 ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 
+# Prevent playwright from downloading browsers when users install playwright via pip
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+
 ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/MiniBrowser
 
 RUN apt update \
@@ -58,14 +61,11 @@ RUN apt update \
     fonts-thai-tlwg \
     fonts-wqy-zenhei \
     \
-    # Install Playwright browser dependencies and browsers
+    # Install Playwright browser OS dependencies
     && python -m pip install playwright \
     && python -m playwright install-deps webkit \
     && apt install -y libgtk-3-0 \
-    && python -m playwright install webkit \
     && python -m pip uninstall -y playwright \
-    # symlink the webkit binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
-    && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/webkit-*/minibrowser-gtk/MiniBrowser ${PLAYWRIGHT_BROWSERS_PATH}/ \
     \
     # Add user so we don't need --no-sandbox.
     && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
@@ -94,7 +94,11 @@ RUN python -m pip install --upgrade \
     pip \
     setuptools \
     wheel \
-    playwright~=${PLAYWRIGHT_VERSION}
+    playwright~=${PLAYWRIGHT_VERSION} \
+    # Install Playwright browsers
+    && python -m playwright install webkit \
+    # symlink the webkit binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
+    && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/webkit-*/minibrowser-gtk/MiniBrowser ${PLAYWRIGHT_BROWSERS_PATH}/
 
 # Copy the dummy source code to the image
 COPY --chown=myuser:myuser . .

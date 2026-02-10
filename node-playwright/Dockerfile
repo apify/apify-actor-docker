@@ -6,7 +6,7 @@ FROM --platform=linux/amd64 mcr.microsoft.com/playwright:${PLAYWRIGHT_VERSION}no
 
 # Add labels to the image to identify it as an Apify Actor
 LABEL maintainer="support@apify.com" \
-    description="Base image for Apify Actors written in Node.js using Playwright with headless Chrome"
+    description="Base image for Apify Actors written in Node.js using Playwright with all browsers"
 
 # Get the Node.js version provided as a build argument
 ARG NODE_VERSION=

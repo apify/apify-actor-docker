@@ -19,6 +19,17 @@ on:
     types: [build-python-images]
 
   pull_request:
+    paths:
+      - "python-playwright/**"
+      - "python-playwright-chrome/**"
+      - "python-playwright-firefox/**"
+      - "python-playwright-webkit/**"
+      - "python-playwright-camoufox/**"
+      - "certificates/**"
+      - ".github/workflows/release-python-playwright.yaml"
+      - ".github/actions/version-matrix/**"
+      - ".github/scripts/prepare-python-image-tags.js"
+      - "Makefile"
 
   schedule:
     - cron: 0 */2 * * *

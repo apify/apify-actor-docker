@@ -33,8 +33,7 @@ RUN apt update \
     && apt install --fix-missing -yq --no-install-recommends \
     # Install xvfb, xauth, wget, curl, git
     xvfb xauth wget curl git \
-    # The following packages are needed for the intermediate certificates to work in Firefox.
-    ca-certificates jq p11-kit \
+    ca-certificates \
     # Found this in other images, not sure whether it's needed, it does not come from Playwright deps
     procps \
     # Packages for Google signing key

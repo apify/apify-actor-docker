@@ -40,6 +40,9 @@ ENV PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
 # Tell the crawlee cli that we already have browsers installed, so it skips installing them
 ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 
+# Prevent playwright from downloading browsers when users install playwright via pip
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+
 # Sets path to Chrome executable
 ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
 
@@ -49,8 +52,7 @@ RUN apt update \
     && apt install --fix-missing -yq --no-install-recommends \
     # Install xvfb, xauth, wget, git
     xvfb xauth wget git \
-    # The following packages are needed for the intermediate certificates to work in Firefox.
-    ca-certificates jq p11-kit \
+    ca-certificates \
     # Found this in other images, not sure whether it's needed, it does not come from Playwright deps
     procps \
     # Packages for Google signing key
@@ -78,14 +80,10 @@ RUN apt update \
     && echo '{ "CommandLineFlagSecurityWarningsEnabled": false }' > /etc/opt/chrome/policies/managed/managed_policies.json \
     && echo '{ "ComponentUpdatesEnabled": false }' > /etc/opt/chrome/policies/managed/component_update.json \
     \
-    # Install Playwright browser dependencies and browsers
+    # Install Playwright browser OS dependencies
     && python -m pip install playwright \
     && python -m playwright install-deps chrome \
-    && python -m playwright install chrome \
-    && python -m playwright install chromium \
     && python -m pip uninstall -y playwright \
-    # symlink the chromium binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
-    && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/chromium-*/chrome-linux*/chrome ${PLAYWRIGHT_BROWSERS_PATH}/ \
     \
     # Add user so we don't need --no-sandbox.
     && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
@@ -116,6 +114,11 @@ RUN python -m pip install --upgrade \
     setuptools \
     wheel \
     playwright~=${PLAYWRIGHT_VERSION} \
+    # Install Playwright browsers
+    && python -m playwright install chrome \
+    && python -m playwright install chromium \
+    # symlink the chromium binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
+    && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/chromium-*/chrome-linux*/chrome ${PLAYWRIGHT_BROWSERS_PATH}/ \
     && echo "Google Chrome version: $(bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version")"
 
 # Copy the dummy source code to the image

@@ -6,7 +6,7 @@ FROM --platform=linux/amd64 python:${PYTHON_VERSION}-slim-trixie
 
 # Add labels to the image to identify it as an Apify Actor
 LABEL maintainer="support@apify.com" \
-    description="Base image for Apify Actors written in Python using Playwright with headless Chrome"
+    description="Base image for Apify Actors written in Python using Playwright with all browsers"
 
 # Get the Playwright version provided as a build argument
 ARG PLAYWRIGHT_VERSION=
@@ -39,6 +39,9 @@ ENV PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
 
 # Tell the crawlee cli that we already have browsers installed, so it skips installing them
 ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
+
+# Prevent playwright from downloading browsers when users install playwright via pip
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 
 # Sets path to Chrome executable
 ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
@@ -84,10 +87,9 @@ RUN apt update \
     && echo '{ "CommandLineFlagSecurityWarningsEnabled": false }' > /etc/opt/chrome/policies/managed/managed_policies.json \
     && echo '{ "ComponentUpdatesEnabled": false }' > /etc/opt/chrome/policies/managed/component_update.json \
     \
-    # Install Playwright browser dependencies and browsers
+    # Install Playwright browser OS dependencies
     && python -m pip install playwright \
     && python -m playwright install-deps \
-    && python -m playwright install \
     && python -m pip uninstall -y playwright \
     \
     # Add user so we don't need --no-sandbox.
@@ -103,11 +105,7 @@ RUN apt update \
     && rm -rf /src/*.deb \
     && apt clean -y && apt autoremove -y \
     # This is needed to remove an annoying error message when running headful.
-    && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix \
-    \
-    # Override the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
-    && rm -f $PLAYWRIGHT_BROWSERS_PATH/firefox-*/firefox/libnssckbi.so \
-    && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so $(ls -d $PLAYWRIGHT_BROWSERS_PATH/firefox-*)/firefox/libnssckbi.so
+    && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
 
 WORKDIR /usr/src/app
 
@@ -123,6 +121,11 @@ RUN python -m pip install --upgrade \
     setuptools \
     wheel \
     playwright~=${PLAYWRIGHT_VERSION} \
+    # Install Playwright browsers
+    && python -m playwright install \
+    # Override the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
+    && rm -f $PLAYWRIGHT_BROWSERS_PATH/firefox-*/firefox/libnssckbi.so \
+    && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so $(ls -d $PLAYWRIGHT_BROWSERS_PATH/firefox-*)/firefox/libnssckbi.so \
     && echo "Google Chrome version: $(bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version")"
 
 # Copy the dummy source code to the image

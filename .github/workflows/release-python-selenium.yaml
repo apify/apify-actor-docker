@@ -19,6 +19,12 @@ on:
     types: [build-python-images]
 
   pull_request:
+    paths:
+      - "python-selenium/**"
+      - ".github/workflows/release-python-selenium.yaml"
+      - ".github/actions/version-matrix/**"
+      - ".github/scripts/prepare-python-image-tags.js"
+      - "Makefile"
 
   schedule:
     - cron: 0 */2 * * *

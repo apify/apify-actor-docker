@@ -26,6 +26,12 @@ on:
       - build-node-images
 
   pull_request:
+    paths:
+      - "node-puppeteer/**"
+      - ".github/workflows/release-node-puppeteer.yaml"
+      - ".github/actions/version-matrix/**"
+      - ".github/scripts/prepare-node-image-tags.js"
+      - "Makefile"
 
   schedule:
     - cron: 0 */2 * * *

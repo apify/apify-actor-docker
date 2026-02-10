@@ -92,11 +92,6 @@ for (const pythonVersion of supportedPythonVersions) {
 		}
 
 		for (const imageName of imageNames) {
-			// Skip camoufox for Python 3.9 (requires Python 3.10+)
-			if (imageName.includes('camoufox') && pythonVersion === '3.9') {
-				continue;
-			}
-
 			matrix.include.push({
 				'image-name': imageName,
 				'python-version': pythonVersion,
