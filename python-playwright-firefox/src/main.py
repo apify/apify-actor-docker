@@ -1,6 +1,5 @@
 import os
-
-import playwright
+from importlib.metadata import version
 
 
 def main():
@@ -10,7 +9,7 @@ def main():
     print("file with your actual application code.")
     print("=" * 60)
     print()
-    print(f"Playwright version: {playwright.__version__}")
+    print(f"Playwright version: {version('playwright')}")
     print()
     print("Environment variables set in this image:")
     print("-" * 60)
