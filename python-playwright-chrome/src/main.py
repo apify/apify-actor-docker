@@ -1,5 +1,7 @@
 import os
 
+import playwright
+
 
 def main():
     print("=" * 60)
@@ -7,6 +9,8 @@ def main():
     print("set up your Docker image correctly. Please replace this")
     print("file with your actual application code.")
     print("=" * 60)
+    print()
+    print(f"Playwright version: {playwright.__version__}")
     print()
     print("Environment variables set in this image:")
     print("-" * 60)

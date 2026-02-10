@@ -64,7 +64,7 @@ RUN apt update \
     fonts-wqy-zenhei \
     \
     # Install Playwright browser dependencies and browsers
-    && python -m pip install playwright~=${PLAYWRIGHT_VERSION} \
+    && python -m pip install playwright \
     && python -m playwright install-deps firefox \
     && python -m playwright install firefox \
     && python -m pip uninstall -y playwright \

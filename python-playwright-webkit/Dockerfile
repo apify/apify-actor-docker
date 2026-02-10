@@ -59,7 +59,7 @@ RUN apt update \
     fonts-wqy-zenhei \
     \
     # Install Playwright browser dependencies and browsers
-    && python -m pip install playwright~=${PLAYWRIGHT_VERSION} \
+    && python -m pip install playwright \
     && python -m playwright install-deps webkit \
     && apt install -y libgtk-3-0 \
     && python -m playwright install webkit \
