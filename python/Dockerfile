@@ -50,7 +50,7 @@ ENV PATH="/root/.local/bin:/home/myuser/.local/bin:$PATH"
 # This instruction:
 # - Upgrades pip to the latest version
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
-RUN pip install --upgrade \
+RUN python -m pip install --upgrade \
     pip \
     setuptools \
     wheel
