@@ -1,3 +1,7 @@
 from .main import main
 
-main()
+try:
+    main()
+except Exception:
+    print('Test failed!')
+    raise
