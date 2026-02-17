@@ -190,7 +190,6 @@ jobs:
           file: ./${{ matrix.image-name }}/Dockerfile
           build-args: |
             PYTHON_VERSION=${{ matrix.python-version }}
-            APIFY_VERSION=${{ env.APIFY_VERSION }}
             SELENIUM_VERSION=${{ matrix.selenium-version }}
           platforms: linux/amd64
           provenance: true

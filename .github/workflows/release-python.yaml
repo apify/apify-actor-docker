@@ -188,7 +188,6 @@ jobs:
           file: ./${{ matrix.image-name }}/Dockerfile
           build-args: |
             PYTHON_VERSION=${{ matrix.python-version }}
-            APIFY_VERSION=${{ env.APIFY_VERSION }}
           platforms: linux/amd64,linux/arm64
           provenance: true
           push: true
