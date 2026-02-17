@@ -97,6 +97,8 @@ RUN python -m pip install --upgrade \
     playwright~=${PLAYWRIGHT_VERSION} \
     # Install Playwright browsers
     && python -m playwright install webkit \
+    # This playwright install-deps call is only needed for Playwright 1.54.0 - remove once that version is no longer built for
+    && python -m playwright install-deps webkit \
     # symlink the webkit binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
     && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/webkit-*/minibrowser-gtk/MiniBrowser ${PLAYWRIGHT_BROWSERS_PATH}/
 
