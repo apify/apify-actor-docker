@@ -35,8 +35,8 @@ define cleanup-firefox-certs
 	@rm -rf ./$(1)/firefox-certs
 endef
 
-ALL_ARM_TESTS = test-node-arm test-node-playwright-arm test-node-playwright-chrome-arm test-node-playwright-firefox-arm test-node-playwright-webkit-arm test-node-puppeteer-chrome-arm test-python-arm test-python-playwright-arm test-python-selenium-arm
-ALL_ARM_NODE_TESTS = test-node-arm test-node-playwright-arm test-node-playwright-chrome-arm test-node-playwright-firefox-arm test-node-playwright-webkit-arm test-node-puppeteer-chrome-arm
+ALL_ARM_TESTS = test-node-arm test-node-playwright-arm test-node-playwright-chrome-arm test-node-playwright-firefox-arm test-node-playwright-webkit-arm test-node-playwright-camoufox-arm test-node-puppeteer-chrome-arm test-python-arm test-python-playwright-arm test-python-selenium-arm
+ALL_ARM_NODE_TESTS = test-node-arm test-node-playwright-arm test-node-playwright-chrome-arm test-node-playwright-firefox-arm test-node-playwright-webkit-arm test-node-playwright-camoufox-arm test-node-puppeteer-chrome-arm
 ALL_ARM_PYTHON_TESTS = test-python-arm test-python-playwright-arm test-python-selenium-arm
 
 what-tests:
@@ -91,6 +91,42 @@ all-python:
 
 	@echo ""
 	@echo "All python tests done!"
+
+all-arm:
+	@echo "Running all arm tests, this will take a while..."
+
+	@for test in $(ALL_ARM_TESTS); do \
+		echo "Running $$test"; \
+		$(MAKE) $$test; \
+		echo "Done $$test"; \
+	done
+
+	@echo ""
+	@echo "All arm tests done!"
+
+all-arm-node:
+	@echo "Running all arm node tests, this will take a while..."
+
+	@for test in $(ALL_ARM_NODE_TESTS); do \
+		echo "Running $$test"; \
+		$(MAKE) $$test; \
+		echo "Done $$test"; \
+	done
+
+	@echo ""
+	@echo "All arm node tests done!"
+
+all-arm-python:
+	@echo "Running all arm python tests, this will take a while..."
+
+	@for test in $(ALL_ARM_PYTHON_TESTS); do \
+		echo "Running $$test"; \
+		$(MAKE) $$test; \
+		echo "Done $$test"; \
+	done
+
+	@echo ""
+	@echo "All arm python tests done!"
 
 test-node:
 	@echo "Building node with version $(NODE_VERSION) (overwrite using NODE_VERSION=XX)"
@@ -306,21 +342,9 @@ test-node-puppeteer-chrome:
 	docker rmi apify/node-puppeteer-chrome:local
 
 test-node-puppeteer-chrome-arm:
-	@echo "Building puppeteer-chrome arm64 with version $(PUPPETEER_VERSION) (overwrite using PUPPETEER_VERSION=22.6.2) and node version $(NODE_VERSION) (overwrite using NODE_VERSION=XX)"
+	@echo "Not supported due to Chrome lacking support for arm64 on Linux"
+	@exit 1
 
-	@# Correct package.json
-	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PUPPETEER_VERSION=$(PUPPETEER_VERSION) node ./scripts/update-package-json.mjs ./node-puppeteer-chrome
-
-	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-puppeteer-chrome/Dockerfile --tag apify/node-puppeteer-chrome:local --load ./node-puppeteer-chrome
-	docker run --rm -it --platform linux/arm64 apify/node-puppeteer-chrome:local
-
-	@# Restore package.json
-	@git checkout ./node-puppeteer-chrome/package.json 1>/dev/null 2>&1
-
-	@# Delete docker image
-	docker rmi apify/node-puppeteer-chrome:local
-
-test-node-puppeteer-chrome-arm:
 	@echo "Building puppeteer-chrome arm64 with version $(PUPPETEER_VERSION) (overwrite using PUPPETEER_VERSION=22.6.2) and node version $(NODE_VERSION) (overwrite using NODE_VERSION=XX)"
 
 	@# Correct package.json
