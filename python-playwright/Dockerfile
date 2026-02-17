@@ -123,8 +123,6 @@ RUN python -m pip install --upgrade \
     playwright~=${PLAYWRIGHT_VERSION} \
     # Install Playwright browsers
     && python -m playwright install \
-    # This playwright install-deps call is only needed for Playwright 1.54.0 - remove once that version is no longer built for
-    && python -m playwright install-deps \
     # Override the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
     && rm -f $PLAYWRIGHT_BROWSERS_PATH/firefox-*/firefox/libnssckbi.so \
     && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so $(ls -d $PLAYWRIGHT_BROWSERS_PATH/firefox-*)/firefox/libnssckbi.so \
