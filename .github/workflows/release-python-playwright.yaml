@@ -216,7 +216,7 @@ jobs:
             PYTHON_VERSION=${{ matrix.python-version }}
             PLAYWRIGHT_VERSION=${{ matrix.playwright-version }}
             CAMOUFOX_VERSION=${{ matrix.camoufox-version }}
-          platforms: linux/amd64${{ (matrix.image-name != 'python-playwright' && matrix.image-name != 'python-playwright-chrome' && ',linux/arm64') || '' }}
+          platforms: ${{ matrix.supports-arm64 == 'true' && 'linux/amd64,linux/arm64' || 'linux/amd64' }}
           provenance: true
           push: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
