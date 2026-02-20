@@ -67,17 +67,17 @@ __metadata:
   linkType: hard
 
 "@biomejs/biome@npm:^2.0.0":
-  version: 2.3.15
-  resolution: "@biomejs/biome@npm:2.3.15"
+  version: 2.4.3
+  resolution: "@biomejs/biome@npm:2.4.3"
   dependencies:
-    "@biomejs/cli-darwin-arm64": "npm:2.3.15"
-    "@biomejs/cli-darwin-x64": "npm:2.3.15"
-    "@biomejs/cli-linux-arm64": "npm:2.3.15"
-    "@biomejs/cli-linux-arm64-musl": "npm:2.3.15"
-    "@biomejs/cli-linux-x64": "npm:2.3.15"
-    "@biomejs/cli-linux-x64-musl": "npm:2.3.15"
-    "@biomejs/cli-win32-arm64": "npm:2.3.15"
-    "@biomejs/cli-win32-x64": "npm:2.3.15"
+    "@biomejs/cli-darwin-arm64": "npm:2.4.3"
+    "@biomejs/cli-darwin-x64": "npm:2.4.3"
+    "@biomejs/cli-linux-arm64": "npm:2.4.3"
+    "@biomejs/cli-linux-arm64-musl": "npm:2.4.3"
+    "@biomejs/cli-linux-x64": "npm:2.4.3"
+    "@biomejs/cli-linux-x64-musl": "npm:2.4.3"
+    "@biomejs/cli-win32-arm64": "npm:2.4.3"
+    "@biomejs/cli-win32-x64": "npm:2.4.3"
   dependenciesMeta:
     "@biomejs/cli-darwin-arm64":
       optional: true
@@ -97,62 +97,62 @@ __metadata:
       optional: true
   bin:
     biome: bin/biome
-  checksum: 10/0d23e94c63f03003f62df523b9a5b24c1bcbe79c7d7dbc0fe2c6471d30c3d27a3243e67b7ff9526d9ed3902291720debea390660b9dbd5b7eebc3d5c7afb1c3f
+  checksum: 10/280f9099f37554266ff5733f80ffaedea33f09b1946b150d74ee16218ce5cfa3ec131c848a47375758e3910b4b835a047c03f9d59d4f548156993734744ab604
   languageName: node
   linkType: hard
 
-"@biomejs/cli-darwin-arm64@npm:2.3.15":
-  version: 2.3.15
-  resolution: "@biomejs/cli-darwin-arm64@npm:2.3.15"
+"@biomejs/cli-darwin-arm64@npm:2.4.3":
+  version: 2.4.3
+  resolution: "@biomejs/cli-darwin-arm64@npm:2.4.3"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@biomejs/cli-darwin-x64@npm:2.3.15":
-  version: 2.3.15
-  resolution: "@biomejs/cli-darwin-x64@npm:2.3.15"
+"@biomejs/cli-darwin-x64@npm:2.4.3":
+  version: 2.4.3
+  resolution: "@biomejs/cli-darwin-x64@npm:2.4.3"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-arm64-musl@npm:2.3.15":
-  version: 2.3.15
-  resolution: "@biomejs/cli-linux-arm64-musl@npm:2.3.15"
+"@biomejs/cli-linux-arm64-musl@npm:2.4.3":
+  version: 2.4.3
+  resolution: "@biomejs/cli-linux-arm64-musl@npm:2.4.3"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-arm64@npm:2.3.15":
-  version: 2.3.15
-  resolution: "@biomejs/cli-linux-arm64@npm:2.3.15"
+"@biomejs/cli-linux-arm64@npm:2.4.3":
+  version: 2.4.3
+  resolution: "@biomejs/cli-linux-arm64@npm:2.4.3"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-x64-musl@npm:2.3.15":
-  version: 2.3.15
-  resolution: "@biomejs/cli-linux-x64-musl@npm:2.3.15"
+"@biomejs/cli-linux-x64-musl@npm:2.4.3":
+  version: 2.4.3
+  resolution: "@biomejs/cli-linux-x64-musl@npm:2.4.3"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-x64@npm:2.3.15":
-  version: 2.3.15
-  resolution: "@biomejs/cli-linux-x64@npm:2.3.15"
+"@biomejs/cli-linux-x64@npm:2.4.3":
+  version: 2.4.3
+  resolution: "@biomejs/cli-linux-x64@npm:2.4.3"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@biomejs/cli-win32-arm64@npm:2.3.15":
-  version: 2.3.15
-  resolution: "@biomejs/cli-win32-arm64@npm:2.3.15"
+"@biomejs/cli-win32-arm64@npm:2.4.3":
+  version: 2.4.3
+  resolution: "@biomejs/cli-win32-arm64@npm:2.4.3"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@biomejs/cli-win32-x64@npm:2.3.15":
-  version: 2.3.15
-  resolution: "@biomejs/cli-win32-x64@npm:2.3.15"
+"@biomejs/cli-win32-x64@npm:2.4.3":
+  version: 2.4.3
+  resolution: "@biomejs/cli-win32-x64@npm:2.4.3"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -180,12 +180,12 @@ __metadata:
   linkType: hard
 
 "@octokit/endpoint@npm:^11.0.2":
-  version: 11.0.2
-  resolution: "@octokit/endpoint@npm:11.0.2"
+  version: 11.0.3
+  resolution: "@octokit/endpoint@npm:11.0.3"
   dependencies:
     "@octokit/types": "npm:^16.0.0"
     universal-user-agent: "npm:^7.0.2"
-  checksum: 10/0d088747baf94eafbba69da23ba840b40cd3f5d0bfbc51c692ff9d9d78de6d81f06366e6e30df8c1783355be826c27d38ab9ab0708396af8f430b06cfa29db35
+  checksum: 10/21b67d76fb1ea28bd87ca467c12dfab648af55522b936760316d70f8ccdd638f170d636ee72606857f0cd8f343f40c8a4e8f55993d6b1f5b9ecf102e072044c5
   languageName: node
   linkType: hard
 
