@@ -179,7 +179,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/endpoint@npm:^11.0.2":
+"@octokit/endpoint@npm:^11.0.3":
   version: 11.0.3
   resolution: "@octokit/endpoint@npm:11.0.3"
   dependencies:
@@ -239,15 +239,16 @@ __metadata:
   linkType: hard
 
 "@octokit/request@npm:^10.0.6, @octokit/request@npm:^10.0.7":
-  version: 10.0.7
-  resolution: "@octokit/request@npm:10.0.7"
+  version: 10.0.8
+  resolution: "@octokit/request@npm:10.0.8"
   dependencies:
-    "@octokit/endpoint": "npm:^11.0.2"
+    "@octokit/endpoint": "npm:^11.0.3"
     "@octokit/request-error": "npm:^7.0.2"
     "@octokit/types": "npm:^16.0.0"
     fast-content-type-parse: "npm:^3.0.0"
+    json-with-bigint: "npm:^3.5.3"
     universal-user-agent: "npm:^7.0.2"
-  checksum: 10/eaf6d347340729b47d482b487411e3543384d1c07f9125c4e53c11ece53f22a0245b71be22dd48bd6ad16af48c7c323c7317da49a238206d07fb7cd3ef0c6e74
+  checksum: 10/db1dc1f9b9b4717107ce777e1cfb497e3fbc1cbd68c98b33e1356b824f353c6db025014b030410a0a6f11d35c9bfa7837230ddc3c4df9d723a210e701a40f804
   languageName: node
   linkType: hard
 
@@ -287,6 +288,13 @@ __metadata:
   version: 3.0.0
   resolution: "fast-content-type-parse@npm:3.0.0"
   checksum: 10/8616a8aa6c9b4f8f4f3c90eaa4e7bfc2240cfa6f41f0eef5b5aa2b2c8b38bd9ad435f1488b6d817ffd725c54651e2777b882ae9dd59366e71e7896f1ec11d473
+  languageName: node
+  linkType: hard
+
+"json-with-bigint@npm:^3.5.3":
+  version: 3.5.3
+  resolution: "json-with-bigint@npm:3.5.3"
+  checksum: 10/af3b23aeb548ef34e4d71ecced96e7de36e4188e930bdfe4d7f2e375cfcf6685d7d84d47498b609e0c455823c21d38a4ea289ed9288f9fc2f79c7f2dec213d9a
   languageName: node
   linkType: hard
 
