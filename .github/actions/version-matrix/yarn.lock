@@ -292,9 +292,9 @@ __metadata:
   linkType: hard
 
 "json-with-bigint@npm:^3.5.3":
-  version: 3.5.3
-  resolution: "json-with-bigint@npm:3.5.3"
-  checksum: 10/af3b23aeb548ef34e4d71ecced96e7de36e4188e930bdfe4d7f2e375cfcf6685d7d84d47498b609e0c455823c21d38a4ea289ed9288f9fc2f79c7f2dec213d9a
+  version: 3.5.7
+  resolution: "json-with-bigint@npm:3.5.7"
+  checksum: 10/7f8c9e81e0bd1c5015ec9aad986f5b5101bceb7accf0cc17d56f81a3d2d0ac9438a051c33f4e767a98ece07b50f7f9d579c0f711cdfdeca314a6a59d6214a8a9
   languageName: node
   linkType: hard
 
