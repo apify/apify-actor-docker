@@ -8,3 +8,4 @@ node_modules
 
 # Individual certificate files (we track the zip archive instead)
 certificates/certs/
+config.bat
