@@ -68,6 +68,12 @@ const imageNames = [
 	'python-playwright-camoufox',
 ] as const;
 
+// Images that require Chrome/Chromium cannot be built for arm64 on Linux
+const arm64UnsupportedImages: ReadonlySet<string> = new Set([
+	'python-playwright',
+	'python-playwright-chrome',
+]);
+
 const matrix = {
 	include: [] as {
 		'image-name': (typeof imageNames)[number];
@@ -76,6 +82,7 @@ const matrix = {
 		'camoufox-version': string;
 		'is-latest': 'true' | 'false';
 		'latest-python-version': string;
+		'supports-arm64': 'true' | 'false';
 	}[],
 };
 
@@ -99,6 +106,7 @@ for (const pythonVersion of supportedPythonVersions) {
 				'camoufox-version': latestCamoufoxVersion,
 				'is-latest': playwrightVersion === latestPlaywrightVersion ? 'true' : 'false',
 				'latest-python-version': latestPythonVersion,
+				'supports-arm64': arm64UnsupportedImages.has(imageName) ? 'false' : 'true',
 			});
 		}
 	}
