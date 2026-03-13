@@ -51,10 +51,13 @@ chmod 755 "${CERTS_DIR}"
 DOWNLOADED=$(ls -1 "${CERTS_DIR}"/*.crt 2>/dev/null | wc -l)
 echo "Successfully downloaded ${DOWNLOADED} certificates to ${CERTS_DIR}"
 
-# Create zip archive of all certificates
+# Create zip archive of all certificates (with deterministic metadata so
+# identical content produces identical zip files)
 echo "Creating zip archive..."
 rm -f "${ZIP_FILE}" 2>/dev/null || true
-cd "${CERTS_DIR}" && zip -q "${ZIP_FILE}" *.crt
+# Normalize file timestamps to a fixed date so zip metadata is deterministic
+touch -t 200001010000.00 "${CERTS_DIR}"/*.crt
+cd "${CERTS_DIR}" && TZ=UTC zip -q -X "${ZIP_FILE}" *.crt
 echo "Created ${ZIP_FILE} with ${DOWNLOADED} certificates"
 
 # Clean up individual certificate files (they're now in the zip)
