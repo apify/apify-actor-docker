@@ -186,11 +186,15 @@ test-node-playwright-arm:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright
 
+	@# Copy Firefox certificates
+	$(call copy-firefox-certs,node-playwright)
+
 	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright/Dockerfile --tag apify/node-playwright:local --load ./node-playwright
 	docker run --rm -it --platform linux/arm64 apify/node-playwright:local
 
-	@# Restore package.json
+	@# Restore package.json and cleanup certificates
 	@git checkout ./node-playwright/package.json 1>/dev/null 2>&1
+	$(call cleanup-firefox-certs,node-playwright)
 
 	@# Delete docker image
 	docker rmi apify/node-playwright:local
@@ -253,11 +257,15 @@ test-node-playwright-firefox-arm:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-firefox
 
+	@# Copy Firefox certificates
+	$(call copy-firefox-certs,node-playwright-firefox)
+
 	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-firefox/Dockerfile --tag apify/node-playwright-firefox:local --load ./node-playwright-firefox
 	docker run --rm -it --platform linux/arm64 apify/node-playwright-firefox:local
 
-	@# Restore package.json
+	@# Restore package.json and cleanup certificates
 	@git checkout ./node-playwright-firefox/package.json 1>/dev/null 2>&1
+	$(call cleanup-firefox-certs,node-playwright-firefox)
 
 	@# Delete docker image
 	docker rmi apify/node-playwright-firefox:local
@@ -287,11 +295,15 @@ test-node-playwright-camoufox-arm:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) CAMOUFOX_VERSION=$(CAMOUFOX_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-camoufox
 
+	@# Copy Firefox certificates
+	$(call copy-firefox-certs,node-playwright-camoufox)
+
 	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-camoufox/Dockerfile --tag apify/node-playwright-camoufox:local --load ./node-playwright-camoufox
 	docker run --rm -it --platform linux/arm64 apify/node-playwright-camoufox:local
 
-	@# Restore package.json
+	@# Restore package.json and cleanup certificates
 	@git checkout ./node-playwright-camoufox/package.json 1>/dev/null 2>&1
+	$(call cleanup-firefox-certs,node-playwright-camoufox)
 
 	@# Delete docker image
 	docker rmi apify/node-playwright-camoufox:local
@@ -398,8 +410,14 @@ test-python-playwright-arm:
 
 	@echo "Building python-playwright arm64 with version $(PYTHON_VERSION) (overwrite using PYTHON_VERSION=XX)"
 
+	@# Copy Firefox certificates
+	$(call copy-firefox-certs,python-playwright)
+
 	docker buildx build --platform linux/arm64 --build-arg PYTHON_VERSION=$(PYTHON_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PYTHON_PLAYWRIGHT_VERSION) --file ./python-playwright/Dockerfile --tag apify/python-playwright:local --load ./python-playwright
 	docker run --rm -it --platform linux/arm64 apify/python-playwright:local
+
+	@# Cleanup certificates
+	$(call cleanup-firefox-certs,python-playwright)
 
 	@# Delete docker image
 	docker rmi apify/python-playwright:local
