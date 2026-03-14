@@ -2,7 +2,7 @@
 ARG NODE_VERSION=
 
 # Use trixie to be consistent across node versions.
-FROM --platform=linux/amd64 node:${NODE_VERSION}-trixie-slim
+FROM node:${NODE_VERSION}-trixie-slim
 
 LABEL maintainer="support@apify.com" \
     description="Base image for Apify Actors written in Node.js using Playwright with Camoufox"
@@ -91,7 +91,7 @@ RUN npm --quiet set progress=false \
     && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=0 npx camoufox-js fetch \
     # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
     && rm -f /home/myuser/.cache/camoufox/libnssckbi.so \
-    && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so /home/myuser/.cache/camoufox/libnssckbi.so \
+    && ln -s $(ls -d /usr/lib/*-linux-gnu)/pkcs11/p11-kit-trust.so /home/myuser/.cache/camoufox/libnssckbi.so \
     \
     && npm install --omit=dev --omit=optional --no-package-lock --prefer-online \
     && npm install --no-package-lock --prefer-online --no-save impit@latest \
