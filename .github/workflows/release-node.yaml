@@ -333,7 +333,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}
 
-    name: "merge node: ${{ matrix.node-version }}"
+    name: "merge: apify/actor-${{ matrix.image-name }}:${{ matrix.node-version }} (tag=${{ github.event.inputs.release_tag || github.event.client_payload.release_tag || 'latest' }})"
 
     steps:
       - name: Set default inputs if event is schedule
