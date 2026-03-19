@@ -11,14 +11,13 @@
 		"node:playwright": "node src/matrices/node/playwright.ts",
 		"fmt": "biome format --write . && biome format --write ../../../renovate.json",
 		"typecheck": "tsc --noEmit",
-		"test": "vitest run"
+		"test": "node --test src/**/*.test.ts"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.0",
 		"@types/node": "^24.0.0",
 		"@types/semver": "^7.7.0",
-		"typescript": "^5.8.3",
-		"vitest": "^4.1.0"
+		"typescript": "^5.8.3"
 	},
 	"dependencies": {
 		"@actions/core": "^3.0.0",
