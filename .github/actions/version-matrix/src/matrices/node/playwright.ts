@@ -12,11 +12,13 @@ import {
 	supportedNodeVersions,
 } from '../../shared/constants.ts';
 import { fetchPackageVersions } from '../../shared/npm.ts';
+import { fetchNodeRuntimeVersions } from '../../shared/runtime-versions.ts';
 
 const playwrightVersions = await fetchPackageVersions('playwright');
 const apifyVersions = await fetchPackageVersions('apify');
 const crawleeVersions = await fetchPackageVersions('crawlee');
 const camoufoxVersions = await fetchPackageVersions('camoufox-js');
+const nodeRuntimeVersions = await fetchNodeRuntimeVersions(supportedNodeVersions);
 
 if (!shouldUseLastFive) {
 	console.warn('Testing with only the latest version of playwright to speed up CI');
@@ -34,6 +36,7 @@ console.error('Latest five versions', latestFivePlaywrightVersions);
 console.error('Latest apify version', latestApifyVersion);
 console.error('Latest crawlee version', latestCrawleeVersion);
 console.error('Latest camoufox version', latestCamoufoxVersion);
+console.error('Node runtime versions', nodeRuntimeVersions);
 console.error('Certificates updated at', certificatesUpdatedAt || '(not available)');
 
 if (process.env.CRAWLEE_VERSION) {
@@ -48,6 +51,7 @@ if (process.env.APIFY_VERSION) {
 
 const cacheParams: CacheValues = {
 	NODE_VERSION: supportedNodeVersions,
+	NODE_RUNTIME_VERSION: nodeRuntimeVersions,
 	PLAYWRIGHT_VERSION: latestFivePlaywrightVersions,
 	APIFY_VERSION: [latestApifyVersion],
 	CRAWLEE_VERSION: [latestCrawleeVersion],
@@ -74,10 +78,7 @@ const imageNames = [
 ] as const;
 
 // Images that require Chrome/Chromium cannot be built for arm64 on Linux
-const arm64UnsupportedImages: ReadonlySet<string> = new Set([
-	'node-playwright',
-	'node-playwright-chrome',
-]);
+const arm64UnsupportedImages: ReadonlySet<string> = new Set(['node-playwright', 'node-playwright-chrome']);
 
 const matrix = {
 	include: [] as {

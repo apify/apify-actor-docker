@@ -10,7 +10,8 @@
 		"node:puppeteer": "node src/matrices/node/puppeteer.ts",
 		"node:playwright": "node src/matrices/node/playwright.ts",
 		"fmt": "biome format --write . && biome format --write ../../../renovate.json",
-		"typecheck": "tsc --noEmit"
+		"typecheck": "tsc --noEmit",
+		"test": "node --test src/**/*.test.ts"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.0",

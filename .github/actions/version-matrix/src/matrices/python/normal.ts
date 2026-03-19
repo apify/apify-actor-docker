@@ -5,9 +5,15 @@ import {
 	setParametersForTriggeringUpdateWorkflowOnActorTemplates,
 	supportedPythonVersions,
 } from '../../shared/constants.ts';
+import { fetchPythonRuntimeVersions } from '../../shared/runtime-versions.ts';
+
+const pythonRuntimeVersions = await fetchPythonRuntimeVersions(supportedPythonVersions);
+
+console.error('Python runtime versions:', pythonRuntimeVersions);
 
 const cacheParams: CacheValues = {
 	PYTHON_VERSION: supportedPythonVersions,
+	PYTHON_RUNTIME_VERSION: pythonRuntimeVersions,
 };
 
 await setParametersForTriggeringUpdateWorkflowOnActorTemplates('python');
