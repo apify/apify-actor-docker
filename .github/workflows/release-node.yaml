@@ -327,7 +327,7 @@ jobs:
     needs: [matrix, build-amd64, build-arm64]
 
     runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'pull_request' }}
+    if: ${{ !cancelled() && github.event_name != 'pull_request' }}
 
     strategy:
       fail-fast: false
