@@ -191,8 +191,6 @@ jobs:
           provenance: false
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
-          cache-from: type=gha,scope=${{ matrix.image-name }}-${{ matrix.python-version }}-${{ matrix.playwright-version }}-${{ matrix.camoufox-version }}-amd64
-          cache-to: type=gha,mode=max,scope=${{ matrix.image-name }}-${{ matrix.python-version }}-${{ matrix.playwright-version }}-${{ matrix.camoufox-version }}-amd64
 
       - name: Test image
         run: docker run ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}
@@ -219,7 +217,6 @@ jobs:
           push: true
           tags: "${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}-amd64"
           outputs: type=image,oci-mediatypes=true
-          cache-from: type=gha,scope=${{ matrix.image-name }}-${{ matrix.python-version }}-${{ matrix.playwright-version }}-${{ matrix.camoufox-version }}-amd64
 
   # Build arm64 image natively on ARM runner (avoids slow QEMU emulation)
   build-arm64:
@@ -305,8 +302,6 @@ jobs:
           push: true
           tags: "${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}-arm64"
           outputs: type=image,oci-mediatypes=true
-          cache-from: type=gha,scope=${{ matrix.image-name }}-${{ matrix.python-version }}-${{ matrix.playwright-version }}-${{ matrix.camoufox-version }}-arm64
-          cache-to: type=gha,mode=max,scope=${{ matrix.image-name }}-${{ matrix.python-version }}-${{ matrix.playwright-version }}-${{ matrix.camoufox-version }}-arm64
 
   # Merge amd64 and arm64 images into a single multi-arch manifest
   merge:
