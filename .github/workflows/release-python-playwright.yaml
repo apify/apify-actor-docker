@@ -120,6 +120,7 @@ jobs:
     if: ${{ toJson(fromJson(needs.matrix.outputs.matrix).include) != '[]' }}
 
     strategy:
+      max-parallel: 10
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}
 
@@ -228,6 +229,7 @@ jobs:
     if: ${{ github.event_name != 'pull_request' && toJson(fromJson(needs.matrix.outputs.matrix).include) != '[]' }}
 
     strategy:
+      max-parallel: 10
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}
 

@@ -129,6 +129,7 @@ jobs:
     if: ${{ toJson(fromJson(needs.matrix.outputs.matrix).include) != '[]' }}
 
     strategy:
+      max-parallel: 10
       # By the time some build fails, other build can be already finished
       # so fail-fast does not really prevent the publishing of all parallel builds
       fail-fast: false
@@ -268,6 +269,7 @@ jobs:
     if: ${{ github.event_name != 'pull_request' && toJson(fromJson(needs.matrix.outputs.matrix).include) != '[]' }}
 
     strategy:
+      max-parallel: 10
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}
 
