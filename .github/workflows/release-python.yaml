@@ -104,8 +104,8 @@ jobs:
               "default_runtime_version": "${{ steps.set-matrix.outputs.latest-runtime-version }}"
             }
 
-  # Build master images that are not dependent on existing builds.
-  build-main:
+  # Build and test amd64 image, push to temp tag for multi-arch merge
+  build-amd64:
     needs: [matrix]
 
     runs-on: ubuntu-latest
@@ -115,7 +115,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}
 
-    name: "py: ${{ matrix.python-version }}"
+    name: "amd64 py: ${{ matrix.python-version }}"
 
     steps:
       - name: Set default inputs if event is pull request
@@ -150,9 +150,6 @@ jobs:
             const generateTags = require("./.github/scripts/prepare-python-image-tags.js");
             return generateTags()
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
@@ -167,8 +164,8 @@ jobs:
           provenance: false
           load: true
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
-          cache-from: type=gha,scope=${{ matrix.image-name }}-${{ matrix.python-version }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.image-name }}-${{ matrix.python-version }}
+          cache-from: type=gha,scope=${{ matrix.image-name }}-${{ matrix.python-version }}-amd64
+          cache-to: type=gha,mode=max,scope=${{ matrix.image-name }}-${{ matrix.python-version }}-amd64
 
       - name: Test image
         run: docker run ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}
@@ -180,7 +177,7 @@ jobs:
           username: ${{ secrets.APIFY_SERVICE_ACCOUNT_DOCKERHUB_USERNAME }}
           password: ${{ secrets.APIFY_SERVICE_ACCOUNT_DOCKERHUB_TOKEN }}
 
-      - name: Build and push OCI image
+      - name: Push amd64 image
         if: github.event_name != 'pull_request'
         uses: docker/build-push-action@v6
         with:
@@ -188,9 +185,133 @@ jobs:
           file: ./${{ matrix.image-name }}/Dockerfile
           build-args: |
             PYTHON_VERSION=${{ matrix.python-version }}
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           provenance: true
           push: true
-          tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
+          tags: "${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}-amd64"
           outputs: type=image,oci-mediatypes=true
-          cache-from: type=gha,scope=${{ matrix.image-name }}-${{ matrix.python-version }}
+          cache-from: type=gha,scope=${{ matrix.image-name }}-${{ matrix.python-version }}-amd64
+
+  # Build arm64 image natively on ARM runner (avoids slow QEMU emulation)
+  build-arm64:
+    needs: [matrix]
+
+    runs-on: ubuntu-24.04-arm
+    if: ${{ github.event_name != 'pull_request' && toJson(fromJson(needs.matrix.outputs.matrix).include) != '[]' }}
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}
+
+    name: "arm64 py: ${{ matrix.python-version }}"
+
+    steps:
+      - name: Set default inputs if event is schedule
+        if: github.event_name == 'schedule'
+        run: |
+          if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=latest" >> $GITHUB_ENV; fi
+
+      - name: Check if inputs are set correctly
+        run: |
+          if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG input is empty!" >&2; exit 1; fi
+
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Prepare image tags
+        id: prepare-tags
+        uses: actions/github-script@v8
+        env:
+          CURRENT_PYTHON: ${{ matrix.python-version }}
+          LATEST_PYTHON: ${{ matrix.latest-python-version }}
+          RELEASE_TAG: ${{ env.RELEASE_TAG }}
+          IMAGE_NAME: apify/actor-${{ matrix.image-name }}
+          IS_LATEST_BROWSER_IMAGE: "true"
+        with:
+          script: |
+            const generateTags = require("./.github/scripts/prepare-python-image-tags.js");
+            return generateTags()
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.APIFY_SERVICE_ACCOUNT_DOCKERHUB_USERNAME }}
+          password: ${{ secrets.APIFY_SERVICE_ACCOUNT_DOCKERHUB_TOKEN }}
+
+      - name: Build and push arm64 image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.image-name }}
+          file: ./${{ matrix.image-name }}/Dockerfile
+          build-args: |
+            PYTHON_VERSION=${{ matrix.python-version }}
+          platforms: linux/arm64
+          provenance: true
+          push: true
+          tags: "${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}-arm64"
+          outputs: type=image,oci-mediatypes=true
+          cache-from: type=gha,scope=${{ matrix.image-name }}-${{ matrix.python-version }}-arm64
+          cache-to: type=gha,mode=max,scope=${{ matrix.image-name }}-${{ matrix.python-version }}-arm64
+
+  # Merge amd64 and arm64 images into a single multi-arch manifest
+  merge:
+    needs: [matrix, build-amd64, build-arm64]
+
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' }}
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}
+
+    name: "merge py: ${{ matrix.python-version }}"
+
+    steps:
+      - name: Set default inputs if event is schedule
+        if: github.event_name == 'schedule'
+        run: |
+          if [[ -z "$RELEASE_TAG" ]]; then echo "RELEASE_TAG=latest" >> $GITHUB_ENV; fi
+
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Prepare image tags
+        id: prepare-tags
+        uses: actions/github-script@v8
+        env:
+          CURRENT_PYTHON: ${{ matrix.python-version }}
+          LATEST_PYTHON: ${{ matrix.latest-python-version }}
+          RELEASE_TAG: ${{ env.RELEASE_TAG }}
+          IMAGE_NAME: apify/actor-${{ matrix.image-name }}
+          IS_LATEST_BROWSER_IMAGE: "true"
+        with:
+          script: |
+            const generateTags = require("./.github/scripts/prepare-python-image-tags.js");
+            return generateTags()
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.APIFY_SERVICE_ACCOUNT_DOCKERHUB_USERNAME }}
+          password: ${{ secrets.APIFY_SERVICE_ACCOUNT_DOCKERHUB_TOKEN }}
+
+      - name: Create and push multi-arch manifest
+        run: |
+          first_image="${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}"
+          all_tags="${{ fromJson(steps.prepare-tags.outputs.result).allTags }}"
+
+          tag_args=""
+          IFS=',' read -ra TAGS <<< "$all_tags"
+          for tag in "${TAGS[@]}"; do
+            tag_args="$tag_args -t $tag"
+          done
+
+          docker buildx imagetools create $tag_args \
+            "${first_image}-amd64" \
+            "${first_image}-arm64"
