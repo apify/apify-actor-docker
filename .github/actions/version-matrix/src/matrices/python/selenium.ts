@@ -7,8 +7,10 @@ import {
 	supportedPythonVersions,
 } from '../../shared/constants.ts';
 import { fetchPackageVersions } from '../../shared/pypi.ts';
+import { fetchPythonRuntimeVersions } from '../../shared/runtime-versions.ts';
 
 const versions = await fetchPackageVersions('selenium');
+const pythonRuntimeVersions = await fetchPythonRuntimeVersions(supportedPythonVersions);
 
 if (!shouldUseLastFive) {
 	console.warn('Testing with only the latest version of selenium to speed up CI');
@@ -19,9 +21,11 @@ const latestSeleniumVersion = lastFiveSeleniumVersions.at(-1)!;
 
 console.error('Last five versions:', lastFiveSeleniumVersions);
 console.error('Latest selenium version:', latestSeleniumVersion);
+console.error('Python runtime versions:', pythonRuntimeVersions);
 
 const cacheParams: CacheValues = {
 	PYTHON_VERSION: supportedPythonVersions,
+	PYTHON_RUNTIME_VERSION: pythonRuntimeVersions,
 	SELENIUM_VERSION: lastFiveSeleniumVersions,
 };
 

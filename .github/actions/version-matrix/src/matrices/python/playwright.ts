@@ -13,6 +13,7 @@ import {
 	supportedPythonVersions,
 } from '../../shared/constants.ts';
 import { fetchPackageVersions } from '../../shared/pypi.ts';
+import { fetchPythonRuntimeVersions } from '../../shared/runtime-versions.ts';
 
 /**
  * Certain playwright versions will not run on newer Python versions.
@@ -27,6 +28,7 @@ const playwrightPythonVersionConstraints = [
 
 const playwrightVersions = await fetchPackageVersions('playwright');
 const camoufoxVersions = await fetchPackageVersions('camoufox');
+const pythonRuntimeVersions = await fetchPythonRuntimeVersions(supportedPythonVersions);
 
 if (!shouldUseLastFive) {
 	console.warn('Testing with only the latest version of playwright to speed up CI');
@@ -41,10 +43,12 @@ const certificatesUpdatedAt = await getCertificatesUpdatedAt();
 console.error('Last five versions:', latestFivePlaywrightVersions);
 console.error('Latest playwright version:', latestPlaywrightVersion);
 console.error('Latest camoufox version:', latestCamoufoxVersion);
+console.error('Python runtime versions:', pythonRuntimeVersions);
 console.error('Certificates updated at:', certificatesUpdatedAt || '(not available)');
 
 const cacheParams: CacheValues = {
 	PYTHON_VERSION: supportedPythonVersions,
+	PYTHON_RUNTIME_VERSION: pythonRuntimeVersions,
 	PLAYWRIGHT_VERSION: latestFivePlaywrightVersions,
 	CAMOUFOX_VERSION: [latestCamoufoxVersion],
 	CERTIFICATES_UPDATED_AT: certificatesUpdatedAt ? [certificatesUpdatedAt] : [],
@@ -69,10 +73,7 @@ const imageNames = [
 ] as const;
 
 // Images that require Chrome/Chromium cannot be built for arm64 on Linux
-const arm64UnsupportedImages: ReadonlySet<string> = new Set([
-	'python-playwright',
-	'python-playwright-chrome',
-]);
+const arm64UnsupportedImages: ReadonlySet<string> = new Set(['python-playwright', 'python-playwright-chrome']);
 
 const matrix = {
 	include: [] as {

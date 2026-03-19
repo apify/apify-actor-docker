@@ -6,15 +6,18 @@ import {
 	supportedNodeVersions,
 } from '../../shared/constants.ts';
 import { fetchPackageVersions } from '../../shared/npm.ts';
+import { fetchNodeRuntimeVersions } from '../../shared/runtime-versions.ts';
 
 const apifyVersions = await fetchPackageVersions('apify');
 const crawleeVersions = await fetchPackageVersions('crawlee');
+const nodeRuntimeVersions = await fetchNodeRuntimeVersions(supportedNodeVersions);
 
 let latestCrawleeVersion = crawleeVersions.at(-1)!;
 let latestApifyVersion = apifyVersions.at(-1)!;
 
 console.error('Latest crawlee version:', latestCrawleeVersion);
 console.error('Latest apify version:', latestApifyVersion);
+console.error('Node runtime versions:', nodeRuntimeVersions);
 
 if (process.env.CRAWLEE_VERSION) {
 	console.error('Using custom crawlee version:', process.env.CRAWLEE_VERSION);
@@ -28,6 +31,7 @@ if (process.env.APIFY_VERSION) {
 
 const cacheParams: CacheValues = {
 	NODE_VERSION: supportedNodeVersions,
+	NODE_RUNTIME_VERSION: nodeRuntimeVersions,
 	APIFY_VERSION: [latestApifyVersion],
 	CRAWLEE_VERSION: [latestCrawleeVersion],
 };
