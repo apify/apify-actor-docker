@@ -1,4 +1,4 @@
-import { compare } from 'semver';
+import { compare, prerelease, valid } from 'semver';
 
 const nodeDistUrl = 'https://nodejs.org/dist/index.json';
 const pythonEndOfLifeUrl = 'https://endoflife.date/api/python.json';
@@ -30,6 +30,7 @@ export async function fetchNodeRuntimeVersions(majorVersions: string[]): Promise
 		const matching = entries
 			.filter((e) => e.version.startsWith(prefix))
 			.map((e) => e.version.slice(1)) // Remove 'v' prefix
+			.filter((v) => valid(v) !== null && prerelease(v) === null)
 			.sort((a, b) => compare(a, b));
 
 		const latest = matching.at(-1);
