@@ -108,7 +108,7 @@ RUN python -m pip install --upgrade \
     setuptools \
     wheel \
     playwright~=${PLAYWRIGHT_VERSION} \
-    camoufox~=${CAMOUFOX_VERSION} \
+    camoufox[geoip]~=${CAMOUFOX_VERSION} \
     # Fetch the Camoufox browser
     && python -m camoufox fetch \
     # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
