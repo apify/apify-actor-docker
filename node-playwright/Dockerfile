@@ -34,7 +34,7 @@ RUN apt-get update \
     && apt install --fix-missing -yq ./google-chrome-stable_current_amd64.deb && rm ./google-chrome-stable_current_amd64.deb \
     \
     # Add user so we don't need --no-sandbox.
-    && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
+    && groupadd -r -g 990 myuser && useradd -r -u 990 -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser \
     \
