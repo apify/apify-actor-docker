@@ -84,28 +84,24 @@ jobs:
           echo ""
           echo '${{ steps.set-matrix.outputs.matrix }}' | jq -e
 
-      - name: Push updated matrix
+      - name: Stage updated matrix
         id: push-matrix
         if: github.event_name != 'pull_request'
         run: |
-          # Setup git user
-          git config --global user.email "noreply@apify.com"
-          git config --global user.name "Apify CI Bot"
-          git config pull.rebase true
-
-          # Add and commit if there are changes
           git add ./.github/actions/version-matrix/data/*.json
-          if git diff-index --quiet HEAD; then
+          if git diff --cached --quiet; then
             echo "No changes to commit"
+            echo "should-trigger=false" >> $GITHUB_OUTPUT
           else
-            git commit -m "chore(docker): update ${{ env.RELEASE_TAG || 'latest' }} node:playwright cache"
             echo "should-trigger=true" >> $GITHUB_OUTPUT
           fi
 
-          # Try to push 5 times, with pulls between retries
-          for i in {1..5}; do
-            git push && break || echo "Failed to push, retrying in 5 seconds..." && sleep 5 && git pull
-          done
+      - name: Commit updated matrix
+        if: github.event_name != 'pull_request' && steps.push-matrix.outputs.should-trigger == 'true'
+        uses: apify/workflows/commit@v0.44.0
+        with:
+          commit-message: "chore(docker): update ${{ env.RELEASE_TAG || 'latest' }} node:playwright cache"
+          github-token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
 
       - name: Trigger workflow on actor-templates
         if: (steps.push-matrix.outputs.should-trigger == 'true' || github.event.inputs.trigger_templates_pr == 'true') && steps.set-matrix.outputs.latest-runtime-version != ''
