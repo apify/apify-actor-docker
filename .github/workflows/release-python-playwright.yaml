@@ -75,27 +75,18 @@ jobs:
           echo ""
           echo '${{ steps.set-matrix.outputs.matrix }}' | jq -e
 
-      - name: Stage updated matrix
-        id: push-matrix
-        if: github.event_name != 'pull_request'
-        run: |
-          git add ./.github/actions/version-matrix/data/*.json
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-            echo "should-trigger=false" >> $GITHUB_OUTPUT
-          else
-            echo "should-trigger=true" >> $GITHUB_OUTPUT
-          fi
-
       - name: Commit updated matrix
-        if: github.event_name != 'pull_request' && steps.push-matrix.outputs.should-trigger == 'true'
-        uses: apify/workflows/commit@v0.44.0
+        id: commit
+        if: github.event_name != 'pull_request'
+        uses: apify/actions/signed-commit@v1.0.0
         with:
-          commit-message: "chore(docker): update ${{ env.RELEASE_TAG || 'latest' }} python:playwright cache"
+          message: "chore(docker): update ${{ env.RELEASE_TAG || 'latest' }} python:playwright cache"
+          add: ./.github/actions/version-matrix/data/*.json
+          retries: 5
           github-token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
 
       - name: Trigger workflow on actor-templates
-        if: (steps.push-matrix.outputs.should-trigger == 'true' || github.event.inputs.trigger_templates_pr == 'true') && steps.set-matrix.outputs.latest-runtime-version != ''
+        if: (steps.commit.outputs.committed == 'true' || github.event.inputs.trigger_templates_pr == 'true') && steps.set-matrix.outputs.latest-runtime-version != ''
         uses: peter-evans/repository-dispatch@v4
         with:
           token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
