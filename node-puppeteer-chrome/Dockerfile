@@ -69,8 +69,9 @@ WORKDIR /home/myuser
 COPY --chown=myuser:myuser package.json main.js check-puppeteer-version.mjs puppeteer_*.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh xvfb-entrypoint.sh /home/myuser/
 
 # Skip puppeteer's bundled browser download — we use system Chrome instead.
-# PUPPETEER_SKIP_CHROMIUM_DOWNLOAD was the old name (puppeteer <22); PUPPETEER_SKIP_DOWNLOAD is current.
+# PUPPETEER_SKIP_CHROMIUM_DOWNLOAD is the old name (puppeteer <25); PUPPETEER_SKIP_DOWNLOAD is current (puppeteer 25+).
 ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 # Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
 ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
