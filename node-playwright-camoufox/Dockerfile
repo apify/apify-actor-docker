@@ -4,6 +4,11 @@ ARG NODE_VERSION=
 # Use trixie to be consistent across node versions.
 FROM node:${NODE_VERSION}-trixie-slim
 
+# Playwright version is passed in the format `v1.57.0-` (matching the tag
+# format used by the full node-playwright image). Stripped below before
+# being passed to npx.
+ARG PLAYWRIGHT_VERSION=
+
 LABEL maintainer="support@apify.com" \
     description="Base image for Apify Actors written in Node.js using Playwright with Camoufox"
 
@@ -46,7 +51,8 @@ RUN apt update \
     fonts-wqy-zenhei \
     \
     # Install playwright browser dependencies for firefox (camoufox is firefox-based)
-    && npx playwright install-deps firefox \
+    && _PW_VERSION="${PLAYWRIGHT_VERSION#v}" && _PW_VERSION="${_PW_VERSION%-}" \
+    && npx playwright@${_PW_VERSION} install-deps firefox \
     \
     # Register certificates
     && chmod +x ./register_intermediate_certs.sh \
