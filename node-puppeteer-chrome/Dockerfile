@@ -2,8 +2,32 @@ ARG NODE_VERSION=22
 # Use trixie to be consistent across node versions.
 FROM --platform=linux/amd64 node:${NODE_VERSION}-trixie-slim
 
+# Version of puppeteer that pins the browser revisions we install below.
+# Must match the puppeteer version in package.json so that the runtime puppeteer finds its expected Chrome revision.
+ARG PUPPETEER_VERSION
+
 LABEL maintainer="support@apify.com" description="Base image for Apify Actors using headless Chrome"
 ENV DEBIAN_FRONTEND=noninteractive
+
+# Set the shell to use /bin/bash with specific options (see Hadolint DL4006)
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Set up XVFB
+ENV XVFB_WHD=1920x1080x24+32
+
+# Tells puppeteer where to install and where to find browsers
+ENV PUPPETEER_CACHE_DIR=/puppeteer-browsers
+
+# Tell the crawlee cli that we already have browsers installed, so it skips installing them
+ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
+
+# Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
+ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
+
+# Prevent installing of browsers by future `npm install`.
+# PUPPETEER_SKIP_CHROMIUM_DOWNLOAD is the old name (puppeteer <22); PUPPETEER_SKIP_DOWNLOAD is current (puppeteer 22+).
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 # This image was inspired by https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-in-docker
 
@@ -19,7 +43,6 @@ RUN apt update \
     && sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list' \
     && sh -c 'echo "deb http://ftp.us.debian.org/debian trixie main non-free" >> /etc/apt/sources.list.d/fonts.list' \
     && apt update \
-    && apt purge --auto-remove -y unzip \
     && apt install -y \
     fonts-freefont-ttf \
     fonts-ipafont-gothic \
@@ -41,6 +64,17 @@ RUN apt update \
     # Install chrome
     && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -nv \
     && apt install --fix-missing -yq ./google-chrome-stable_current_amd64.deb && rm ./google-chrome-stable_current_amd64.deb \
+    \
+    # Pre-install the puppeteer-bundled browsers into PUPPETEER_CACHE_DIR.
+    # PUPPETEER_SKIP_DOWNLOAD only blocks puppeteer's npm postinstall hook, not the explicit `browsers install` command.
+    # We pin the puppeteer version so the installed Chrome revision matches the one the runtime puppeteer expects.
+    # We install both `chrome` (used when launching with headless: true) and `chrome-headless-shell` (used when launching with headless: 'shell').
+    && npx --yes puppeteer@${PUPPETEER_VERSION} browsers install chrome \
+    && npx --yes puppeteer@${PUPPETEER_VERSION} browsers install chrome-headless-shell \
+    && chmod -R a+rX ${PUPPETEER_CACHE_DIR} \
+    \
+    # unzip is only needed during browser extraction above; drop it now.
+    && apt purge --auto-remove -y unzip \
     \
     # Add user so we don't need --no-sandbox.
     && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
@@ -68,17 +102,6 @@ WORKDIR /home/myuser
 # Copy source code and xvfb script
 COPY --chown=myuser:myuser package.json main.js check-puppeteer-version.mjs puppeteer_*.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh xvfb-entrypoint.sh /home/myuser/
 
-# Skip puppeteer's bundled browser download — we use system Chrome instead.
-# PUPPETEER_SKIP_CHROMIUM_DOWNLOAD is the old name (puppeteer <25); PUPPETEER_SKIP_DOWNLOAD is current (puppeteer 25+).
-ENV PUPPETEER_SKIP_DOWNLOAD=true
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-
-# Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
-ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
-
-# Tell the crawlee cli that we already have browers installed, so it skips installing them
-ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
-
 # Tell Node.js this is a production environemnt
 ENV NODE_ENV=production
 
@@ -99,9 +122,6 @@ RUN npm --quiet set progress=false \
     && npm --version \
     && echo "Google Chrome version:" \
     && bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version"
-
-# Set up xvfb
-ENV XVFB_WHD=1920x1080x24+32
 
 # The entrypoint script will be the one handling the CMD passed in, and will always wrap it into xvfb-run
 ENTRYPOINT ["/home/myuser/xvfb-entrypoint.sh"]
