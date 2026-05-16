@@ -344,7 +344,7 @@ test-node-puppeteer-chrome:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PUPPETEER_VERSION=$(PUPPETEER_VERSION) node ./scripts/update-package-json.mjs ./node-puppeteer-chrome
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-puppeteer-chrome/Dockerfile --tag apify/node-puppeteer-chrome:local --output type=docker,oci-mediatypes=true ./node-puppeteer-chrome
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PUPPETEER_VERSION=$(PUPPETEER_VERSION) --file ./node-puppeteer-chrome/Dockerfile --tag apify/node-puppeteer-chrome:local --output type=docker,oci-mediatypes=true ./node-puppeteer-chrome
 	docker run --rm -it --platform linux/amd64 apify/node-puppeteer-chrome:local
 
 	@# Restore package.json
@@ -362,7 +362,7 @@ test-node-puppeteer-chrome-arm:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PUPPETEER_VERSION=$(PUPPETEER_VERSION) node ./scripts/update-package-json.mjs ./node-puppeteer-chrome
 
-	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-puppeteer-chrome/Dockerfile --tag apify/node-puppeteer-chrome:local --load ./node-puppeteer-chrome
+	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PUPPETEER_VERSION=$(PUPPETEER_VERSION) --file ./node-puppeteer-chrome/Dockerfile --tag apify/node-puppeteer-chrome:local --load ./node-puppeteer-chrome
 	docker run --rm -it --platform linux/arm64 apify/node-puppeteer-chrome:local
 
 	@# Restore package.json

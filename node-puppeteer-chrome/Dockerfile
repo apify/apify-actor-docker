@@ -67,20 +67,17 @@ RUN apt update \
     \
     # Pre-install the puppeteer-bundled browsers into PUPPETEER_CACHE_DIR.
     # We install puppeteer-core@${PUPPETEER_VERSION} to read its pinned Chrome revisions
-    # (parsing revisions.js as text so it works for both CJS in puppeteer 24 and ESM in puppeteer 25),
-    # then invoke a newer @puppeteer/browsers CLI to actually download.
+    # via the package's public ESM export, then invoke @puppeteer/browsers CLI to actually download.
     # Older puppeteer versions bundle @puppeteer/browsers 2.13.0, which silently fails to extract
-    # Chrome on node 26 (the binary is missing after extraction).
+    # Chrome on node 26 (the binary is missing after extraction), so we always use the latest CLI.
     && cd /tmp \
     && npm init -y --silent > /dev/null \
     && npm install --no-save --no-package-lock --omit=optional puppeteer-core@${PUPPETEER_VERSION} \
-    && REVISIONS_FILE=$(find /tmp/node_modules/puppeteer-core/lib -name revisions.js -not -name "*.map" | head -1) \
-    && CHROME_VERSION=$(grep -E "^[[:space:]]*chrome:" "$REVISIONS_FILE" | sed -E "s/.*['\"]([0-9.]+)['\"].*/\1/") \
-    && CHS_VERSION=$(grep -E "['\"]chrome-headless-shell['\"][[:space:]]*:" "$REVISIONS_FILE" | sed -E "s/.*:[[:space:]]*['\"]([0-9.]+)['\"].*/\1/") \
-    && rm -rf /tmp/node_modules /tmp/package.json /tmp/package-lock.json \
+    && read -r CHROME_VERSION CHS_VERSION < <(node --input-type=module -e "import {PUPPETEER_REVISIONS as r} from 'puppeteer-core'; console.log(r.chrome, r['chrome-headless-shell'])") \
+    && rm -rf /tmp/node_modules /tmp/package*.json \
     && cd / \
-    && npx --yes @puppeteer/browsers@3.0.2 install chrome@${CHROME_VERSION} --path ${PUPPETEER_CACHE_DIR} \
-    && npx --yes @puppeteer/browsers@3.0.2 install chrome-headless-shell@${CHS_VERSION} --path ${PUPPETEER_CACHE_DIR} \
+    && npx --yes @puppeteer/browsers install chrome@${CHROME_VERSION} --path ${PUPPETEER_CACHE_DIR} \
+    && npx --yes @puppeteer/browsers install chrome-headless-shell@${CHS_VERSION} --path ${PUPPETEER_CACHE_DIR} \
     && chmod -R a+rX ${PUPPETEER_CACHE_DIR} \
     \
     # unzip is only needed during browser extraction above; drop it now.
