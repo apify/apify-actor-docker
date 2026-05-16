@@ -2,8 +2,7 @@ ARG NODE_VERSION=22
 # Use trixie to be consistent across node versions.
 FROM --platform=linux/amd64 node:${NODE_VERSION}-trixie-slim
 
-# Version of puppeteer that pins the browser revisions we install below.
-# Must match the puppeteer version in package.json so that the runtime puppeteer finds its expected Chrome revision.
+# Must match the puppeteer version in package.json so the installed Chrome revisions line up with what runtime puppeteer expects.
 ARG PUPPETEER_VERSION
 
 LABEL maintainer="support@apify.com" description="Base image for Apify Actors using headless Chrome"
@@ -24,8 +23,7 @@ ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 # Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
 ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
 
-# Prevent installing of browsers by future `npm install`.
-# PUPPETEER_SKIP_CHROMIUM_DOWNLOAD is the old name (puppeteer <22); PUPPETEER_SKIP_DOWNLOAD is current (puppeteer 22+).
+# Skip browser download during `npm install`. CHROMIUM_DOWNLOAD is the old name (puppeteer <22), kept for back-compat.
 ENV PUPPETEER_SKIP_DOWNLOAD=true
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
@@ -65,11 +63,9 @@ RUN apt update \
     && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -nv \
     && apt install --fix-missing -yq ./google-chrome-stable_current_amd64.deb && rm ./google-chrome-stable_current_amd64.deb \
     \
-    # Pre-install the puppeteer-bundled browsers into PUPPETEER_CACHE_DIR.
-    # We install puppeteer-core@${PUPPETEER_VERSION} to read its pinned Chrome revisions
-    # via the package's public ESM export, then invoke @puppeteer/browsers CLI to actually download.
-    # Older puppeteer versions bundle @puppeteer/browsers 2.13.0, which silently fails to extract
-    # Chrome on node 26 (the binary is missing after extraction), so we always use the latest CLI.
+    # Pre-install browsers into PUPPETEER_CACHE_DIR using the latest @puppeteer/browsers CLI —
+    # puppeteer 24.x bundles 2.13.0, which silently fails to extract Chrome on node 26.
+    # The pinned Chrome revisions come from puppeteer-core's PUPPETEER_REVISIONS export.
     && cd /tmp \
     && npm init -y --silent > /dev/null \
     && npm install --no-save --no-package-lock --omit=optional puppeteer-core@${PUPPETEER_VERSION} \
