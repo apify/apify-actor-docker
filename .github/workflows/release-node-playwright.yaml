@@ -87,7 +87,7 @@ jobs:
       - name: Commit updated matrix
         id: commit
         if: github.event_name != 'pull_request'
-        uses: apify/actions/signed-commit@v1.0.0
+        uses: apify/actions/signed-commit@v1.1.2
         with:
           message: "chore(docker): update ${{ env.RELEASE_TAG || 'latest' }} node:playwright cache"
           add: ./.github/actions/version-matrix/data/*.json
