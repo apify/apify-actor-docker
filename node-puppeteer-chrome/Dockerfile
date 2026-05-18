@@ -2,8 +2,30 @@ ARG NODE_VERSION=22
 # Use trixie to be consistent across node versions.
 FROM --platform=linux/amd64 node:${NODE_VERSION}-trixie-slim
 
+# Must match the puppeteer version in package.json so the installed Chrome revisions line up with what runtime puppeteer expects.
+ARG PUPPETEER_VERSION
+
 LABEL maintainer="support@apify.com" description="Base image for Apify Actors using headless Chrome"
 ENV DEBIAN_FRONTEND=noninteractive
+
+# Set the shell to use /bin/bash with specific options (see Hadolint DL4006)
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Set up XVFB
+ENV XVFB_WHD=1920x1080x24+32
+
+# Tells puppeteer where to install and where to find browsers
+ENV PUPPETEER_CACHE_DIR=/puppeteer-browsers
+
+# Tell the crawlee cli that we already have browsers installed, so it skips installing them
+ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
+
+# Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
+ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
+
+# Skip browser download during `npm install`. CHROMIUM_DOWNLOAD is the old name (puppeteer <22), kept for back-compat.
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 # This image was inspired by https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-in-docker
 
@@ -19,7 +41,6 @@ RUN apt update \
     && sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list' \
     && sh -c 'echo "deb http://ftp.us.debian.org/debian trixie main non-free" >> /etc/apt/sources.list.d/fonts.list' \
     && apt update \
-    && apt purge --auto-remove -y unzip \
     && apt install -y \
     fonts-freefont-ttf \
     fonts-ipafont-gothic \
@@ -41,6 +62,22 @@ RUN apt update \
     # Install chrome
     && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -nv \
     && apt install --fix-missing -yq ./google-chrome-stable_current_amd64.deb && rm ./google-chrome-stable_current_amd64.deb \
+    \
+    # Pre-install browsers into PUPPETEER_CACHE_DIR using the latest @puppeteer/browsers CLI —
+    # puppeteer 24.x bundles 2.13.0, which silently fails to extract Chrome on node 26.
+    # The pinned Chrome revisions come from puppeteer-core's PUPPETEER_REVISIONS export.
+    && cd /tmp \
+    && npm init -y --silent > /dev/null \
+    && npm install --no-save --no-package-lock --omit=optional puppeteer-core@${PUPPETEER_VERSION} \
+    && read -r CHROME_VERSION CHS_VERSION < <(node --input-type=module -e "import {PUPPETEER_REVISIONS as r} from 'puppeteer-core'; console.log(r.chrome, r['chrome-headless-shell'])") \
+    && rm -rf /tmp/node_modules /tmp/package*.json \
+    && cd / \
+    && npx --yes @puppeteer/browsers install chrome@${CHROME_VERSION} --path ${PUPPETEER_CACHE_DIR} \
+    && npx --yes @puppeteer/browsers install chrome-headless-shell@${CHS_VERSION} --path ${PUPPETEER_CACHE_DIR} \
+    && chmod -R a+rX ${PUPPETEER_CACHE_DIR} \
+    \
+    # unzip is only needed during browser extraction above; drop it now.
+    && apt purge --auto-remove -y unzip \
     \
     # Add user so we don't need --no-sandbox.
     && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
@@ -68,17 +105,6 @@ WORKDIR /home/myuser
 # Copy source code and xvfb script
 COPY --chown=myuser:myuser package.json main.js check-puppeteer-version.mjs puppeteer_*.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh xvfb-entrypoint.sh /home/myuser/
 
-# Uncomment to skip the chromium download when installing puppeteer. If you do,
-# you'll need to launch puppeteer with:
-#     browser.launch({executablePath: 'google-chrome'})
-# ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
-
-# Sets path to Chrome executable, this is used by Apify.launchPuppeteer()
-ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/google-chrome
-
-# Tell the crawlee cli that we already have browers installed, so it skips installing them
-ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
-
 # Tell Node.js this is a production environemnt
 ENV NODE_ENV=production
 
@@ -99,9 +125,6 @@ RUN npm --quiet set progress=false \
     && npm --version \
     && echo "Google Chrome version:" \
     && bash -c "$APIFY_CHROME_EXECUTABLE_PATH --version"
-
-# Set up xvfb
-ENV XVFB_WHD=1920x1080x24+32
 
 # The entrypoint script will be the one handling the CMD passed in, and will always wrap it into xvfb-run
 ENTRYPOINT ["/home/myuser/xvfb-entrypoint.sh"]
