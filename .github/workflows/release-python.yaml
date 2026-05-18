@@ -76,6 +76,7 @@ jobs:
           message: "chore(docker): update ${{ env.RELEASE_TAG || 'latest' }} python:normal cache"
           add: ./.github/actions/version-matrix/data/*.json
           retries: 5
+          pull: '--rebase --autostash'
           github-token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
 
       - name: Trigger workflow on actor-templates

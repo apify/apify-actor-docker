@@ -51,6 +51,7 @@ jobs:
           message: "chore(certificates): update Firefox intermediate certificates"
           add: ./certificates/
           retries: 5
+          pull: '--rebase --autostash'
           github-token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
 
       - name: Summary
