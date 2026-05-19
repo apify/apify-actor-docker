@@ -30,8 +30,7 @@ jobs:
       - name: Check for changes
         id: check-changes
         run: |
-          git add ./certificates/firefox-certificates.zip
-          if git diff --cached --quiet; then
+          if git diff --quiet -- ./certificates/firefox-certificates.zip; then
             echo "No changes detected in certificates"
             echo "has_changes=false" >> $GITHUB_OUTPUT
           else
@@ -39,27 +38,21 @@ jobs:
             echo "has_changes=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Update timestamp and commit
+      - name: Update timestamp
         if: steps.check-changes.outputs.has_changes == 'true'
         run: |
           # Update the last-updated-at file
           date -u +"%Y-%m-%dT%H:%M:%SZ" > ./certificates/.last-updated-at
 
-          # Setup git user
-          git config --global user.email "noreply@apify.com"
-          git config --global user.name "Apify CI Bot"
-          git config pull.rebase true
-
-          # Stage all certificate changes
-          git add ./certificates/
-
-          # Commit and push
-          git commit -m "chore(certificates): update Firefox intermediate certificates"
-
-          # Try to push with retries
-          for i in {1..5}; do
-            git push && break || echo "Failed to push, retrying in 5 seconds..." && sleep 5 && git pull --rebase
-          done
+      - name: Commit certificate changes
+        if: steps.check-changes.outputs.has_changes == 'true'
+        uses: apify/actions/signed-commit@v1.1.2
+        with:
+          message: "chore(certificates): update Firefox intermediate certificates"
+          add: ./certificates/
+          retries: 5
+          pull: '--rebase --autostash'
+          github-token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
 
       - name: Summary
         run: |
