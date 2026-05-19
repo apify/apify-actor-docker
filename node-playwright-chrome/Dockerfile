@@ -4,6 +4,11 @@ ARG NODE_VERSION=
 # Use trixie to be consistent across node versions.
 FROM --platform=linux/amd64 node:${NODE_VERSION}-trixie-slim
 
+# Playwright version is passed in the format `v1.57.0-` (matching the tag
+# format used by the full node-playwright image). Stripped below before
+# being passed to npx.
+ARG PLAYWRIGHT_VERSION=
+
 LABEL maintainer="support@apify.com" \
     description="Base image for Apify Actors written in Node.js using Playwright with only Chrome/Chromium"
 
@@ -55,9 +60,10 @@ RUN apt update \
     fonts-wqy-zenhei \
     \
     # Install playwright browser dependencies and browsers for chrome
-    && npx playwright install-deps chrome \
-    && npx playwright install chrome \
-    && npx playwright install chromium \
+    && _PW_VERSION="${PLAYWRIGHT_VERSION#v}" && _PW_VERSION="${_PW_VERSION%-}" \
+    && npx playwright@${_PW_VERSION} install-deps chrome \
+    && npx playwright@${_PW_VERSION} install chrome \
+    && npx playwright@${_PW_VERSION} install chromium \
     # symlink the chromium binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
     && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/chromium-*/chrome-linux*/chrome ${PLAYWRIGHT_BROWSERS_PATH}/ \
     \

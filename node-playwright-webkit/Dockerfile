@@ -4,6 +4,11 @@ ARG NODE_VERSION=
 # Use trixie to be consistent across node versions.
 FROM --platform=linux/amd64 node:${NODE_VERSION}-trixie-slim
 
+# Playwright version is passed in the format `v1.57.0-` (matching the tag
+# format used by the full node-playwright image). Stripped below before
+# being passed to npx.
+ARG PLAYWRIGHT_VERSION=
+
 LABEL maintainer="support@apify.com" \
     description="Base image for Apify Actors written in Node.js using Playwright with WebKit"
 
@@ -40,9 +45,10 @@ RUN apt update \
     fonts-wqy-zenhei \
     \
     # Install playwright browser dependencies and browsers for webkit
-    && npx playwright install-deps webkit \
+    && _PW_VERSION="${PLAYWRIGHT_VERSION#v}" && _PW_VERSION="${_PW_VERSION%-}" \
+    && npx playwright@${_PW_VERSION} install-deps webkit \
     && apt install -y libgtk-3-0 \
-    && npx playwright install webkit \
+    && npx playwright@${_PW_VERSION} install webkit \
     # symlink the webkit binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
     && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/webkit-*/minibrowser-gtk/MiniBrowser ${PLAYWRIGHT_BROWSERS_PATH}/ \
     \

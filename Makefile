@@ -205,7 +205,7 @@ test-node-playwright-chrome:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-chrome
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-chrome/Dockerfile --tag apify/node-playwright-chrome:local --load ./node-playwright-chrome
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-chrome/Dockerfile --tag apify/node-playwright-chrome:local --load ./node-playwright-chrome
 	docker run --rm -it --platform linux/amd64 apify/node-playwright-chrome:local
 
 	@# Restore package.json
@@ -223,7 +223,7 @@ test-node-playwright-chrome-arm:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-chrome
 
-	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-chrome/Dockerfile --tag apify/node-playwright-chrome:local --load ./node-playwright-chrome
+	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-chrome/Dockerfile --tag apify/node-playwright-chrome:local --load ./node-playwright-chrome
 	docker run --rm -it --platform linux/arm64 apify/node-playwright-chrome:local
 
 	@# Restore package.json
@@ -241,7 +241,7 @@ test-node-playwright-firefox:
 	@# Copy Firefox certificates
 	$(call copy-firefox-certs,node-playwright-firefox)
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-firefox/Dockerfile --tag apify/node-playwright-firefox:local --load ./node-playwright-firefox
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-firefox/Dockerfile --tag apify/node-playwright-firefox:local --load ./node-playwright-firefox
 	docker run --rm -it --platform linux/amd64 apify/node-playwright-firefox:local
 
 	@# Restore package.json and cleanup certificates
@@ -260,7 +260,7 @@ test-node-playwright-firefox-arm:
 	@# Copy Firefox certificates
 	$(call copy-firefox-certs,node-playwright-firefox)
 
-	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-firefox/Dockerfile --tag apify/node-playwright-firefox:local --load ./node-playwright-firefox
+	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-firefox/Dockerfile --tag apify/node-playwright-firefox:local --load ./node-playwright-firefox
 	docker run --rm -it --platform linux/arm64 apify/node-playwright-firefox:local
 
 	@# Restore package.json and cleanup certificates
@@ -279,7 +279,7 @@ test-node-playwright-camoufox:
 	@# Copy Firefox certificates
 	$(call copy-firefox-certs,node-playwright-camoufox)
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-camoufox/Dockerfile --tag apify/node-playwright-camoufox:local --load ./node-playwright-camoufox
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-camoufox/Dockerfile --tag apify/node-playwright-camoufox:local --load ./node-playwright-camoufox
 	docker run --rm -it --platform linux/amd64 apify/node-playwright-camoufox:local
 
 	@# Restore package.json and cleanup certificates
@@ -298,7 +298,7 @@ test-node-playwright-camoufox-arm:
 	@# Copy Firefox certificates
 	$(call copy-firefox-certs,node-playwright-camoufox)
 
-	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-camoufox/Dockerfile --tag apify/node-playwright-camoufox:local --load ./node-playwright-camoufox
+	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-camoufox/Dockerfile --tag apify/node-playwright-camoufox:local --load ./node-playwright-camoufox
 	docker run --rm -it --platform linux/arm64 apify/node-playwright-camoufox:local
 
 	@# Restore package.json and cleanup certificates
@@ -314,7 +314,7 @@ test-node-playwright-webkit:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-webkit
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-webkit/Dockerfile --tag apify/node-playwright-webkit:local --load ./node-playwright-webkit
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-webkit/Dockerfile --tag apify/node-playwright-webkit:local --load ./node-playwright-webkit
 	docker run --rm -it --platform linux/amd64 apify/node-playwright-webkit:local
 
 	@# Restore package.json
@@ -329,7 +329,7 @@ test-node-playwright-webkit-arm:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-webkit
 
-	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node-playwright-webkit/Dockerfile --tag apify/node-playwright-webkit:local --load ./node-playwright-webkit
+	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-webkit/Dockerfile --tag apify/node-playwright-webkit:local --load ./node-playwright-webkit
 	docker run --rm -it --platform linux/arm64 apify/node-playwright-webkit:local
 
 	@# Restore package.json
