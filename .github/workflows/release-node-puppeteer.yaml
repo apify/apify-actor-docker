@@ -196,7 +196,9 @@ jobs:
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
-          build-args: NODE_VERSION=${{ matrix.node-version }}
+          build-args: |
+            NODE_VERSION=${{ matrix.node-version }}
+            PUPPETEER_VERSION=${{ matrix.puppeteer-version }}
           platforms: linux/amd64
           provenance: false
           load: true
@@ -220,7 +222,9 @@ jobs:
         with:
           context: ./${{ matrix.image-name }}
           file: ./${{ matrix.image-name }}/Dockerfile
-          build-args: NODE_VERSION=${{ matrix.node-version }}
+          build-args: |
+            NODE_VERSION=${{ matrix.node-version }}
+            PUPPETEER_VERSION=${{ matrix.puppeteer-version }}
           platforms: linux/amd64
           provenance: true
           push: true
