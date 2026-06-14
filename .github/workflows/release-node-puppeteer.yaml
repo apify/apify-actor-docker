@@ -209,6 +209,41 @@ jobs:
       - name: Test image
         run: docker run ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}
 
+      - name: Measure image size
+        id: image-size
+        if: github.event_name == 'pull_request'
+        env:
+          MATRIX_JSON: ${{ toJSON(matrix) }}
+          NEW_IMAGE: ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}
+          BASE_IMAGE: apify/actor-${{ matrix.image-name }}:${{ matrix.node-version }}
+        run: |
+          set -euo pipefail
+          mkdir -p size-report
+          id="$(printf '%s' "$MATRIX_JSON" | sha256sum | cut -c1-16)"
+          new_bytes="$(docker image inspect "$NEW_IMAGE" --format '{{.Size}}')"
+          if docker pull --platform linux/amd64 "$BASE_IMAGE" >/dev/null 2>&1; then
+            current_bytes="$(docker image inspect "$BASE_IMAGE" --format '{{.Size}}')"
+          else
+            current_bytes=""
+            echo "No published baseline image found for ${BASE_IMAGE}"
+          fi
+          jq -n \
+            --argjson matrix "$MATRIX_JSON" \
+            --arg base "$BASE_IMAGE" \
+            --arg current "$current_bytes" \
+            --arg new "$new_bytes" \
+            '{matrix: $matrix, baseImage: $base, currentBytes: $current, newBytes: $new}' \
+            > "size-report/${id}.json"
+          echo "id=${id}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload image size report
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v7
+        with:
+          name: image-size-${{ steps.image-size.outputs.id }}
+          path: size-report/
+          retention-days: 1
+
       - name: Login to DockerHub
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v4
@@ -231,3 +266,41 @@ jobs:
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
           outputs: type=image,oci-mediatypes=true
           cache-from: type=gha,scope=${{ matrix.image-name }}-${{ matrix.node-version }}-${{ matrix.puppeteer-version }}
+
+  # Aggregate the per-image size reports uploaded by the build matrix and post/update
+  # a single sticky PR comment comparing current vs new image sizes.
+  size-report:
+    name: Report image size changes
+    needs: [build-main]
+    if: ${{ always() && github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Download image size reports
+        uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          pattern: image-size-*
+          path: size-reports
+          merge-multiple: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Render comment body
+        run: |
+          mkdir -p size-reports
+          node .github/scripts/format-image-size-report.ts size-reports | tee image-size-comment.md
+
+      - name: Post or update image size comment
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          header: image-sizes-node-puppeteer
+          path: image-size-comment.md
