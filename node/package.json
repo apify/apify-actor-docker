@@ -8,8 +8,10 @@
     },
     "dependencies": {
         "apify": "APIFY_VERSION",
-        "crawlee": "CRAWLEE_VERSION",
-        "typescript": "^5.4.3"
+        "crawlee": "CRAWLEE_VERSION"
+    },
+    "devDependencies": {
+        "typescript": "^5.9.2"
     },
     "overrides": {
         "apify": {

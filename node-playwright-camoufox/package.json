@@ -11,8 +11,10 @@
         "camoufox-js": "CAMOUFOX_VERSION",
         "crawlee": "CRAWLEE_VERSION",
         "impit": "latest",
-        "playwright": "PLAYWRIGHT_VERSION",
-        "typescript": "^5.4.3"
+        "playwright": "PLAYWRIGHT_VERSION"
+    },
+    "devDependencies": {
+        "typescript": "^5.9.2"
     },
     "overrides": {
         "apify": {
