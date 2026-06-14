@@ -81,6 +81,15 @@ RUN apt update \
     # Globally disable the update-notifier.
     && npm config --global set update-notifier false \
     \
+    # Install the latest Corepack so Actors can opt into yarn or pnpm; `enable` drops the shims into the global bin.
+    && npm install -g corepack@latest \
+    && corepack enable \
+    \
+    # Pre-create the shared package-manager cache dirs (see the *_CACHE_*/*_STORE_DIR env vars), world-writable so any
+    # user can populate them and `rm -rf` them at the end to reclaim space, regardless of which user the Actor runs as.
+    && mkdir -p /pkg-cache/npm /pkg-cache/yarn /pkg-cache/pnpm/store /pkg-cache/pnpm/cache \
+    && chmod -R 777 /pkg-cache \
+    \
     # Cleanup time
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
@@ -104,6 +113,20 @@ ENV NODE_ENV=production
 # However they did not think about all the sites there with large headers,
 # so we put back the old limit of 80kb, which seems to work just fine.
 ENV NODE_OPTIONS="--max_old_space_size=30000 --max-http-header-size=80000"
+
+# Send every package-manager cache to a single, dedicated location instead of $HOME.
+# npm, yarn, and pnpm have no real "disable the cache" switch (unlike pip), so isolating
+# their caches under /pkg-cache is the practical equivalent: the tree holds only throwaway
+# cache data and can be wiped or mounted as tmpfs without touching installed dependencies.
+ENV NPM_CONFIG_CACHE=/pkg-cache/npm \
+    YARN_CACHE_FOLDER=/pkg-cache/yarn \
+    YARN_GLOBAL_FOLDER=/pkg-cache/yarn \
+    PNPM_CONFIG_STORE_DIR=/pkg-cache/pnpm/store \
+    PNPM_CONFIG_CACHE_DIR=/pkg-cache/pnpm/cache
+
+# Make pnpm use a flat, npm-style node_modules (the `hoisted` linker) instead of its
+# default symlinked layout, so installed dependencies are plain copies with no symlinks.
+ENV PNPM_CONFIG_NODE_LINKER=hoisted
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
