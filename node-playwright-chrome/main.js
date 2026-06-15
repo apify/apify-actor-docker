@@ -11,31 +11,29 @@ For more information, see https://docs.apify.com/actors/development/source-code#
 `);
 console.log('Testing Docker image...');
 
-// `apify` is optional: the empty-* test images ship without it preinstalled.
-let Actor;
-try {
-    ({ Actor } = require('apify'));
-} catch {
-    Actor = undefined;
-}
-
+const { Actor } = require('apify');
+const { launchPlaywright, getMemoryInfo } = require('crawlee');
 const { testChrome } = require('./chrome_test');
 
-const run = async () => {
-    // Full Chrome headless
+Actor.main(async () => {
+    // Sanity test browsers.
+    // We need --no-sandbox, because even though the build is running on GitHub, the test is running in Docker.
+    const launchOptions = { headless: true, args: ['--no-sandbox'] };
+    const launchContext = { launchOptions };
+
+    const browser = await launchPlaywright(launchContext);
+    await browser.close();
+
+    // Try to use full Chrome headless
     await testChrome({ headless: true });
 
-    // Full Chrome with XVFB (headful)
+    // Try to use full Chrome with XVFB
     await testChrome({ headless: false });
 
-    console.log('... test PASSED');
-};
+    // Try to use playwright default
+    await testChrome({ executablePath: undefined });
+    await testChrome({ executablePath: process.env.APIFY_DEFAULT_BROWSER_PATH });
 
-if (Actor) {
-    Actor.main(run);
-} else {
-    run().catch((error) => {
-        console.error(error);
-        process.exitCode = 1;
-    });
-}
+    // Test that "ps" command is available, sometimes it was missing in official Node builds
+    await getMemoryInfo();
+});

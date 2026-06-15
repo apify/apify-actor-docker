@@ -6,6 +6,17 @@
     "scripts": {
         "start": "node main.js"
     },
-    "dependencies": {},
+    "dependencies": {
+        "apify": "APIFY_VERSION",
+        "crawlee": "CRAWLEE_VERSION",
+        "typescript": "^5.4.3"
+    },
+    "overrides": {
+        "apify": {
+            "@crawlee/core": "CRAWLEE_VERSION",
+            "@crawlee/types": "CRAWLEE_VERSION",
+            "@crawlee/utils": "CRAWLEE_VERSION"
+        }
+    },
     "repository": {}
 }

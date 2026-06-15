@@ -7,9 +7,19 @@
         "start": "node main.js"
     },
     "dependencies": {
+        "apify": "APIFY_VERSION",
         "camoufox-js": "CAMOUFOX_VERSION",
+        "crawlee": "CRAWLEE_VERSION",
         "impit": "latest",
-        "playwright": "PLAYWRIGHT_VERSION"
+        "playwright": "PLAYWRIGHT_VERSION",
+        "typescript": "^5.4.3"
+    },
+    "overrides": {
+        "apify": {
+            "@crawlee/core": "CRAWLEE_VERSION",
+            "@crawlee/types": "CRAWLEE_VERSION",
+            "@crawlee/utils": "CRAWLEE_VERSION"
+        }
     },
     "repository": {}
 }

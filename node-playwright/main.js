@@ -11,33 +11,27 @@ For more information, see https://docs.apify.com/actors/development/source-code#
 `);
 console.log('Testing Docker image...');
 
-// `apify` is optional: the empty-* test images ship without it preinstalled.
-let Actor;
-try {
-    ({ Actor } = require('apify'));
-} catch {
-    Actor = undefined;
-}
-
+const { Actor } = require('apify');
+const { launchPlaywright, getMemoryInfo } = require('crawlee');
 const playwright = require('playwright');
 const { testChrome, testPageLoading } = require('./chrome_test');
 
-const run = async () => {
+Actor.main(async () => {
     const browsers = ['webkit', 'firefox', 'chromium'];
+    const promisesHeadless = browsers.map(async (browserName) => {
+        console.log(`Testing Playwright with ${browserName} and headless`);
+        const browser = await launchPlaywright({ launcher: playwright[browserName] });
+        return testPageLoading(browser);
+    });
 
-    for (const headless of [true, false]) {
-        await Promise.all(
-            browsers.map(async (browserName) => {
-                console.log(`Testing Playwright with ${browserName} and ${headless ? 'headless' : 'headful'}`);
-                const browser = await playwright[browserName].launch({ headless });
-                try {
-                    await testPageLoading(browser);
-                } finally {
-                    await browser.close();
-                }
-            }),
-        );
-    }
+    const promisesHeadful = browsers.map(async (browserName) => {
+        console.log(`Testing Playwright with ${browserName} and headful`);
+        const browser = await launchPlaywright({ launcher: playwright[browserName], launchOptions: { headless: false } });
+        return testPageLoading(browser);
+    });
+
+    await Promise.all(promisesHeadless);
+    await Promise.all(promisesHeadful);
 
     // Try to use full Chrome headless
     await testChrome({ headless: true });
@@ -45,14 +39,8 @@ const run = async () => {
     // Try to use full Chrome with XVFB
     await testChrome({ headless: false, args: ['--disable-gpu'] });
 
-    console.log('All tests passed!');
-};
+    // Test that "ps" command is available, sometimes it was missing in official Node builds
+    await getMemoryInfo();
 
-if (Actor) {
-    Actor.main(run);
-} else {
-    run().catch((error) => {
-        console.error(error);
-        process.exitCode = 1;
-    });
-}
+    console.log('All tests passed!');
+});

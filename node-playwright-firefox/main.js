@@ -11,31 +11,23 @@ For more information, see https://docs.apify.com/actors/development/source-code#
 `);
 console.log('Testing Docker image...');
 
-// `apify` is optional: the empty-* test images ship without it preinstalled.
-let Actor;
-try {
-    ({ Actor } = require('apify'));
-} catch {
-    Actor = undefined;
-}
-
+const { Actor } = require('apify');
+const { getMemoryInfo } = require('crawlee');
 const testFirefox = require('./firefox_test');
 
-const run = async () => {
-    // Full Firefox headless
+Actor.main(async () => {
+    // Sanity test browsers.
+
+    // Try to use full Firefox headless
     await testFirefox({ headless: true });
 
-    // Full Firefox with XVFB (headful)
+    // Try to use full Firefox with XVFB
     await testFirefox({ headless: false });
 
-    console.log('... test PASSED');
-};
+    // Try to use playwright default
+    await testFirefox({ executablePath: undefined });
+    await testFirefox({ executablePath: process.env.APIFY_DEFAULT_BROWSER_PATH });
 
-if (Actor) {
-    Actor.main(run);
-} else {
-    run().catch((error) => {
-        console.error(error);
-        process.exitCode = 1;
-    });
-}
+    // Test that "ps" command is available, sometimes it was missing in official Node builds
+    await getMemoryInfo();
+});
