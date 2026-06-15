@@ -6,6 +6,9 @@ on:
       release_tag:
         description: "Tag for the images (e.g.: beta)"
         required: true
+      commit:
+        description: "Commit SHA to build and deploy. If empty, uses the latest commit on the selected branch."
+        required: false
       apify_version:
         description: "Apify SDK version (e.g.: ^1.0.0). If missing, the latest version will be used."
         required: false
@@ -57,6 +60,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          ref: ${{ github.event.inputs.commit }}
           token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
           fetch-depth: 0
 
@@ -86,7 +90,7 @@ jobs:
 
       - name: Commit updated matrix
         id: commit
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.event.inputs.commit == ''
         uses: apify/actions/signed-commit@v1.2.0
         with:
           message: "chore(docker): update ${{ env.RELEASE_TAG || 'latest' }} node:playwright cache"
@@ -153,6 +157,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.inputs.commit }}
 
       - name: Copy Firefox certificates to image folder
         run: |
@@ -299,6 +305,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.inputs.commit }}
 
       - name: Download image size reports
         uses: actions/download-artifact@v8

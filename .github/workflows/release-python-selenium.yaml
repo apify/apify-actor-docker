@@ -6,6 +6,9 @@ on:
       release_tag:
         description: 'Tag for the images (e.g.: "latest" or "beta")'
         required: true
+      commit:
+        description: "Commit SHA to build and deploy. If empty, uses the latest commit on the selected branch."
+        required: false
       rebuild_images:
         description: "Rebuilds images even if the cache state matches the current state."
         required: false
@@ -43,6 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          ref: ${{ github.event.inputs.commit }}
           token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
           fetch-depth: 0
 
@@ -71,7 +75,7 @@ jobs:
 
       - name: Commit updated matrix
         id: commit
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.event.inputs.commit == ''
         uses: apify/actions/signed-commit@v1.2.0
         with:
           message: "chore(docker): update ${{ env.RELEASE_TAG || 'latest' }} python:selenium cache"
@@ -123,6 +127,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.inputs.commit }}
 
       - name: Prepare image tags
         id: prepare-tags
@@ -234,6 +240,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.inputs.commit }}
 
       - name: Download image size reports
         uses: actions/download-artifact@v8
