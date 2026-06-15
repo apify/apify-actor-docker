@@ -1,0 +1,11 @@
+# Populated package-manager caches/stores (regenerated on every run).
+/data/npm/
+/data/yarn/
+/data/pnpm/
+/data/yarn_tmp/
+
+# Generated cache archives (uploaded as workflow artifacts, not committed).
+/data/*.zip
+
+# Local dependencies (only needed for `yarn typecheck`).
+/node_modules/

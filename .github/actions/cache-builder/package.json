@@ -1,0 +1,16 @@
+{
+	"name": "cache-builder",
+	"type": "module",
+	"private": true,
+	"description": "Pre-caches recent versions of common Apify Actor dependencies per package manager (npm, yarn, pnpm) and zips each cache to speed up Docker image builds.",
+	"scripts": {
+		"cache:npm": "node src/caches/npm.ts",
+		"cache:yarn": "node src/caches/yarn.ts",
+		"cache:pnpm": "node src/caches/pnpm.ts",
+		"typecheck": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@types/node": "^22.15.32",
+		"typescript": "^5.8.3"
+	}
+}
