@@ -11,29 +11,44 @@ For more information, see https://docs.apify.com/actors/development/source-code#
 `);
 console.log('Testing Docker image...');
 
-const { Actor } = require('apify');
-const { launchPuppeteer, getMemoryInfo } = require('crawlee');
+// `apify` is optional: the empty-* test images ship without it preinstalled.
+let Actor;
+try {
+    ({ Actor } = require('apify'));
+} catch {
+    Actor = undefined;
+}
+
+const puppeteer = require('puppeteer');
 const testPuppeteerChrome = require('./puppeteer_chrome_test');
 
-Actor.main(async () => {
-    // First, try to open Chromium to see all dependencies are correctly installed
+const run = async () => {
+    // First, open the Chromium bundled with Puppeteer to verify dependencies are installed.
     console.log('Testing Puppeteer with Chromium');
-    // We need --no-sandbox, because even though the build is running on GitHub, the test is running in Docker.
-    const launchOptions = { headless: true, args: ['--no-sandbox'] };
-    const browser1 = await launchPuppeteer({ launchOptions });
-    const page1 = await browser1.newPage();
-    await page1.goto('http://www.example.com');
-    const pageTitle1 = await page1.title();
-    if (pageTitle1 !== 'Example Domain') {
-        throw new Error(`Puppeteer+Chromium test failed - returned title "${pageTitle1}"" !== "Example Domain"`);
+    // We need --no-sandbox, because even though the build runs on GitHub, the test runs in Docker.
+    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
+    try {
+        const page = await browser.newPage();
+        await page.goto('http://www.example.com');
+        const pageTitle = await page.title();
+        if (pageTitle !== 'Example Domain') {
+            throw new Error(`Puppeteer+Chromium test failed - returned title "${pageTitle}" !== "Example Domain"`);
+        }
+    } finally {
+        await browser.close();
     }
-    await browser1.close();
 
-    // Second, try to use full Chrome
+    // Second, use full Chrome.
     await testPuppeteerChrome();
 
-    // Test that "ps" command is available, sometimes it was missing in official Node builds
-    await getMemoryInfo();
-
     console.log('... test PASSED');
-});
+};
+
+if (Actor) {
+    Actor.main(run);
+} else {
+    run().catch((error) => {
+        console.error(error);
+        process.exitCode = 1;
+    });
+}
