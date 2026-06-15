@@ -11,14 +11,69 @@ on:
     paths:
       - ".github/actions/cache-builder/**"
       - ".github/workflows/cache-node.yaml"
-      - ".github/workflows/build-node-package-caches.yaml"
 
   # Enable once we are happy with the trial.
   # schedule:
   #   - cron: 0 */2 * * *
 
+env:
+  # Let Corepack download package manager releases without an interactive prompt.
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+
 jobs:
-  # Standalone entry point for building (and inspecting) the package caches.
-  # The actual logic lives in the reusable workflow so release builds can share it.
-  caches:
-    uses: ./.github/workflows/build-node-package-caches.yaml
+  cache-node:
+    name: Build node package caches
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Enable Corepack (yarn + pnpm)
+        run: corepack enable
+
+      - name: Build npm cache archive
+        run: node src/caches/npm.ts
+        working-directory: .github/actions/cache-builder
+
+      - name: Build yarn cache archive
+        run: node src/caches/yarn.ts
+        working-directory: .github/actions/cache-builder
+
+      - name: Build pnpm cache archive
+        run: node src/caches/pnpm.ts
+        working-directory: .github/actions/cache-builder
+
+      - name: Print cache states
+        run: |
+          for pm in npm yarn pnpm; do
+            echo "== ${pm} =="
+            cat ".github/actions/cache-builder/data/${pm}_state.json"
+            echo
+          done
+
+      - name: Upload cache archives
+        uses: actions/upload-artifact@v7
+        with:
+          name: node-package-caches
+          path: .github/actions/cache-builder/data/*.zip
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Commit updated cache states
+        if: github.event_name != 'pull_request'
+        uses: apify/actions/signed-commit@v1.2.0
+        with:
+          message: "chore(pkg-caches): update node package caches"
+          add: ./.github/actions/cache-builder/data/*_state.json
+          retries: 5
+          pull: "--rebase --autostash"
+          github-token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}

@@ -6,8 +6,5 @@ node_modules
 # Temporary Firefox certificates copied to image folders during build
 */firefox-certs/
 
-# Package-manager caches staged into image folders during build (built on demand in CI)
-*/package-caches/
-
 # Individual certificate files (we track the zip archive instead)
 certificates/certs/
