@@ -105,9 +105,15 @@ jobs:
               "default_runtime_version": "${{ steps.set-matrix.outputs.latest-runtime-version }}"
             }
 
+  # Build the package-manager caches once and share them with every image build.
+  package-caches:
+    needs: [matrix]
+    if: ${{ toJson(fromJson(needs.matrix.outputs.matrix).include) != '[]' }}
+    uses: ./.github/workflows/build-node-package-caches.yaml
+
   # Build master images that are not dependent on existing builds.
   build-main:
-    needs: [matrix]
+    needs: [matrix, package-caches]
 
     runs-on: ubuntu-latest
     if: ${{ toJson(fromJson(needs.matrix.outputs.matrix).include) != '[]' }}
@@ -190,6 +196,12 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
+
+      - name: Download package caches
+        uses: actions/download-artifact@v8
+        with:
+          name: node-package-caches
+          path: ./${{ matrix.image-name }}/package-caches
 
       - name: Build and tag image for testing
         uses: docker/build-push-action@v6

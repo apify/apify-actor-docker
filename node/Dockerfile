@@ -44,6 +44,12 @@ ENV NPM_CONFIG_CACHE=/pkg-cache/npm \
 # default symlinked layout, so installed dependencies are plain copies with no symlinks.
 ENV PNPM_CONFIG_NODE_LINKER=hoisted
 
+# Inject the pre-built package-manager caches (test build: *-cached images) so downstream
+# Actor builds install dependencies from a warm cache. CI stages these into the build context.
+COPY --chown=myuser:myuser package-caches/npm /pkg-cache/npm
+COPY --chown=myuser:myuser package-caches/yarn /pkg-cache/yarn
+COPY --chown=myuser:myuser package-caches/pnpm /pkg-cache/pnpm
+
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
 	&& npm install --omit=dev --omit=optional --no-package-lock --prefer-online \

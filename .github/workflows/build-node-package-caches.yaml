@@ -1,0 +1,64 @@
+name: Build node package caches (reusable)
+
+# Reusable workflow that warms the npm/yarn/pnpm caches with recent versions of the
+# common Actor dependencies and exposes them as the `node-package-caches` artifact.
+# Callers download the artifact and copy the per-package-manager directories into the
+# image build context so they can be baked into /pkg-cache/<pm>.
+
+on:
+  workflow_call:
+    inputs:
+      artifact-name:
+        description: "Name of the uploaded cache artifact."
+        type: string
+        default: node-package-caches
+    outputs:
+      artifact-name:
+        description: "Name of the uploaded cache artifact."
+        value: ${{ inputs.artifact-name }}
+
+env:
+  # Let Corepack download package manager releases without an interactive prompt.
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+
+jobs:
+  build:
+    name: Build package caches
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Enable Corepack (yarn + pnpm)
+        run: corepack enable
+
+      - name: Build npm cache
+        run: node src/caches/npm.ts
+        working-directory: .github/actions/cache-builder
+
+      - name: Build yarn cache
+        run: node src/caches/yarn.ts
+        working-directory: .github/actions/cache-builder
+
+      - name: Build pnpm cache
+        run: node src/caches/pnpm.ts
+        working-directory: .github/actions/cache-builder
+
+      - name: Upload package caches
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ inputs.artifact-name }}
+          # Upload the populated cache directories (their common parent becomes the
+          # artifact root, so it contains npm/, yarn/ and pnpm/).
+          path: |
+            .github/actions/cache-builder/data/npm
+            .github/actions/cache-builder/data/yarn
+            .github/actions/cache-builder/data/pnpm
+          retention-days: 1
+          if-no-files-found: error
