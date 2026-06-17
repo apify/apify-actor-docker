@@ -15,13 +15,25 @@ For each supported package manager — **npm**, **yarn**, **pnpm** — the match
 
 1. Looks up the last `versionsToCache` (currently 5) **stable** versions of every package in
    `packagesToPrecache` (see `src/shared/constants.ts`) from the npm registry.
-2. Warms that package manager's cache/store with those versions, pointed at `data/<pm>/`.
+2. Warms that package manager's cache/store with those versions **including their full
+   dependency trees**, by doing a real install (`npm install` / `pnpm add` / `yarn add`) of
+   each version in a throwaway project — not `npm cache add` / `pnpm store add`, which would
+   only cache the named package and leave an Actor to download the whole transitive tree.
+   Installs use `--ignore-scripts` (no browser downloads; we only need the tarballs cached).
 3. Writes `data/<pm>_state.json` listing exactly which versions were cached.
 4. Zips the populated cache into `data/<pm>.zip`.
 
-The cache directories line up with the cache locations the base images already use:
-npm cache → `npm_config_cache`, yarn global cache → `YARN_GLOBAL_FOLDER`, pnpm store →
-`--store-dir`. So a `data/<pm>.zip` can be unpacked straight into `/pkg-cache/<pm>`.
+`packagesToPrecache` is `crawlee`, `apify`, `playwright`, `puppeteer` (TypeScript is excluded —
+Actors don't install it at runtime and it dominated the cache size).
+
+The cache directories line up with the cache locations the base images already use, so a
+`data/<pm>/` tree unpacks straight into `/pkg-cache/<pm>`:
+- **npm** → `/pkg-cache/npm` (matches `NPM_CONFIG_CACHE`).
+- **yarn** → `/pkg-cache/yarn` (Berry global cache; matches `YARN_GLOBAL_FOLDER`).
+- **pnpm** → `/pkg-cache/pnpm/store` (matches `PNPM_CONFIG_STORE_DIR`). pnpm's store is
+  versioned, so the builder warms a store for **each pnpm major in `PNPM_MAJORS`** (currently
+  10 and 11) → `/pkg-cache/pnpm/store/v10` and `/pkg-cache/pnpm/store/v11`. An Actor then hits
+  the cache whether it uses pnpm 10 or 11.
 
 ## Running locally
 
