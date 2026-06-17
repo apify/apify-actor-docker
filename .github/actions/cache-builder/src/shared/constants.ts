@@ -3,12 +3,14 @@ import { fileURLToPath } from 'node:url';
 // Packages whose recent versions we pre-cache, so Docker image builds (and the Actors
 // built on top of them) can install these dependencies from a warm cache instead of
 // hitting the network. These are the dependencies that show up most in Apify Actors.
+// Each is warmed with its full dependency tree (see the per-pm scripts), not just the
+// top-level package. typescript is intentionally excluded: Actors don't install it at
+// runtime and it dominated the cache size.
 export const packagesToPrecache = [
 	'crawlee',
 	'apify',
 	'playwright',
 	'puppeteer',
-	'typescript',
 ];
 
 // How many of the most recent stable versions of each package to cache.

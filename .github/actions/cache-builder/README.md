@@ -15,9 +15,16 @@ For each supported package manager — **npm**, **yarn**, **pnpm** — the match
 
 1. Looks up the last `versionsToCache` (currently 5) **stable** versions of every package in
    `packagesToPrecache` (see `src/shared/constants.ts`) from the npm registry.
-2. Warms that package manager's cache/store with those versions, pointed at `data/<pm>/`.
+2. Warms that package manager's cache/store with those versions **including their full
+   dependency trees**, by doing a real install (`npm install` / `pnpm add` / `yarn add`) of
+   each version in a throwaway project — not `npm cache add` / `pnpm store add`, which would
+   only cache the named package and leave an Actor to download the whole transitive tree.
+   Installs use `--ignore-scripts` (no browser downloads; we only need the tarballs cached).
 3. Writes `data/<pm>_state.json` listing exactly which versions were cached.
 4. Zips the populated cache into `data/<pm>.zip`.
+
+`packagesToPrecache` is `crawlee`, `apify`, `playwright`, `puppeteer` (TypeScript is excluded —
+Actors don't install it at runtime and it dominated the cache size).
 
 The cache directories line up with the cache locations the base images already use, so a
 `data/<pm>/` tree unpacks straight into `/pkg-cache/<pm>`:
