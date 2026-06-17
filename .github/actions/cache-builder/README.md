@@ -19,9 +19,14 @@ For each supported package manager — **npm**, **yarn**, **pnpm** — the match
 3. Writes `data/<pm>_state.json` listing exactly which versions were cached.
 4. Zips the populated cache into `data/<pm>.zip`.
 
-The cache directories line up with the cache locations the base images already use:
-npm cache → `npm_config_cache`, yarn global cache → `YARN_GLOBAL_FOLDER`, pnpm store →
-`--store-dir`. So a `data/<pm>.zip` can be unpacked straight into `/pkg-cache/<pm>`.
+The cache directories line up with the cache locations the base images already use, so a
+`data/<pm>/` tree unpacks straight into `/pkg-cache/<pm>`:
+- **npm** → `/pkg-cache/npm` (matches `NPM_CONFIG_CACHE`).
+- **yarn** → `/pkg-cache/yarn` (Berry global cache; matches `YARN_GLOBAL_FOLDER`).
+- **pnpm** → `/pkg-cache/pnpm/store` (matches `PNPM_CONFIG_STORE_DIR`). pnpm's store is
+  versioned, so the builder warms a store for **each pnpm major in `PNPM_MAJORS`** (currently
+  10 and 11) → `/pkg-cache/pnpm/store/v10` and `/pkg-cache/pnpm/store/v11`. An Actor then hits
+  the cache whether it uses pnpm 10 or 11.
 
 ## Running locally
 
