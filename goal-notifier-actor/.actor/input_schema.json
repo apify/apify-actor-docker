@@ -1,0 +1,71 @@
+{
+    "title": "Goal notifier input",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "rapidApiKey": {
+            "title": "RapidAPI key (API-Football)",
+            "type": "string",
+            "description": "Your RapidAPI key for the API-Football (api-football-v1) endpoint. Get one at https://rapidapi.com/api-sports/api/api-football.",
+            "editor": "textfield",
+            "isSecret": true
+        },
+        "notificationEmail": {
+            "title": "Notification email",
+            "type": "string",
+            "description": "Email address that will receive a message for every goal.",
+            "editor": "textfield",
+            "prefill": "marcel.rebro@apify.com"
+        },
+        "homeTeam": {
+            "title": "Home team",
+            "type": "string",
+            "description": "Team name to match (case-insensitive substring). Used to auto-resolve the fixture when no Fixture ID is given.",
+            "editor": "textfield",
+            "prefill": "Belgium"
+        },
+        "awayTeam": {
+            "title": "Away team",
+            "type": "string",
+            "description": "The other team name to match (case-insensitive substring).",
+            "editor": "textfield",
+            "prefill": "Spain"
+        },
+        "matchDate": {
+            "title": "Match date (UTC, YYYY-MM-DD)",
+            "type": "string",
+            "description": "Date the match takes place, in UTC. Leave empty to search today's fixtures. Ignored when Fixture ID is set.",
+            "editor": "textfield"
+        },
+        "fixtureId": {
+            "title": "Fixture ID (optional override)",
+            "type": "integer",
+            "description": "API-Football fixture ID. If provided, team/date auto-resolution is skipped. Most reliable option.",
+            "editor": "number"
+        },
+        "pollIntervalSecs": {
+            "title": "Poll interval (seconds)",
+            "type": "integer",
+            "description": "How often to check the match for new goals.",
+            "editor": "number",
+            "default": 30,
+            "minimum": 15,
+            "maximum": 600
+        },
+        "notifyOnKickoffAndFullTime": {
+            "title": "Also email on kickoff & full-time",
+            "type": "boolean",
+            "description": "Send an extra email when the match kicks off and when it finishes.",
+            "default": true
+        },
+        "maxRuntimeSecs": {
+            "title": "Max runtime (seconds)",
+            "type": "integer",
+            "description": "Hard stop for the watcher, in case the match status never reaches a finished state.",
+            "editor": "number",
+            "default": 18000,
+            "minimum": 60
+        }
+    },
+    "required": ["rapidApiKey", "notificationEmail"]
+}

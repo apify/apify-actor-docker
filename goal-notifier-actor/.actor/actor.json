@@ -1,0 +1,29 @@
+{
+    "actorSpecification": 1,
+    "name": "goal-notifier",
+    "title": "Football Goal Email Notifier",
+    "description": "Watches a live football match (e.g. Belgium vs Spain) and emails you the moment anyone scores a goal.",
+    "version": "0.1",
+    "meta": {
+        "templateId": "custom"
+    },
+    "input": "./input_schema.json",
+    "dockerfile": "../Dockerfile",
+    "storages": {
+        "dataset": {
+            "actorSpecification": 1,
+            "title": "Goal events",
+            "views": {
+                "goals": {
+                    "title": "Goals scored",
+                    "transformation": {
+                        "fields": ["minute", "team", "scorer", "assist", "detail", "score", "notifiedAt"]
+                    },
+                    "display": {
+                        "component": "table"
+                    }
+                }
+            }
+        }
+    }
+}

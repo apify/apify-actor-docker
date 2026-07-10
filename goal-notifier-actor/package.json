@@ -1,0 +1,16 @@
+{
+    "name": "goal-notifier",
+    "version": "0.1.0",
+    "type": "module",
+    "description": "Apify Actor that emails you whenever anyone scores in a live football match.",
+    "engines": {
+        "node": ">=18"
+    },
+    "dependencies": {
+        "apify": "^3.2.6"
+    },
+    "scripts": {
+        "start": "node src/main.js"
+    },
+    "license": "Apache-2.0"
+}
