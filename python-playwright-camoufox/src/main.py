@@ -31,7 +31,7 @@ def print_image_info():
 async def run_test(headless=True):
     print(f"Testing Camoufox with {headless=}")
     async with AsyncCamoufox(headless=headless) as browser:
-        page = await browser.new_page()
+        page = await browser.new_page(no_viewport=True)
         await page.goto("http://www.example.com")
         title = await page.title()
         if title != "Example Domain":
