@@ -9,8 +9,10 @@
     "dependencies": {
         "apify": "APIFY_VERSION",
         "crawlee": "CRAWLEE_VERSION",
-        "puppeteer": "PUPPETEER_VERSION",
-        "typescript": "^5.4.3"
+        "puppeteer": "PUPPETEER_VERSION"
+    },
+    "devDependencies": {
+        "typescript": "^5.9.2"
     },
     "overrides": {
         "apify": {
