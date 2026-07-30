@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { satisfies } from 'semver';
 
-import { resolveCamoufoxPlaywrightVersions } from './camoufox.ts';
+import { isUnboundedRange, resolveCamoufoxPlaywrightVersions } from './camoufox.ts';
 import { fetchPackageManifest } from './npm.ts';
 
 const playwrightVersions = ['1.56.0', '1.59.0', '1.60.0', '1.61.0', '1.62.0'];
@@ -20,12 +20,23 @@ describe('resolveCamoufoxPlaywrightVersions', () => {
 		const { range, versions } = await resolveCamoufoxPlaywrightVersions('node', '0.11.5', playwrightVersions);
 
 		// camoufox-js declares the range as a `playwright-core` peer dependency. What it declares is up to camoufox and
-		// is expected to change, so this asserts that we read a range and apply it - not what the range happens to be.
+		// is expected to change, so this asserts how we treat the range we read - not what the range happens to be.
 		assert.notEqual(range, undefined);
 		assert.deepEqual(
 			versions,
-			playwrightVersions.filter((version) => satisfies(version, range!)),
+			isUnboundedRange(range!) ? [] : playwrightVersions.filter((version) => satisfies(version, range!)),
 		);
+	});
+
+	it('returns no versions when the declared range says nothing', async () => {
+		// A `*` peer dependency is the npm default, not a statement that every Playwright version works
+		assert.equal(isUnboundedRange('*'), true);
+		assert.equal(isUnboundedRange(''), true);
+		assert.equal(isUnboundedRange('x'), true);
+
+		assert.equal(isUnboundedRange('<1.61'), false);
+		assert.equal(isUnboundedRange('^1.53.1'), false);
+		assert.equal(isUnboundedRange('>=1.50 <1.61'), false);
 	});
 
 	it('returns no versions when the range cannot be resolved', async () => {
