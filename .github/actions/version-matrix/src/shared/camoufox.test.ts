@@ -1,5 +1,6 @@
-import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+import { satisfies } from 'semver';
 
 import { resolveCamoufoxPlaywrightVersions } from './camoufox.ts';
 import { fetchPackageManifest } from './npm.ts';
@@ -16,11 +17,15 @@ describe('resolveCamoufoxPlaywrightVersions', () => {
 	});
 
 	it('reads the supported range from the camoufox-js package on npm', async () => {
-		const { range } = await resolveCamoufoxPlaywrightVersions('node', '0.11.5', playwrightVersions);
+		const { range, versions } = await resolveCamoufoxPlaywrightVersions('node', '0.11.5', playwrightVersions);
 
-		// camoufox-js declares the range as a `playwright-core` peer dependency. It is unbounded (`*`) as of 0.11.5,
-		// so this only asserts that we read it - the range itself is expected to change.
-		assert.equal(typeof range, 'string');
+		// camoufox-js declares the range as a `playwright-core` peer dependency. What it declares is up to camoufox and
+		// is expected to change, so this asserts that we read a range and apply it - not what the range happens to be.
+		assert.notEqual(range, undefined);
+		assert.deepEqual(
+			versions,
+			playwrightVersions.filter((version) => satisfies(version, range!)),
+		);
 	});
 
 	it('returns no versions when the range cannot be resolved', async () => {
