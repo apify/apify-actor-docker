@@ -1,12 +1,11 @@
-import { satisfies } from 'semver';
 import {
 	type CacheValues,
 	getCertificatesUpdatedAt,
 	needsToRunMatrixGeneration,
 	updateCacheState,
 } from '../../shared/cache.ts';
+import { resolveCamoufoxPlaywrightVersions } from '../../shared/camoufox.ts';
 import {
-	camoufoxPlaywrightVersionRange,
 	emptyMatrix,
 	latestNodeVersion,
 	setParametersForTriggeringUpdateWorkflowOnActorTemplates,
@@ -32,11 +31,12 @@ let latestApifyVersion = apifyVersions.at(-1)!;
 let latestCrawleeVersion = crawleeVersions.at(-1)!;
 let latestCamoufoxVersion = camoufoxVersions.at(-1)!;
 
-// Camoufox is incompatible with the newest Playwright releases, so its images are built with the newest Playwright
-// versions Camoufox still supports, picked from all releases instead of just the last five.
-const camoufoxPlaywrightVersions = playwrightVersions
-	.filter((version) => satisfies(version, camoufoxPlaywrightVersionRange))
-	.slice(shouldUseLastFive ? -5 : -1);
+// Camoufox does not support every Playwright release, so its images are built with the newest Playwright versions it
+// declares support for, picked from all releases instead of just the last five - otherwise the camoufox image would
+// drop out of the matrix entirely once the last five releases are all unsupported.
+const { range: camoufoxPlaywrightRange, versions: supportedCamoufoxPlaywrightVersions } =
+	await resolveCamoufoxPlaywrightVersions('node', latestCamoufoxVersion, playwrightVersions);
+const camoufoxPlaywrightVersions = supportedCamoufoxPlaywrightVersions.slice(shouldUseLastFive ? -5 : -1);
 const latestCamoufoxPlaywrightVersion = camoufoxPlaywrightVersions.at(-1);
 
 const certificatesUpdatedAt = await getCertificatesUpdatedAt();
@@ -46,7 +46,7 @@ console.error('Latest apify version', latestApifyVersion);
 console.error('Latest crawlee version', latestCrawleeVersion);
 console.error('Latest camoufox version', latestCamoufoxVersion);
 console.error(
-	`Playwright versions for camoufox (${camoufoxPlaywrightVersionRange})`,
+	`Playwright versions for camoufox (camoufox-js@${latestCamoufoxVersion} supports ${camoufoxPlaywrightRange ?? 'nothing we could resolve'})`,
 	camoufoxPlaywrightVersions.length ? camoufoxPlaywrightVersions : '(none, camoufox images will be skipped)',
 );
 console.error('Node runtime versions', nodeRuntimeVersions);
