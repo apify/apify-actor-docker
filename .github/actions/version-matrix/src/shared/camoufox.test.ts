@@ -17,7 +17,7 @@ describe('resolveCamoufoxPlaywrightVersions', () => {
 	});
 
 	it('reads the supported range from the camoufox-js package on npm', async () => {
-		const { range, versions } = await resolveCamoufoxPlaywrightVersions('node', '0.11.5', playwrightVersions);
+		const { range, versions } = await resolveCamoufoxPlaywrightVersions('node', '0.12.0', playwrightVersions);
 
 		// camoufox-js declares the range as a `playwright-core` peer dependency. What it declares is up to camoufox and
 		// is expected to change, so this asserts that we read a range and apply it - not what the range happens to be.
@@ -49,7 +49,7 @@ describe('fetchPackageManifest', () => {
 	});
 
 	it('reads the declared peer dependency ranges of a published version', async () => {
-		const manifest = await fetchPackageManifest('camoufox-js', '0.11.5');
+		const manifest = await fetchPackageManifest('camoufox-js', '0.12.0');
 
 		assert.equal(typeof manifest.peerDependencies?.['playwright-core'], 'string');
 	});
