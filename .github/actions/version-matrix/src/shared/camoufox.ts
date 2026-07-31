@@ -50,22 +50,12 @@ async function fetchPythonCamoufoxPlaywrightRange(camoufoxVersion: string) {
 }
 
 /**
- * A range that matches everything (`*`, or no range at all) is not a statement of support - it is the default you get
- * when a package does not say anything. We cannot tell which Playwright versions work from it, so it is treated the
- * same as not being able to read the range at all.
- */
-export function isUnboundedRange(range: string) {
-	return ['', '*', 'x', 'X'].includes(range.trim());
-}
-
-/**
  * Resolves which of the given Playwright versions can be used to build the camoufox image, based on the range the
  * camoufox package declares for its Playwright dependency.
  *
- * If the range cannot be determined - the dependency is not declared, it says nothing (`*`), it cannot be expressed as
- * a semver range, or the registry request fails - this returns no versions at all, which leaves the camoufox image out
- * of the matrix. Publishing an image we have no reason to believe works is worse than not publishing one, and the
- * other images are unaffected either way.
+ * If the range cannot be determined - the dependency is not declared, or it cannot be expressed as a semver range -
+ * this returns no versions at all, which leaves the camoufox image out of the matrix. Publishing an image that is
+ * known to be broken is worse than not publishing one, and the other images are unaffected either way.
  */
 export async function resolveCamoufoxPlaywrightVersions(
 	runtime: 'node' | 'python',
@@ -98,12 +88,10 @@ export async function resolveCamoufoxPlaywrightVersions(
 		return { range: undefined, versions: [] };
 	}
 
-	if (isUnboundedRange(range)) {
-		console.error(
-			`${packageName}@${camoufoxVersion} declares its Playwright dependency as "${range}", which says nothing about what it supports - the camoufox image will be skipped`,
+	if (range === '*' || range === '') {
+		console.warn(
+			`${packageName}@${camoufoxVersion} declares no bounds on its Playwright dependency, the camoufox image will be built with the same versions as the other images`,
 		);
-
-		return { range, versions: [] };
 	}
 
 	return { range, versions: playwrightVersions.filter((version) => satisfies(version, range)) };
