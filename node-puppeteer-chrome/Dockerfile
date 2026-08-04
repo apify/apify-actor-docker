@@ -151,9 +151,11 @@ ENV NPM_CONFIG_CACHE=/pkg-cache/npm \
     PNPM_CONFIG_CACHE_DIR=/pkg-cache/pnpm/cache \
     COREPACK_HOME=/pkg-cache/corepack
 
-# Make pnpm use a flat, npm-style node_modules (the `hoisted` linker) instead of its
-# default symlinked layout, so installed dependencies are plain copies with no symlinks.
-ENV PNPM_CONFIG_NODE_LINKER=hoisted
+# Make pnpm and yarn use a flat, npm-style node_modules instead of their non-node_modules
+# defaults (pnpm's symlinked store, yarn Berry's Plug'n'Play), so installed dependencies are
+# plain copies that any tooling can resolve without symlinks or a PnP loader.
+ENV PNPM_CONFIG_NODE_LINKER=hoisted \
+    YARN_NODE_LINKER=node-modules
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
