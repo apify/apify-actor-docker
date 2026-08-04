@@ -93,9 +93,14 @@ RUN apt update \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /src/*.deb \
     && apt clean -y && apt autoremove -y \
-    && rm -rf /root/.npm \
     # This is needed to remove an annoying error message when running headful.
-    && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
+    && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix \
+    \
+    # Point the default per-user npm cache dirs (~/.npm) at the shared cache, so tooling
+    # that bypasses NPM_CONFIG_CACHE - and templates that `rm -r ~/.npm` - keep working.
+    && rm -rf /root/.npm /home/myuser/.npm \
+    && ln -s /pkg-cache/npm /root/.npm \
+    && ln -s /pkg-cache/npm /home/myuser/.npm
 
 # Run everything after as non-privileged user.
 USER myuser

@@ -37,7 +37,13 @@ RUN npm config --global set update-notifier false \
     # Pre-create the shared package-manager cache dirs (see the *_CACHE_*/*_STORE_DIR env vars), world-writable so any
     # user can populate them and `rm -rf` them at the end to reclaim space, regardless of which user the Actor runs as.
     && mkdir -p /pkg-cache/npm /pkg-cache/yarn /pkg-cache/pnpm/store /pkg-cache/pnpm/cache \
-    && chmod -R 777 /pkg-cache
+    && chmod -R 777 /pkg-cache \
+    \
+    # Point the default per-user npm cache dirs (~/.npm) at the shared cache, so tooling
+    # that bypasses NPM_CONFIG_CACHE - and templates that `rm -r ~/.npm` - keep working.
+    && rm -rf /root/.npm /home/myuser/.npm \
+    && ln -s /pkg-cache/npm /root/.npm \
+    && ln -s /pkg-cache/npm /home/myuser/.npm
 
 WORKDIR /usr/src/app
 
