@@ -4,6 +4,7 @@ import {
 	needsToRunMatrixGeneration,
 	updateCacheState,
 } from '../../shared/cache.ts';
+import { resolveCamoufoxPlaywrightVersions } from '../../shared/camoufox.ts';
 import {
 	emptyMatrix,
 	latestNodeVersion,
@@ -30,12 +31,24 @@ let latestApifyVersion = apifyVersions.at(-1)!;
 let latestCrawleeVersion = crawleeVersions.at(-1)!;
 let latestCamoufoxVersion = camoufoxVersions.at(-1)!;
 
+// Camoufox does not support every Playwright release, so its images are built with the newest Playwright versions it
+// declares support for, picked from all releases instead of just the last five - otherwise the camoufox image would
+// drop out of the matrix entirely once the last five releases are all unsupported.
+const { range: camoufoxPlaywrightRange, versions: supportedCamoufoxPlaywrightVersions } =
+	await resolveCamoufoxPlaywrightVersions('node', latestCamoufoxVersion, playwrightVersions);
+const camoufoxPlaywrightVersions = supportedCamoufoxPlaywrightVersions.slice(shouldUseLastFive ? -5 : -1);
+const latestCamoufoxPlaywrightVersion = camoufoxPlaywrightVersions.at(-1);
+
 const certificatesUpdatedAt = await getCertificatesUpdatedAt();
 
 console.error('Latest five versions', latestFivePlaywrightVersions);
 console.error('Latest apify version', latestApifyVersion);
 console.error('Latest crawlee version', latestCrawleeVersion);
 console.error('Latest camoufox version', latestCamoufoxVersion);
+console.error(
+	`Playwright versions for camoufox (camoufox-js@${latestCamoufoxVersion} supports ${camoufoxPlaywrightRange ?? 'nothing we could resolve'})`,
+	camoufoxPlaywrightVersions.length ? camoufoxPlaywrightVersions : '(none, camoufox images will be skipped)',
+);
 console.error('Node runtime versions', nodeRuntimeVersions);
 console.error('Certificates updated at', certificatesUpdatedAt || '(not available)');
 
@@ -56,6 +69,7 @@ const cacheParams: CacheValues = {
 	APIFY_VERSION: [latestApifyVersion],
 	CRAWLEE_VERSION: [latestCrawleeVersion],
 	CAMOUFOX_VERSION: [latestCamoufoxVersion],
+	CAMOUFOX_PLAYWRIGHT_VERSION: camoufoxPlaywrightVersions,
 	CERTIFICATES_UPDATED_AT: certificatesUpdatedAt ? [certificatesUpdatedAt] : [],
 };
 
@@ -95,8 +109,17 @@ const matrix = {
 };
 
 for (const nodeVersion of supportedNodeVersions) {
-	for (const playwrightVersion of latestFivePlaywrightVersions) {
-		for (const imageName of imageNames) {
+	for (const imageName of imageNames) {
+		const isCamoufoxImage = imageName === 'node-playwright-camoufox';
+
+		// The camoufox image only supports a subset of the Playwright versions, so it gets its own version list, along
+		// with its own "latest" version - otherwise it would never receive the moving tags (e.g. `:24`, `:latest`).
+		const imagePlaywrightVersions = isCamoufoxImage ? camoufoxPlaywrightVersions : latestFivePlaywrightVersions;
+		const latestImagePlaywrightVersion = isCamoufoxImage
+			? latestCamoufoxPlaywrightVersion
+			: latestPlaywrightVersion;
+
+		for (const playwrightVersion of imagePlaywrightVersions) {
 			matrix.include.push({
 				'image-name': imageName,
 				'node-version': nodeVersion,
@@ -104,7 +127,7 @@ for (const nodeVersion of supportedNodeVersions) {
 				'apify-version': `^${latestApifyVersion}`,
 				'crawlee-version': `^${latestCrawleeVersion}`,
 				'camoufox-version': `^${latestCamoufoxVersion}`,
-				'is-latest': playwrightVersion === latestPlaywrightVersion ? 'true' : 'false',
+				'is-latest': playwrightVersion === latestImagePlaywrightVersion ? 'true' : 'false',
 				'latest-node-version': latestNodeVersion,
 				'supports-arm64': arm64UnsupportedImages.has(imageName) ? 'false' : 'true',
 			});
