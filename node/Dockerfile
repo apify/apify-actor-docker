@@ -14,12 +14,43 @@ RUN npm config --global set update-notifier false \
     && chown -R myuser:myuser /home/myuser \
     && mkdir -p /usr/src/app \
     && chown -R myuser:myuser /usr/src/app \
-    && ln -s /usr/src/app /home/myuser
+    && ln -s /usr/src/app /home/myuser \
+    \
+    # Install the latest Corepack so Actors can opt into yarn or pnpm; `enable` drops the shims into the global bin.
+    && npm install -g corepack@latest \
+    && corepack enable \
+    \
+    # Pre-create the shared package-manager cache dirs (see the *_CACHE_*/*_STORE_DIR env vars), world-writable so any
+    # user can populate them and `rm -rf` them at the end to reclaim space, regardless of which user the Actor runs as.
+    && mkdir -p /pkg-cache/npm /pkg-cache/yarn /pkg-cache/pnpm/store /pkg-cache/pnpm/cache \
+    && chmod -R 777 /pkg-cache \
+    \
+    # Point the default per-user npm cache dirs (~/.npm) at the shared cache, so tooling
+    # that bypasses NPM_CONFIG_CACHE - and templates that `rm -r ~/.npm` - keep working.
+    && rm -rf /root/.npm /home/myuser/.npm \
+    && ln -s /pkg-cache/npm /root/.npm \
+    && ln -s /pkg-cache/npm /home/myuser/.npm
 
 WORKDIR /usr/src/app
 
 # Copy source code
 COPY --chown=myuser:myuser package.json main.js .
+
+# Send every package-manager cache to a single, dedicated location instead of $HOME.
+# npm, yarn, and pnpm have no real "disable the cache" switch (unlike pip), so isolating
+# their caches under /pkg-cache is the practical equivalent: the tree holds only throwaway
+# cache data and can be wiped or mounted as tmpfs without touching installed dependencies.
+ENV NPM_CONFIG_CACHE=/pkg-cache/npm \
+    YARN_CACHE_FOLDER=/pkg-cache/yarn \
+    YARN_GLOBAL_FOLDER=/pkg-cache/yarn \
+    PNPM_CONFIG_STORE_DIR=/pkg-cache/pnpm/store \
+    PNPM_CONFIG_CACHE_DIR=/pkg-cache/pnpm/cache
+
+# Make pnpm and yarn use a flat, npm-style node_modules instead of their non-node_modules
+# defaults (pnpm's symlinked store, yarn Berry's Plug'n'Play), so installed dependencies are
+# plain copies that any tooling can resolve without symlinks or a PnP loader.
+ENV PNPM_CONFIG_NODE_LINKER=hoisted \
+    YARN_NODE_LINKER=node-modules
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
