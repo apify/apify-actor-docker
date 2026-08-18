@@ -1,6 +1,7 @@
 const fs = require('fs');
 
-const PACKAGE_JSON_PATH = './package.json';
+// package.slim.json is the manifest for the -slim image variants; keep it in sync.
+const PACKAGE_JSON_PATHS = ['./package.json', './package.slim.json'];
 
 const DEPENDENCY_VERSIONS = {
 	'apify': process.env.APIFY_VERSION,
@@ -13,9 +14,12 @@ const DEPENDENCY_VERSIONS = {
 	'camoufox-js': process.env.CAMOUFOX_VERSION,
 };
 
-const pkg = readPackageJson(PACKAGE_JSON_PATH);
-updateDependencyVersions(pkg, DEPENDENCY_VERSIONS);
-fs.writeFileSync(PACKAGE_JSON_PATH, JSON.stringify(pkg, null, 4));
+for (const path of PACKAGE_JSON_PATHS) {
+	const pkg = readPackageJson(path);
+	if (!pkg) continue;
+	updateDependencyVersions(pkg, DEPENDENCY_VERSIONS);
+	fs.writeFileSync(path, JSON.stringify(pkg, null, 4));
+}
 
 function readPackageJson(path) {
 	try {
@@ -23,8 +27,8 @@ function readPackageJson(path) {
 		return JSON.parse(pkgJson);
 	} catch (err) {
 		if (err.code === 'ENOENT') {
-			console.log(`No package.json to update in ${process.cwd()}`);
-			process.exit(0);
+			console.log(`No ${path} to update in ${process.cwd()}`);
+			return undefined;
 		}
 	}
 }
