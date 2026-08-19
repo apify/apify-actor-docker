@@ -228,6 +228,18 @@ jobs:
       - name: Test image
         run: docker run ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}
 
+      - name: Test package manager configuration
+        run: |
+          docker run --rm ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }} sh -c '
+            set -ex
+            test "$(npm config get cache)" = "/pkg-cache/npm"
+            pnpm store path | grep -q "^/pkg-cache/pnpm/store"
+            test "$(pnpm config get node-linker)" = "hoisted"
+            corepack pnpm@10 store path | grep -q "^/pkg-cache/pnpm/store"
+            ! npm config list 2>&1 | grep -qi "unknown"
+            yarn cache dir | grep -q "^/pkg-cache/yarn"
+          '
+
       - name: Login to DockerHub
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v4
