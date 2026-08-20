@@ -11,6 +11,8 @@ For more information, see https://docs.apify.com/actors/development/source-code#
 `);
 console.log('Testing Docker image...');
 
+const { execSync } = require('node:child_process');
+
 // `apify` is optional: the -slim images ship without it preinstalled. Anything other than
 // apify itself being absent means a broken install and must fail the test.
 let Actor;
@@ -29,6 +31,10 @@ const puppeteer = require('puppeteer');
 const testPuppeteerChrome = require('./puppeteer_chrome_test');
 
 const run = async () => {
+    // Check that `ps` is available - some Node builds have shipped without it,
+    // and crawlee needs it at runtime to measure memory.
+    execSync('ps');
+
     // First, open the Chromium bundled with Puppeteer to verify dependencies are installed.
     console.log('Testing Puppeteer with Chromium');
     // We need --no-sandbox, because even though the build runs on GitHub, the test runs in Docker.

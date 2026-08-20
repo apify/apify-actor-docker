@@ -51,8 +51,7 @@ WORKDIR /usr/src/app
 COPY --chown=myuser:myuser package.json package.slim.json main.js .
 
 # The -slim variant ships without the preinstalled Actor SDKs (apify, crawlee, typescript):
-# it installs from package.slim.json instead, which keeps only the browser library the image
-# is built around.
+# it installs from package.slim.json instead, which has no dependencies at all.
 ARG SLIM=0
 RUN if [ "$SLIM" = "1" ]; then mv package.slim.json package.json; else rm package.slim.json; fi
 

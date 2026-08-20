@@ -280,6 +280,7 @@ jobs:
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
           outputs: type=image,oci-mediatypes=true
           cache-from: type=gha,scope=${{ matrix.image-name }}-${{ matrix.node-version }}-${{ matrix.puppeteer-version }}
+
       - name: Build and push slim OCI image
         if: github.event_name != 'pull_request'
         uses: docker/build-push-action@v6

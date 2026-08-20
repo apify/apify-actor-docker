@@ -11,6 +11,8 @@ For more information, see https://docs.apify.com/actors/development/source-code#
 `);
 console.log('Testing Docker image...');
 
+const { execSync } = require('node:child_process');
+
 // `apify` is optional: the -slim images ship without it preinstalled. Anything other than
 // apify itself being absent means a broken install and must fail the test.
 let Actor;
@@ -28,6 +30,10 @@ if (Actor) {
 const { testChrome, testChromium } = require('./chrome_test');
 
 const run = async () => {
+    // Check that `ps` is available - some Node builds have shipped without it,
+    // and crawlee needs it at runtime to measure memory.
+    execSync('ps');
+
     // Bundled Chromium: once resolved via PLAYWRIGHT_BROWSERS_PATH, once via the
     // APIFY_DEFAULT_BROWSER_PATH symlink the image sets up.
     await testChromium({ headless: true });
