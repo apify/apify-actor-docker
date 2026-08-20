@@ -9,6 +9,18 @@ const testPageLoading = async (browser) => {
     }
 };
 
+const testChromium = async (launchOptions = {}) => {
+    console.log('Testing Playwright with bundled Chromium', launchOptions);
+
+    const browser = await playwright.chromium.launch(launchOptions);
+
+    try {
+        await testPageLoading(browser);
+    } finally {
+        await browser.close();
+    }
+};
+
 const testChrome = async (launchOptions = {}) => {
     console.log('Testing Playwright with Chrome', launchOptions);
 
@@ -23,5 +35,6 @@ const testChrome = async (launchOptions = {}) => {
 
 module.exports = {
     testChrome,
+    testChromium,
     testPageLoading,
 };

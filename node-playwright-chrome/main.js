@@ -25,9 +25,14 @@ if (Actor) {
     require('crawlee');
 }
 
-const { testChrome } = require('./chrome_test');
+const { testChrome, testChromium } = require('./chrome_test');
 
 const run = async () => {
+    // Bundled Chromium: once resolved via PLAYWRIGHT_BROWSERS_PATH, once via the
+    // APIFY_DEFAULT_BROWSER_PATH symlink the image sets up.
+    await testChromium({ headless: true });
+    await testChromium({ executablePath: process.env.APIFY_DEFAULT_BROWSER_PATH, headless: true });
+
     // Full Chrome headless
     await testChrome({ headless: true });
 
