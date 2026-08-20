@@ -11,12 +11,18 @@ For more information, see https://docs.apify.com/actors/development/source-code#
 `);
 console.log('Testing Docker image...');
 
-// `apify` is optional: the -slim images ship without it preinstalled.
+// `apify` is optional: the -slim images ship without it preinstalled. Anything other than
+// apify itself being absent means a broken install and must fail the test.
 let Actor;
 try {
     ({ Actor } = require('apify'));
-} catch {
-    Actor = undefined;
+} catch (error) {
+    if (error.code !== 'MODULE_NOT_FOUND' || !error.message.includes("'apify'")) throw error;
+}
+
+if (Actor) {
+    // The regular images preinstall crawlee next to apify; make sure it loads too.
+    require('crawlee');
 }
 
 const testFirefox = require('./firefox_test');
