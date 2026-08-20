@@ -84,8 +84,8 @@ RUN apt update \
     && npm config --global set update-notifier false \
     \
     # Install the latest Corepack so Actors can opt into yarn or pnpm; `enable` drops the shims into
-    # the global bin. --force: some base images (mcr playwright) already ship a yarn binary, which
-    # npm otherwise refuses to overwrite with corepack's yarn shim.
+    # the global bin. --force: the base images already ship yarn and/or corepack binaries, which
+    # npm otherwise refuses to overwrite with corepack's shims.
     && npm install -g --force corepack@latest \
     && corepack enable \
     # Make pnpm >= 11 the version corepack provisions by default: pnpm 10 ignores the
