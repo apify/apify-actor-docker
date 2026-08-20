@@ -36,5 +36,4 @@ const testChrome = async (launchOptions = {}) => {
 module.exports = {
     testChrome,
     testChromium,
-    testPageLoading,
 };

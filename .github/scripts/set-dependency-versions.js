@@ -30,6 +30,8 @@ function readPackageJson(path) {
 			console.log(`No ${path} to update in ${process.cwd()}`);
 			return undefined;
 		}
+
+		throw err;
 	}
 }
 
