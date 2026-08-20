@@ -217,7 +217,7 @@ jobs:
             pnpm store path | grep -q "^/pkg-cache/pnpm/store"
             test "$(pnpm config get node-linker)" = "hoisted"
             corepack pnpm@10 store path | grep -q "^/pkg-cache/pnpm/store"
-            ! npm config list 2>&1 | grep -qi "unknown"
+            if npm config list 2>&1 | grep -qi "unknown"; then exit 1; fi
             yarn cache dir | grep -q "^/pkg-cache/yarn"
           '
 
