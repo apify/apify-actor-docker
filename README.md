@@ -13,6 +13,8 @@ The images are using the following tags:
 | `latest` | Well-tested production version of the image. |
 | `beta`   | Development version of the image.            |
 
+The Node.js images are additionally published as slim variants, with a `-slim` suffix appended to every tag (e.g. `latest-slim`, `20-slim`, `beta-slim`). These do not preinstall the `apify` and `crawlee` npm packages (only the browser automation library where the image needs one), so Actors bring their own dependencies.
+
 ## Maintenance
 
 The process of building and publishing new images is automated using GitHub Actions, and a set of scripts that are stored in `.github/actions/version-matrix`. We recommend reading the [`README.md`](.github/actions/version-matrix/README.md) in that directory to understand how the scripts work.
@@ -50,5 +52,6 @@ You will need the following tools installed: docker, make, jq, git
 You can overwrite the node version you build the images for by specifying `NODE_VERSION=xx` environment variable.
 You can overwrite the playwright version you build the images for by specifying `PLAYWRIGHT_VERSION=vx.x.x-` environment variable. You must respect the format of `v<full-semver-version>-`
 You can overwrite the puppeteer version you build the images for by specifying `PUPPETEER_VERSION=x.x.x` environment variable. You must respect the format of `<full-semver-version>`
+You can build the slim variant of a node image by specifying `SLIM=1`, e.g. `SLIM=1 make test-node`.
 
 1. If you want to run a specific test, call it with `make <test name>`. Run `make what-tests` to see what tests are available.

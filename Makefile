@@ -6,6 +6,8 @@ PLAYWRIGHT_VERSION ?= v1.57.0-
 CAMOUFOX_VERSION ?= 0.12.0
 # Tag must have format: 22.6.2
 PUPPETEER_VERSION ?= 24.34.0
+# Set SLIM=1 to build the -slim variant of a node image (uses package.slim.json)
+SLIM ?= 0
 PKG_JSON_PW_VERSION = $(subst v,,$(subst -,,$(PLAYWRIGHT_VERSION)))
 
 # Python
@@ -134,11 +136,11 @@ test-node:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest node ./scripts/update-package-json.mjs ./node
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node/Dockerfile -t apify/node:local --load ./node
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg SLIM=$(SLIM) --file ./node/Dockerfile -t apify/node:local --load ./node
 	docker run --rm -it --platform linux/amd64 apify/node:local
 
 	@# Restore package.json
-	@git checkout ./node/package.json 1>/dev/null 2>&1
+	@git checkout ./node/package.json ./node/package.slim.json 1>/dev/null 2>&1
 
 	@# Delete docker image
 	docker rmi apify/node:local
@@ -149,11 +151,11 @@ test-node-arm:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest node ./scripts/update-package-json.mjs ./node
 
-	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --file ./node/Dockerfile -t apify/node:local --load ./node
+	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg SLIM=$(SLIM) --file ./node/Dockerfile -t apify/node:local --load ./node
 	docker run --rm -it --platform linux/arm64 apify/node:local
 
 	@# Restore package.json
-	@git checkout ./node/package.json 1>/dev/null 2>&1
+	@git checkout ./node/package.json ./node/package.slim.json 1>/dev/null 2>&1
 
 	@# Delete docker image
 	docker rmi apify/node:local
@@ -167,11 +169,11 @@ test-node-playwright:
 	@# Copy Firefox certificates
 	$(call copy-firefox-certs,node-playwright)
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright/Dockerfile --tag apify/node-playwright:local --load ./node-playwright
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg SLIM=$(SLIM) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright/Dockerfile --tag apify/node-playwright:local --load ./node-playwright
 	docker run --rm -it --platform linux/amd64 apify/node-playwright:local
 
 	@# Restore package.json and cleanup certificates
-	@git checkout ./node-playwright/package.json 1>/dev/null 2>&1
+	@git checkout ./node-playwright/package.json ./node-playwright/package.slim.json 1>/dev/null 2>&1
 	$(call cleanup-firefox-certs,node-playwright)
 
 	@# Delete docker image
@@ -189,11 +191,11 @@ test-node-playwright-arm:
 	@# Copy Firefox certificates
 	$(call copy-firefox-certs,node-playwright)
 
-	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright/Dockerfile --tag apify/node-playwright:local --load ./node-playwright
+	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg SLIM=$(SLIM) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright/Dockerfile --tag apify/node-playwright:local --load ./node-playwright
 	docker run --rm -it --platform linux/arm64 apify/node-playwright:local
 
 	@# Restore package.json and cleanup certificates
-	@git checkout ./node-playwright/package.json 1>/dev/null 2>&1
+	@git checkout ./node-playwright/package.json ./node-playwright/package.slim.json 1>/dev/null 2>&1
 	$(call cleanup-firefox-certs,node-playwright)
 
 	@# Delete docker image
@@ -205,11 +207,11 @@ test-node-playwright-chrome:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-chrome
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-chrome/Dockerfile --tag apify/node-playwright-chrome:local --load ./node-playwright-chrome
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg SLIM=$(SLIM) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-chrome/Dockerfile --tag apify/node-playwright-chrome:local --load ./node-playwright-chrome
 	docker run --rm -it --platform linux/amd64 apify/node-playwright-chrome:local
 
 	@# Restore package.json
-	@git checkout ./node-playwright-chrome/package.json 1>/dev/null 2>&1
+	@git checkout ./node-playwright-chrome/package.json ./node-playwright-chrome/package.slim.json 1>/dev/null 2>&1
 
 	@# Delete docker image
 	docker rmi apify/node-playwright-chrome:local
@@ -223,11 +225,11 @@ test-node-playwright-chrome-arm:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-chrome
 
-	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-chrome/Dockerfile --tag apify/node-playwright-chrome:local --load ./node-playwright-chrome
+	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg SLIM=$(SLIM) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-chrome/Dockerfile --tag apify/node-playwright-chrome:local --load ./node-playwright-chrome
 	docker run --rm -it --platform linux/arm64 apify/node-playwright-chrome:local
 
 	@# Restore package.json
-	@git checkout ./node-playwright-chrome/package.json 1>/dev/null 2>&1
+	@git checkout ./node-playwright-chrome/package.json ./node-playwright-chrome/package.slim.json 1>/dev/null 2>&1
 
 	@# Delete docker image
 	docker rmi apify/node-playwright-chrome:local
@@ -241,11 +243,11 @@ test-node-playwright-firefox:
 	@# Copy Firefox certificates
 	$(call copy-firefox-certs,node-playwright-firefox)
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-firefox/Dockerfile --tag apify/node-playwright-firefox:local --load ./node-playwright-firefox
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg SLIM=$(SLIM) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-firefox/Dockerfile --tag apify/node-playwright-firefox:local --load ./node-playwright-firefox
 	docker run --rm -it --platform linux/amd64 apify/node-playwright-firefox:local
 
 	@# Restore package.json and cleanup certificates
-	@git checkout ./node-playwright-firefox/package.json 1>/dev/null 2>&1
+	@git checkout ./node-playwright-firefox/package.json ./node-playwright-firefox/package.slim.json 1>/dev/null 2>&1
 	$(call cleanup-firefox-certs,node-playwright-firefox)
 
 	@# Delete docker image
@@ -260,11 +262,11 @@ test-node-playwright-firefox-arm:
 	@# Copy Firefox certificates
 	$(call copy-firefox-certs,node-playwright-firefox)
 
-	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-firefox/Dockerfile --tag apify/node-playwright-firefox:local --load ./node-playwright-firefox
+	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg SLIM=$(SLIM) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-firefox/Dockerfile --tag apify/node-playwright-firefox:local --load ./node-playwright-firefox
 	docker run --rm -it --platform linux/arm64 apify/node-playwright-firefox:local
 
 	@# Restore package.json and cleanup certificates
-	@git checkout ./node-playwright-firefox/package.json 1>/dev/null 2>&1
+	@git checkout ./node-playwright-firefox/package.json ./node-playwright-firefox/package.slim.json 1>/dev/null 2>&1
 	$(call cleanup-firefox-certs,node-playwright-firefox)
 
 	@# Delete docker image
@@ -279,11 +281,11 @@ test-node-playwright-camoufox:
 	@# Copy Firefox certificates
 	$(call copy-firefox-certs,node-playwright-camoufox)
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-camoufox/Dockerfile --tag apify/node-playwright-camoufox:local --load ./node-playwright-camoufox
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg SLIM=$(SLIM) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-camoufox/Dockerfile --tag apify/node-playwright-camoufox:local --load ./node-playwright-camoufox
 	docker run --rm -it --platform linux/amd64 apify/node-playwright-camoufox:local
 
 	@# Restore package.json and cleanup certificates
-	@git checkout ./node-playwright-camoufox/package.json 1>/dev/null 2>&1
+	@git checkout ./node-playwright-camoufox/package.json ./node-playwright-camoufox/package.slim.json 1>/dev/null 2>&1
 	$(call cleanup-firefox-certs,node-playwright-camoufox)
 
 	@# Delete docker image
@@ -298,11 +300,11 @@ test-node-playwright-camoufox-arm:
 	@# Copy Firefox certificates
 	$(call copy-firefox-certs,node-playwright-camoufox)
 
-	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-camoufox/Dockerfile --tag apify/node-playwright-camoufox:local --load ./node-playwright-camoufox
+	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg SLIM=$(SLIM) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-camoufox/Dockerfile --tag apify/node-playwright-camoufox:local --load ./node-playwright-camoufox
 	docker run --rm -it --platform linux/arm64 apify/node-playwright-camoufox:local
 
 	@# Restore package.json and cleanup certificates
-	@git checkout ./node-playwright-camoufox/package.json 1>/dev/null 2>&1
+	@git checkout ./node-playwright-camoufox/package.json ./node-playwright-camoufox/package.slim.json 1>/dev/null 2>&1
 	$(call cleanup-firefox-certs,node-playwright-camoufox)
 
 	@# Delete docker image
@@ -314,11 +316,11 @@ test-node-playwright-webkit:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-webkit
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-webkit/Dockerfile --tag apify/node-playwright-webkit:local --load ./node-playwright-webkit
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg SLIM=$(SLIM) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-webkit/Dockerfile --tag apify/node-playwright-webkit:local --load ./node-playwright-webkit
 	docker run --rm -it --platform linux/amd64 apify/node-playwright-webkit:local
 
 	@# Restore package.json
-	@git checkout ./node-playwright-webkit/package.json 1>/dev/null 2>&1
+	@git checkout ./node-playwright-webkit/package.json ./node-playwright-webkit/package.slim.json 1>/dev/null 2>&1
 
 	@# Delete docker image
 	docker rmi apify/node-playwright-webkit:local
@@ -329,11 +331,11 @@ test-node-playwright-webkit-arm:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PLAYWRIGHT_VERSION=$(PKG_JSON_PW_VERSION) node ./scripts/update-package-json.mjs ./node-playwright-webkit
 
-	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-webkit/Dockerfile --tag apify/node-playwright-webkit:local --load ./node-playwright-webkit
+	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg SLIM=$(SLIM) --build-arg PLAYWRIGHT_VERSION=$(PLAYWRIGHT_VERSION) --file ./node-playwright-webkit/Dockerfile --tag apify/node-playwright-webkit:local --load ./node-playwright-webkit
 	docker run --rm -it --platform linux/arm64 apify/node-playwright-webkit:local
 
 	@# Restore package.json
-	@git checkout ./node-playwright-webkit/package.json 1>/dev/null 2>&1
+	@git checkout ./node-playwright-webkit/package.json ./node-playwright-webkit/package.slim.json 1>/dev/null 2>&1
 
 	@# Delete docker image
 	docker rmi apify/node-playwright-webkit:local
@@ -344,11 +346,11 @@ test-node-puppeteer-chrome:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PUPPETEER_VERSION=$(PUPPETEER_VERSION) node ./scripts/update-package-json.mjs ./node-puppeteer-chrome
 
-	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PUPPETEER_VERSION=$(PUPPETEER_VERSION) --file ./node-puppeteer-chrome/Dockerfile --tag apify/node-puppeteer-chrome:local --output type=docker,oci-mediatypes=true ./node-puppeteer-chrome
+	docker buildx build --platform linux/amd64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg SLIM=$(SLIM) --build-arg PUPPETEER_VERSION=$(PUPPETEER_VERSION) --file ./node-puppeteer-chrome/Dockerfile --tag apify/node-puppeteer-chrome:local --output type=docker,oci-mediatypes=true ./node-puppeteer-chrome
 	docker run --rm -it --platform linux/amd64 apify/node-puppeteer-chrome:local
 
 	@# Restore package.json
-	@git checkout ./node-puppeteer-chrome/package.json 1>/dev/null 2>&1
+	@git checkout ./node-puppeteer-chrome/package.json ./node-puppeteer-chrome/package.slim.json 1>/dev/null 2>&1
 
 	@# Delete docker image
 	docker rmi apify/node-puppeteer-chrome:local
@@ -362,11 +364,11 @@ test-node-puppeteer-chrome-arm:
 	@# Correct package.json
 	@APIFY_VERSION=latest CRAWLEE_VERSION=latest PUPPETEER_VERSION=$(PUPPETEER_VERSION) node ./scripts/update-package-json.mjs ./node-puppeteer-chrome
 
-	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg PUPPETEER_VERSION=$(PUPPETEER_VERSION) --file ./node-puppeteer-chrome/Dockerfile --tag apify/node-puppeteer-chrome:local --load ./node-puppeteer-chrome
+	docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg SLIM=$(SLIM) --build-arg PUPPETEER_VERSION=$(PUPPETEER_VERSION) --file ./node-puppeteer-chrome/Dockerfile --tag apify/node-puppeteer-chrome:local --load ./node-puppeteer-chrome
 	docker run --rm -it --platform linux/arm64 apify/node-puppeteer-chrome:local
 
 	@# Restore package.json
-	@git checkout ./node-puppeteer-chrome/package.json 1>/dev/null 2>&1
+	@git checkout ./node-puppeteer-chrome/package.json ./node-puppeteer-chrome/package.slim.json 1>/dev/null 2>&1
 
 	@# Delete docker image
 	docker rmi apify/node-puppeteer-chrome:local
