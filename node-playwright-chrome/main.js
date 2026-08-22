@@ -11,29 +11,48 @@ For more information, see https://docs.apify.com/actors/development/source-code#
 `);
 console.log('Testing Docker image...');
 
-const { Actor } = require('apify');
-const { launchPlaywright, getMemoryInfo } = require('crawlee');
-const { testChrome } = require('./chrome_test');
+const { execSync } = require('node:child_process');
 
-Actor.main(async () => {
-    // Sanity test browsers.
-    // We need --no-sandbox, because even though the build is running on GitHub, the test is running in Docker.
-    const launchOptions = { headless: true, args: ['--no-sandbox'] };
-    const launchContext = { launchOptions };
+// `apify` is optional: the -slim images ship without it preinstalled. Anything other than
+// apify itself being absent means a broken install and must fail the test.
+let Actor;
+try {
+    ({ Actor } = require('apify'));
+} catch (error) {
+    if (error.code !== 'MODULE_NOT_FOUND' || !error.message.includes("'apify'")) throw error;
+}
 
-    const browser = await launchPlaywright(launchContext);
-    await browser.close();
+if (Actor) {
+    // The regular images preinstall crawlee next to apify; make sure it loads too.
+    require('crawlee');
+}
 
-    // Try to use full Chrome headless
+const { testChrome, testChromium } = require('./chrome_test');
+
+const run = async () => {
+    // Check that `ps` is available - some Node builds have shipped without it,
+    // and crawlee needs it at runtime to measure memory.
+    execSync('ps');
+
+    // Bundled Chromium: once resolved via PLAYWRIGHT_BROWSERS_PATH, once via the
+    // APIFY_DEFAULT_BROWSER_PATH symlink the image sets up.
+    await testChromium({ headless: true });
+    await testChromium({ executablePath: process.env.APIFY_DEFAULT_BROWSER_PATH, headless: true });
+
+    // Full Chrome headless
     await testChrome({ headless: true });
 
-    // Try to use full Chrome with XVFB
+    // Full Chrome with XVFB (headful)
     await testChrome({ headless: false });
 
-    // Try to use playwright default
-    await testChrome({ executablePath: undefined });
-    await testChrome({ executablePath: process.env.APIFY_DEFAULT_BROWSER_PATH });
+    console.log('... test PASSED');
+};
 
-    // Test that "ps" command is available, sometimes it was missing in official Node builds
-    await getMemoryInfo();
-});
+if (Actor) {
+    Actor.main(run);
+} else {
+    run().catch((error) => {
+        console.error(error);
+        process.exitCode = 1;
+    });
+}

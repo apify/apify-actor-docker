@@ -122,7 +122,7 @@ USER myuser
 WORKDIR /home/myuser
 
 # Copy source code and xvfb script
-COPY --chown=myuser:myuser package.json main.js check-playwright-version.mjs chrome_test.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh xvfb-entrypoint.sh /home/myuser/
+COPY --chown=myuser:myuser package.json package.slim.json main.js check-playwright-version.mjs chrome_test.js start_xvfb_and_run_cmd.sh new_xvfb_run_cmd.sh xvfb-entrypoint.sh /home/myuser/
 
 # Tell Node.js this is a production environment
 ENV NODE_ENV=production
@@ -152,6 +152,12 @@ ENV NPM_CONFIG_CACHE=/pkg-cache/npm \
 # plain copies that any tooling can resolve without symlinks or a PnP loader.
 ENV PNPM_CONFIG_NODE_LINKER=hoisted \
     YARN_NODE_LINKER=node-modules
+
+# The -slim variant ships without the preinstalled Actor SDKs (apify, crawlee, typescript):
+# it installs from package.slim.json instead, which keeps only the browser library the image
+# is built around.
+ARG SLIM=0
+RUN if [ "$SLIM" = "1" ]; then mv package.slim.json package.json; else rm package.slim.json; fi
 
 # Install default dependencies, print versions of everything
 RUN npm --quiet set progress=false \
