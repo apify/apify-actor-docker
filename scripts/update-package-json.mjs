@@ -7,14 +7,30 @@ if (process.argv.length !== 3) {
 
 const path = process.argv[2];
 
-const packageJsonPath = new URL(`../${path}/package.json`, import.meta.url);
+// package.slim.json is the manifest for the -slim image variants; keep it in sync.
+const packageJsonFileNames = ['package.json', 'package.slim.json'];
 
 const replacers = ['APIFY_VERSION', 'CRAWLEE_VERSION', 'PLAYWRIGHT_VERSION', 'PUPPETEER_VERSION', 'CAMOUFOX_VERSION'];
 
-try {
-	const packageJson = JSON.parse(await readFile(packageJsonPath, 'utf8'));
+for (const fileName of packageJsonFileNames) {
+	const packageJsonPath = new URL(`../${path}/${fileName}`, import.meta.url);
 
-	console.log(`Updating package.json in ${path}`);
+	let packageJson;
+
+	try {
+		packageJson = JSON.parse(await readFile(packageJsonPath, 'utf8'));
+	} catch (err) {
+		if (fileName === 'package.slim.json' && err.code === 'ENOENT') {
+			continue;
+		}
+
+		console.error(`Failed to read ${fileName} from ${packageJsonPath}`);
+		console.error(err);
+
+		process.exit(1);
+	}
+
+	console.log(`Updating ${fileName} in ${path}`);
 
 	for (const [depName, depVersion] of Object.entries(packageJson.dependencies)) {
 		if (!replacers.includes(depVersion)) {
@@ -67,9 +83,4 @@ try {
 	}
 
 	await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 4));
-} catch (err) {
-	console.error(`Failed to read package.json from ${packageJsonPath}`);
-	console.error(err);
-
-	process.exit(1);
 }

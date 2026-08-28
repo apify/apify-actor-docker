@@ -1,6 +1,8 @@
 module.exports = () => {
-    const { CURRENT_NODE, LATEST_NODE, RELEASE_TAG, IMAGE_NAME, FRAMEWORK_VERSION, IS_LATEST_BROWSER_IMAGE } = process.env
+    const { CURRENT_NODE, LATEST_NODE, RELEASE_TAG, IMAGE_NAME, FRAMEWORK_VERSION, IS_LATEST_BROWSER_IMAGE, TAG_SUFFIX } = process.env
     const tags = [];
+    // Optional suffix appended to every tag (e.g. "-slim" -> apify/actor-node:20-slim).
+    const suffix = TAG_SUFFIX || '';
 
     if (CURRENT_NODE === LATEST_NODE && IS_LATEST_BROWSER_IMAGE === 'true') {
         // apify/actor-node-x:latest
@@ -31,5 +33,7 @@ module.exports = () => {
         tags.push(`${IMAGE_NAME}:${CURRENT_NODE}-${RELEASE_TAG}`);
     }
 
-    return { allTags: tags.join(','), firstImageName: tags[0] };
+    const suffixedTags = tags.map((tag) => `${tag}${suffix}`);
+
+    return { allTags: suffixedTags.join(','), firstImageName: suffixedTags[0] };
 }

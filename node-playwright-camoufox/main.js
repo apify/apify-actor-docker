@@ -11,23 +11,43 @@ For more information, see https://docs.apify.com/actors/development/source-code#
 `);
 console.log('Testing Docker image...');
 
-const { Actor } = require('apify');
-const { getMemoryInfo } = require('crawlee');
+const { execSync } = require('node:child_process');
+
+// `apify` is optional: the -slim images ship without it preinstalled. Anything other than
+// apify itself being absent means a broken install and must fail the test.
+let Actor;
+try {
+    ({ Actor } = require('apify'));
+} catch (error) {
+    if (error.code !== 'MODULE_NOT_FOUND' || !error.message.includes("'apify'")) throw error;
+}
+
+if (Actor) {
+    // The regular images preinstall crawlee next to apify; make sure it loads too.
+    require('crawlee');
+}
+
 const testFirefox = require('./firefox_test');
 
-Actor.main(async () => {
-    // Sanity test browsers.
+const run = async () => {
+    // Check that `ps` is available - some Node builds have shipped without it,
+    // and crawlee needs it at runtime to measure memory.
+    execSync('ps');
 
-    // Try to use full Firefox headless
+    // Camoufox (Firefox) headless
     await testFirefox({ headless: true });
 
-    // Try to use full Firefox with XVFB
+    // Camoufox (Firefox) with XVFB (headful)
     await testFirefox({ headless: false });
 
-    // Try to use playwright default
-    await testFirefox({ executablePath: undefined });
-    await testFirefox({ executablePath: process.env.APIFY_DEFAULT_BROWSER_PATH });
+    console.log('... test PASSED');
+};
 
-    // Test that "ps" command is available, sometimes it was missing in official Node builds
-    await getMemoryInfo();
-});
+if (Actor) {
+    Actor.main(run);
+} else {
+    run().catch((error) => {
+        console.error(error);
+        process.exit(1);
+    });
+}

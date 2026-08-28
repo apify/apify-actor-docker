@@ -1,0 +1,15 @@
+{
+    "description": "Anonymous actor on the Apify platform (with Firefox)",
+    "version": "0.0.1",
+    "license": "UNLICENSED",
+    "main": "main.js",
+    "scripts": {
+        "start": "node main.js"
+    },
+    "dependencies": {
+        "camoufox-js": "CAMOUFOX_VERSION",
+        "impit": "latest",
+        "playwright": "PLAYWRIGHT_VERSION"
+    },
+    "repository": {}
+}

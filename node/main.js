@@ -11,12 +11,36 @@ For more information, see https://docs.apify.com/actors/development/source-code#
 `);
 console.log('Testing Docker image...');
 
-const { Actor } = require('apify');
-const { getMemoryInfo } = require('crawlee');
+const { execSync } = require('node:child_process');
 
-Actor.main(async () => {
-    // Test that "ps" command is available, sometimes it was missing in official Node builds
-    await getMemoryInfo();
+// `apify` is optional: the -slim images ship without it preinstalled. Anything other than
+// apify itself being absent means a broken install and must fail the test.
+let Actor;
+try {
+    ({ Actor } = require('apify'));
+} catch (error) {
+    if (error.code !== 'MODULE_NOT_FOUND' || !error.message.includes("'apify'")) throw error;
+}
 
+if (Actor) {
+    // The regular images preinstall crawlee next to apify; make sure it loads too.
+    require('crawlee');
+}
+
+const run = async () => {
+    // Check that `ps` is available - some Node builds have shipped without it,
+    // and crawlee needs it at runtime to measure memory.
+    execSync('ps');
+
+    // The base Node image has no browser to exercise; just confirm the runtime starts.
     console.log('... test PASSED');
-});
+};
+
+if (Actor) {
+    Actor.main(run);
+} else {
+    run().catch((error) => {
+        console.error(error);
+        process.exit(1);
+    });
+}

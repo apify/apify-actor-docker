@@ -48,7 +48,12 @@ RUN npm config --global set update-notifier false \
 WORKDIR /usr/src/app
 
 # Copy source code
-COPY --chown=myuser:myuser package.json main.js .
+COPY --chown=myuser:myuser package.json package.slim.json main.js .
+
+# The -slim variant ships without the preinstalled Actor SDKs (apify, crawlee, typescript):
+# it installs from package.slim.json instead, which has no dependencies at all.
+ARG SLIM=0
+RUN if [ "$SLIM" = "1" ]; then mv package.slim.json package.json; else rm package.slim.json; fi
 
 # Send every package-manager cache to a single, dedicated location instead of $HOME.
 # npm, yarn, and pnpm have no real "disable the cache" switch (unlike pip), so isolating
