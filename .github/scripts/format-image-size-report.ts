@@ -13,6 +13,8 @@ import { join } from 'node:path';
 interface SizeReport {
     matrix?: Record<string, string>;
     baseImage?: string;
+    // Extra variant label not derivable from the matrix (e.g. "slim").
+    variant?: string;
     currentBytes?: string;
     newBytes?: string;
 }
@@ -100,7 +102,7 @@ function render(reports: SizeReport[]): string {
     const rows = reports
         .map((report) => ({
             image: report.baseImage || '(unknown)',
-            variant: describeVariant(report.matrix),
+            variant: [describeVariant(report.matrix), report.variant].filter(Boolean).join(', '),
             current: formatSize(report.currentBytes) ?? '_n/a_',
             next: formatSize(report.newBytes) ?? '_n/a_',
             delta: formatDelta(report.currentBytes, report.newBytes),

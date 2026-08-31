@@ -256,24 +256,33 @@ jobs:
           MATRIX_JSON: ${{ toJSON(matrix) }}
           NEW_IMAGE: ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}
           BASE_IMAGE: apify/actor-${{ matrix.image-name }}:${{ matrix.node-version }}
+          NEW_SLIM_IMAGE: ${{ fromJson(steps.prepare-slim-tags.outputs.result).firstImageName }}
+          BASE_SLIM_IMAGE: apify/actor-${{ matrix.image-name }}:${{ matrix.node-version }}-slim
         run: |
           set -euo pipefail
           mkdir -p size-report
           id="$(printf '%s' "$MATRIX_JSON" | sha256sum | cut -c1-16)"
-          new_bytes="$(docker image inspect "$NEW_IMAGE" --format '{{.Size}}')"
-          if docker pull --platform linux/amd64 "$BASE_IMAGE" >/dev/null 2>&1; then
-            current_bytes="$(docker image inspect "$BASE_IMAGE" --format '{{.Size}}')"
-          else
-            current_bytes=""
-            echo "No published baseline image found for ${BASE_IMAGE}"
-          fi
-          jq -n \
-            --argjson matrix "$MATRIX_JSON" \
-            --arg base "$BASE_IMAGE" \
-            --arg current "$current_bytes" \
-            --arg new "$new_bytes" \
-            '{matrix: $matrix, baseImage: $base, currentBytes: $current, newBytes: $new}' \
-            > "size-report/${id}.json"
+          measure() {
+            local new_image="$1" base_image="$2" variant="$3" out="$4"
+            local new_bytes current_bytes
+            new_bytes="$(docker image inspect "$new_image" --format '{{.Size}}')"
+            if docker pull --platform linux/amd64 "$base_image" >/dev/null 2>&1; then
+              current_bytes="$(docker image inspect "$base_image" --format '{{.Size}}')"
+            else
+              current_bytes=""
+              echo "No published baseline image found for ${base_image}"
+            fi
+            jq -n \
+              --argjson matrix "$MATRIX_JSON" \
+              --arg base "$base_image" \
+              --arg variant "$variant" \
+              --arg current "$current_bytes" \
+              --arg new "$new_bytes" \
+              '{matrix: $matrix, baseImage: $base, variant: $variant, currentBytes: $current, newBytes: $new}' \
+              > "size-report/${out}.json"
+          }
+          measure "$NEW_IMAGE" "$BASE_IMAGE" "" "$id"
+          measure "$NEW_SLIM_IMAGE" "$BASE_SLIM_IMAGE" "slim" "${id}-slim"
           echo "id=${id}" >> "$GITHUB_OUTPUT"
 
       - name: Upload image size report
