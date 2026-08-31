@@ -353,6 +353,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
+    # All image workflows update sections of ONE shared PR comment; the repo-wide
+    # concurrency group serializes their read-modify-write so no section is lost.
+    concurrency:
+      group: image-size-comment-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
 
     steps:
       - name: Checkout
@@ -371,13 +376,17 @@ jobs:
         with:
           node-version: 24
 
-      - name: Render comment body
+      - name: Render comment section
         run: |
           mkdir -p size-reports
-          node .github/scripts/format-image-size-report.ts size-reports | tee image-size-comment.md
+          node .github/scripts/format-image-size-report.ts size-reports "Node + Puppeteer images" "${{ github.event.pull_request.head.sha }}" | tee image-size-comment.md
 
       - name: Post or update image size comment
-        uses: marocchino/sticky-pull-request-comment@v3
+        uses: actions/github-script@v8
+        env:
+          SECTION_KEY: node-puppeteer
         with:
-          header: image-sizes-node-puppeteer
-          path: image-size-comment.md
+          script: |
+            const { readFileSync } = require('node:fs');
+            const upsertSection = require('./.github/scripts/upsert-image-size-comment.js');
+            await upsertSection({ github, context }, process.env.SECTION_KEY, readFileSync('image-size-comment.md', 'utf8'));

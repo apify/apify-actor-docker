@@ -1,6 +1,8 @@
-// Renders the Markdown body for the "image size" PR comment.
+// Renders one workflow's <details> section of the shared "image size" PR comment.
+// The section is upserted into a single sticky comment by upsert-image-size-comment.js,
+// so each image workflow only ever touches its own foldable block.
 //
-// Usage: node format-image-size-report.ts <reports-dir>
+// Usage: node format-image-size-report.ts <reports-dir> <section-title> [head-sha]
 // Runs natively on Node.js >=24 via built-in TypeScript type stripping (no build step).
 //
 // <reports-dir> contains one JSON file per built image (uploaded as artifacts by
@@ -79,22 +81,22 @@ function describeVariant(matrix: Record<string, string> = {}): string {
     return variants.join(', ');
 }
 
-function render(reports: SizeReport[]): string {
+function render(reports: SizeReport[], title: string, headSha: string): string {
     const lines: string[] = [];
-    lines.push('### 📦 Image size report');
-    lines.push('');
+    const measuredAt = headSha ? ` <sub>(at ${headSha.slice(0, 7)})</sub>` : '';
 
     if (reports.length === 0) {
-        lines.push('No image size data was collected (no images were built in this run).');
+        lines.push('<details>');
+        lines.push(`<summary><b>${title}</b> — no image size data collected${measuredAt}</summary>`);
+        lines.push('');
+        lines.push('No images were built in this run.');
+        lines.push('</details>');
         lines.push('');
         return lines.join('\n');
     }
 
-    lines.push(
-        'Built images compared against the currently published rolling tag for the same runtime version '
-            + '(e.g. `apify/actor-node:22`). Sizes are the **uncompressed** on-disk size reported by '
-            + '`docker image inspect`, so they will be larger than the compressed download size shown on Docker Hub.',
-    );
+    lines.push('<details>');
+    lines.push(`<summary><b>${title}</b> — ${reports.length} image${reports.length === 1 ? '' : 's'}${measuredAt}</summary>`);
     lines.push('');
     lines.push('| Image | Variant | Current | New | Δ |');
     lines.push('| --- | --- | ---: | ---: | --- |');
@@ -113,8 +115,9 @@ function render(reports: SizeReport[]): string {
         lines.push(`| \`${row.image}\` | ${row.variant || '—'} | ${row.current} | ${row.next} | ${row.delta} |`);
     }
 
+    lines.push('</details>');
     lines.push('');
     return lines.join('\n');
 }
 
-process.stdout.write(render(readReports(process.argv[2] ?? '')));
+process.stdout.write(render(readReports(process.argv[2] ?? ''), process.argv[3] ?? 'Image sizes', process.argv[4] ?? ''));
