@@ -80,7 +80,7 @@ RUN apt update \
     && apt purge --auto-remove -y unzip \
     \
     # Add user so we don't need --no-sandbox.
-    && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
+    && groupadd -r -g 990 myuser && useradd -r -u 990 -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser \
     \
