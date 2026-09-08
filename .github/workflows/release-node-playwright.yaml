@@ -248,7 +248,14 @@ jobs:
         run: |
           docker run --rm ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }} sh -c '
             set -ex
-            test "$(npm config get cache)" = "/pkg-cache/npm"
+            test "$(npm config get cache)" = "$HOME/.npm"
+            test ! -L "$HOME/.npm"
+            test ! -e /pkg-cache/npm
+            npm cache add is-number@7.0.0
+            test -d "$HOME/.npm/_cacache"
+            rm -rf "$HOME/.npm"
+            test ! -e "$HOME/.npm"
+            test -z "$(ls -A "$COREPACK_HOME")"
             pnpm store path | grep -q "^/pkg-cache/pnpm/store"
             test "$(pnpm config get node-linker)" = "hoisted"
             corepack pnpm@10 store path | grep -q "^/pkg-cache/pnpm/store"

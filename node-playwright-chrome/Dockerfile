@@ -86,10 +86,6 @@ RUN apt update \
     # npm otherwise refuses to overwrite with corepack's shims.
     && npm install -g --force corepack@latest \
     && corepack enable \
-    # Make pnpm >= 11 the version corepack provisions by default: pnpm 10 ignores the
-    # PNPM_CONFIG_* env vars set below, so its store and cache would land in $HOME instead
-    # of /pkg-cache. COREPACK_HOME is passed inline because its ENV is declared further down.
-    && COREPACK_HOME=/pkg-cache/corepack corepack install -g pnpm@latest \
     # pnpm 10 ignores the PNPM_CONFIG_* env vars set further down (they are pnpm >= 11 only),
     # and npm >= 11 warns on the equivalent npmrc keys / NPM_CONFIG_* vars, so mirror the
     # settings into pnpm's own global rc files, which only pnpm reads. This makes Actors that
@@ -101,7 +97,7 @@ RUN apt update \
     \
     # Pre-create the shared package-manager cache dirs (see the *_CACHE_*/*_STORE_DIR env vars), world-writable so any
     # user can populate them and `rm -rf` them at the end to reclaim space, regardless of which user the Actor runs as.
-    && mkdir -p /pkg-cache/npm /pkg-cache/yarn /pkg-cache/pnpm/store /pkg-cache/pnpm/cache \
+    && mkdir -p /pkg-cache/yarn /pkg-cache/pnpm/store /pkg-cache/pnpm/cache /pkg-cache/corepack \
     && chmod -R 777 /pkg-cache \
     \
     # Cleanup time
@@ -111,11 +107,8 @@ RUN apt update \
     # This is needed to remove an annoying error message when running headful.
     && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix \
     \
-    # Point the default per-user npm cache dirs (~/.npm) at the shared cache, so tooling
-    # that bypasses NPM_CONFIG_CACHE - and templates that `rm -r ~/.npm` - keep working.
-    && rm -rf /root/.npm /home/myuser/.npm \
-    && ln -s /pkg-cache/npm /root/.npm \
-    && ln -s /pkg-cache/npm /home/myuser/.npm
+    # Clear npm caches populated during setup.
+    && rm -rf /root/.npm /home/myuser/.npm
 
 # Run everything after as non-privileged user.
 USER myuser
@@ -133,15 +126,12 @@ ENV NODE_ENV=production
 # so we put back the old limit of 80kb, which seems to work just fine.
 ENV NODE_OPTIONS="--max_old_space_size=30000 --max-http-header-size=80000"
 
-# Send every package-manager cache to a single, dedicated location instead of $HOME.
-# npm, yarn, and pnpm have no real "disable the cache" switch (unlike pip), so isolating
-# their caches under /pkg-cache is the practical equivalent: the tree holds only throwaway
-# cache data and can be wiped or mounted as tmpfs without touching installed dependencies.
+# Keep yarn and pnpm caches under /pkg-cache so they can be removed after installation.
+# npm uses its default ~/.npm directory so existing cache cleanup commands still work.
 # COREPACK_HOME holds the package-manager versions corepack provisions on demand.
 # NOTE: only pnpm >= 11 reads the PNPM_CONFIG_* vars; pnpm 10 picks up the same settings
 # from the global pnpm rc files written to /root/.config/pnpm and /home/myuser/.config/pnpm.
-ENV NPM_CONFIG_CACHE=/pkg-cache/npm \
-    YARN_CACHE_FOLDER=/pkg-cache/yarn \
+ENV YARN_CACHE_FOLDER=/pkg-cache/yarn \
     YARN_GLOBAL_FOLDER=/pkg-cache/yarn \
     PNPM_CONFIG_STORE_DIR=/pkg-cache/pnpm/store \
     PNPM_CONFIG_CACHE_DIR=/pkg-cache/pnpm/cache \
