@@ -68,7 +68,11 @@ const cacheParams: CacheValues = {
 	CERTIFICATES_UPDATED_AT: certificatesUpdatedAt ? [certificatesUpdatedAt] : [],
 };
 
-await setParametersForTriggeringUpdateWorkflowOnActorTemplates('python', latestPlaywrightVersion);
+await setParametersForTriggeringUpdateWorkflowOnActorTemplates(
+	'python',
+	latestPlaywrightVersion,
+	latestCamoufoxPlaywrightVersion,
+);
 
 if (!(await needsToRunMatrixGeneration('python:playwright', cacheParams))) {
 	console.error('Matrix is up to date, skipping new image building');
