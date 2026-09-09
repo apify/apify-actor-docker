@@ -135,10 +135,17 @@ ARG SLIM=0
 RUN if [ "$SLIM" = "1" ]; then mv package.slim.json package.json; else rm package.slim.json; fi
 
 # Install default dependencies, print versions of everything
-RUN npm --quiet set progress=false \
+#
+# `camoufox-js fetch` reads api.github.com, where the whole matrix shares one 60/hour budget.
+# GITHUB_TOKEN lifts it to 1000/hour; a secret, not a build arg, keeps it out of the layers.
+# mode=0444 because this stage runs as myuser and secrets default to root-owned 0400.
+# Without it the build stays unauthenticated and still works.
+RUN --mount=type=secret,id=github_token,mode=0444 \
+    npm --quiet set progress=false \
     \
     # Install Camoufox browser
-    && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=0 npx camoufox-js fetch \
+    && GITHUB_TOKEN="$(cat /run/secrets/github_token 2>/dev/null || true)" \
+    PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=0 npx camoufox-js fetch \
     # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
     && rm -f /home/myuser/.cache/camoufox/libnssckbi.so \
     && ln -s $(ls -d /usr/lib/*-linux-gnu)/pkcs11/p11-kit-trust.so /home/myuser/.cache/camoufox/libnssckbi.so \

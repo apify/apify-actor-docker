@@ -240,6 +240,8 @@ jobs:
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
           cache-from: type=gha,scope=${{ matrix.image-name }}-${{ matrix.node-version }}-${{ matrix.playwright-version }}
           cache-to: type=gha,mode=max,scope=${{ matrix.image-name }}-${{ matrix.node-version }}-${{ matrix.playwright-version }}
+          secrets: |
+            github_token=${{ secrets.GITHUB_TOKEN }}
 
       - name: Test image
         run: docker run ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}
@@ -281,6 +283,8 @@ jobs:
             type=gha,scope=${{ matrix.image-name }}-${{ matrix.node-version }}-${{ matrix.playwright-version }}-slim
             type=gha,scope=${{ matrix.image-name }}-${{ matrix.node-version }}-${{ matrix.playwright-version }}
           cache-to: type=gha,mode=max,scope=${{ matrix.image-name }}-${{ matrix.node-version }}-${{ matrix.playwright-version }}-slim
+          secrets: |
+            github_token=${{ secrets.GITHUB_TOKEN }}
 
       - name: Test slim image
         run: docker run ${{ fromJson(steps.prepare-slim-tags.outputs.result).firstImageName }}
@@ -351,6 +355,8 @@ jobs:
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
           outputs: type=image,oci-mediatypes=true
           cache-from: type=gha,scope=${{ matrix.image-name }}-${{ matrix.node-version }}-${{ matrix.playwright-version }}
+          secrets: |
+            github_token=${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push slim OCI image
         if: github.event_name != 'pull_request'
@@ -370,6 +376,8 @@ jobs:
           cache-from: |
             type=gha,scope=${{ matrix.image-name }}-${{ matrix.node-version }}-${{ matrix.playwright-version }}-slim
             type=gha,scope=${{ matrix.image-name }}-${{ matrix.node-version }}-${{ matrix.playwright-version }}
+          secrets: |
+            github_token=${{ secrets.GITHUB_TOKEN }}
 
   # Aggregate the per-image size reports uploaded by the build matrix and post/update
   # a single sticky PR comment comparing current vs new image sizes.
