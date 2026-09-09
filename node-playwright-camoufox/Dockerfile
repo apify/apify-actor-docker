@@ -26,8 +26,8 @@ ENV PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
 # Tell the crawlee cli that we already have browsers installed, so it skips installing them
 ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 
-# Stable symlink to the installed Camoufox executable.
-ENV APIFY_DEFAULT_BROWSER_PATH=/home/myuser/.cache/camoufox-bin
+# Stable path through a symlink to the installed Camoufox directory.
+ENV APIFY_DEFAULT_BROWSER_PATH=/home/myuser/.cache/camoufox-current/camoufox-bin
 
 # Prevent installing of browsers by future `npm install`.
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
@@ -142,7 +142,7 @@ RUN npm --quiet set progress=false \
     # Resolve both flat and versioned Camoufox cache layouts.
     && CAMOUFOX_BINARY="$(find /home/myuser/.cache/camoufox -type f -name camoufox-bin)" \
     && test -x "$CAMOUFOX_BINARY" \
-    && ln -s "$CAMOUFOX_BINARY" "$APIFY_DEFAULT_BROWSER_PATH" \
+    && ln -s "$(dirname "$CAMOUFOX_BINARY")" "$(dirname "$APIFY_DEFAULT_BROWSER_PATH")" \
     # Load system certificates from the browser's own library directory.
     && ln -sf "$(ls -d /usr/lib/*-linux-gnu)/pkcs11/p11-kit-trust.so" "$(dirname "$CAMOUFOX_BINARY")/libnssckbi.so" \
     \
