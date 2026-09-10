@@ -104,9 +104,8 @@ ENV PATH="/root/.local/bin:/home/myuser/.local/bin:$PATH"
 # - Installs the specified version of Playwright and Camoufox
 # - Fetches the Camoufox browser
 #
-# `camoufox fetch` reads api.github.com, where the whole matrix shares one 60/hour budget.
-# GITHUB_TOKEN lifts it to 1000/hour; a secret, not a build arg, keeps it out of the layers.
-# Without it the build stays unauthenticated and still works.
+# GITHUB_TOKEN raises the api.github.com rate limit for `camoufox fetch`. A secret, not a build
+# arg, keeps it out of the layers. Optional.
 RUN --mount=type=secret,id=github_token \
     python -m pip install --upgrade \
     pip \
@@ -115,8 +114,11 @@ RUN --mount=type=secret,id=github_token \
     playwright~=${PLAYWRIGHT_VERSION} \
     camoufox[geoip]~=${CAMOUFOX_VERSION} \
     # Fetch the Camoufox browser
-    && GITHUB_TOKEN="$(cat /run/secrets/github_token 2>/dev/null || true)" \
-    python -m camoufox fetch \
+    && if [ -r /run/secrets/github_token ]; then \
+           GITHUB_TOKEN="$(cat /run/secrets/github_token)"; \
+           export GITHUB_TOKEN; \
+       fi \
+    && python -m camoufox fetch \
     # `camoufox fetch` swallows sync errors and exits 0, so check what the runtime checks
     # rather than ship an image that only fails at launch.
     && python -c "from camoufox.pkgman import installed_verstr; print('Camoufox installed:', installed_verstr())" \
