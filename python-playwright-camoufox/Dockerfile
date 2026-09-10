@@ -103,14 +103,25 @@ ENV PATH="/root/.local/bin:/home/myuser/.local/bin:$PATH"
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
 # - Installs the specified version of Playwright and Camoufox
 # - Fetches the Camoufox browser
-RUN python -m pip install --upgrade \
+#
+# GITHUB_TOKEN raises the api.github.com rate limit for `camoufox fetch`. A secret, not a build
+# arg, keeps it out of the layers. Optional.
+RUN --mount=type=secret,id=github_token \
+    python -m pip install --upgrade \
     pip \
     setuptools \
     wheel \
     playwright~=${PLAYWRIGHT_VERSION} \
     camoufox[geoip]~=${CAMOUFOX_VERSION} \
     # Fetch the Camoufox browser
+    && if [ -r /run/secrets/github_token ]; then \
+           GITHUB_TOKEN="$(cat /run/secrets/github_token)"; \
+           export GITHUB_TOKEN; \
+       fi \
     && python -m camoufox fetch \
+    # `camoufox fetch` swallows sync errors and exits 0, so check what the runtime checks
+    # rather than ship an image that only fails at launch.
+    && python -c "from camoufox.pkgman import installed_verstr; print('Camoufox installed:', installed_verstr())" \
     # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
     && rm -f /root/.cache/camoufox/libnssckbi.so \
     && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so /root/.cache/camoufox/libnssckbi.so

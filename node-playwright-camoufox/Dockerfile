@@ -135,9 +135,17 @@ ARG SLIM=0
 RUN if [ "$SLIM" = "1" ]; then mv package.slim.json package.json; else rm package.slim.json; fi
 
 # Install default dependencies, print versions of everything
-RUN npm --quiet set progress=false \
+#
+# GITHUB_TOKEN raises the api.github.com rate limit for `camoufox-js fetch`. A secret, not a build
+# arg, keeps it out of the layers; mode=0444 because this stage runs as myuser. Optional.
+RUN --mount=type=secret,id=github_token,mode=0444 \
+    npm --quiet set progress=false \
     \
     # Install Camoufox browser
+    && if [ -r /run/secrets/github_token ]; then \
+           GITHUB_TOKEN="$(cat /run/secrets/github_token)"; \
+           export GITHUB_TOKEN; \
+       fi \
     && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=0 npx camoufox-js fetch \
     # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
     && rm -f /home/myuser/.cache/camoufox/libnssckbi.so \
