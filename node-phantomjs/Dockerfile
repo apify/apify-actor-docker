@@ -23,7 +23,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt purge --auto-remove -y wget \
     && rm -rf /src/*.deb
 
 # Run everything after as non-privileged user to avoid warnings
-RUN groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
+RUN groupadd -r -g 990 myuser && useradd -r -u 990 -g myuser -G audio,video myuser \
     && mkdir -p /home/myuser/Downloads \
     && chown -R myuser:myuser /home/myuser
 USER myuser
