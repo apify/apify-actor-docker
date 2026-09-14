@@ -46,8 +46,8 @@ ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 # Prevent playwright from downloading browsers when users install playwright via pip
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 
-# Camoufox stores its browser in ~/.cache/camoufox
-ENV APIFY_DEFAULT_BROWSER_PATH=/root/.cache/camoufox/camoufox-bin
+# Stable path through a symlink to the installed Camoufox directory.
+ENV APIFY_DEFAULT_BROWSER_PATH=/root/.cache/camoufox-current/camoufox-bin
 
 # Copy the script for registering intermediate certificates and the pre-downloaded certificates
 COPY ./register_intermediate_certs.sh ./register_intermediate_certs.sh
@@ -122,9 +122,12 @@ RUN --mount=type=secret,id=github_token \
     # `camoufox fetch` swallows sync errors and exits 0, so check what the runtime checks
     # rather than ship an image that only fails at launch.
     && python -c "from camoufox.pkgman import installed_verstr; print('Camoufox installed:', installed_verstr())" \
-    # Overrides the dynamic library used by Firefox to determine trusted root certificates with p11-kit-trust.so, which loads the system certificates.
-    && rm -f /root/.cache/camoufox/libnssckbi.so \
-    && ln -s /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so /root/.cache/camoufox/libnssckbi.so
+    # Resolve both flat and versioned Camoufox cache layouts.
+    && CAMOUFOX_BINARY="$(find /root/.cache/camoufox -type f -name camoufox-bin)" \
+    && test -x "$CAMOUFOX_BINARY" \
+    && ln -s "$(dirname "$CAMOUFOX_BINARY")" "$(dirname "$APIFY_DEFAULT_BROWSER_PATH")" \
+    # Load system certificates from the browser's own library directory.
+    && ln -sf "$(ls -d /usr/lib/*-linux-gnu)/pkcs11/p11-kit-trust.so" "$(dirname "$CAMOUFOX_BINARY")/libnssckbi.so"
 
 # Copy the dummy source code to the image
 COPY --chown=myuser:myuser . .

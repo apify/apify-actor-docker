@@ -73,7 +73,11 @@ const cacheParams: CacheValues = {
 	CERTIFICATES_UPDATED_AT: certificatesUpdatedAt ? [certificatesUpdatedAt] : [],
 };
 
-await setParametersForTriggeringUpdateWorkflowOnActorTemplates('node', latestPlaywrightVersion);
+await setParametersForTriggeringUpdateWorkflowOnActorTemplates(
+	'node',
+	latestPlaywrightVersion,
+	latestCamoufoxPlaywrightVersion,
+);
 
 if (!(await needsToRunMatrixGeneration('node:playwright', cacheParams))) {
 	console.error('Matrix generation is not needed, exiting.');
