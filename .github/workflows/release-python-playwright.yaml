@@ -198,6 +198,8 @@ jobs:
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
           cache-from: type=gha,scope=${{ matrix.image-name }}-${{ matrix.python-version }}-${{ matrix.playwright-version }}-${{ matrix.camoufox-version }}
           cache-to: type=gha,mode=max,scope=${{ matrix.image-name }}-${{ matrix.python-version }}-${{ matrix.playwright-version }}-${{ matrix.camoufox-version }}
+          secrets: |
+            github_token=${{ secrets.GITHUB_TOKEN }}
 
       - name: Test image
         run: docker run ${{ fromJson(steps.prepare-tags.outputs.result).firstImageName }}
@@ -260,6 +262,8 @@ jobs:
           tags: ${{ fromJson(steps.prepare-tags.outputs.result).allTags }}
           outputs: type=image,oci-mediatypes=true
           cache-from: type=gha,scope=${{ matrix.image-name }}-${{ matrix.python-version }}-${{ matrix.playwright-version }}-${{ matrix.camoufox-version }}
+          secrets: |
+            github_token=${{ secrets.GITHUB_TOKEN }}
 
   # Aggregate the per-image size reports uploaded by the build matrix and post/update
   # a single sticky PR comment comparing current vs new image sizes.
