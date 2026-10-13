@@ -93,6 +93,10 @@ const imageNames = [
 // Images that require Chrome/Chromium cannot be built for arm64 on Linux
 const arm64UnsupportedImages: ReadonlySet<string> = new Set(['python-playwright', 'python-playwright-chrome']);
 
+// Python versions the camoufox image is not built for. Camoufox depends on `zstandard` and `pyyaml`, which publish no
+// wheels for these versions, and the slim base image has no compiler to build them from source.
+const camoufoxUnsupportedPythonVersions: ReadonlySet<string> = new Set(['3.15']);
+
 const matrix = {
 	include: [] as {
 		'image-name': (typeof imageNames)[number];
@@ -112,6 +116,10 @@ for (const pythonVersion of supportedPythonVersions) {
 
 	for (const imageName of imageNames) {
 		const isCamoufoxImage = imageName === 'python-playwright-camoufox';
+
+		if (isCamoufoxImage && camoufoxUnsupportedPythonVersions.has(pythonVersion)) {
+			continue;
+		}
 
 		// The camoufox image only supports a subset of the Playwright versions, so it gets its own version list, along
 		// with its own "latest" version - otherwise it would never receive the moving tags (e.g. `:3.14`, `:latest`).
