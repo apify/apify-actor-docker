@@ -103,13 +103,21 @@ ENV PATH="/root/.local/bin:/home/myuser/.local/bin:$PATH"
 # - Preinstalls the latest versions of setuptools and wheel to improve package installation speed
 # - Installs the specified version of Playwright and Camoufox
 # - Fetches the Camoufox browser
-RUN python -m pip install --upgrade \
+#
+# GITHUB_TOKEN raises the api.github.com rate limit for `camoufox fetch`. A secret, not a build
+# arg, keeps it out of the layers. Optional.
+RUN --mount=type=secret,id=github_token \
+    python -m pip install --upgrade \
     pip \
     setuptools \
     wheel \
     playwright~=${PLAYWRIGHT_VERSION} \
     camoufox[geoip]~=${CAMOUFOX_VERSION} \
     # Fetch the Camoufox browser
+    && if [ -r /run/secrets/github_token ]; then \
+           GITHUB_TOKEN="$(cat /run/secrets/github_token)"; \
+           export GITHUB_TOKEN; \
+       fi \
     && python -m camoufox fetch \
     # Resolve both flat and versioned Camoufox cache layouts.
     && CAMOUFOX_BINARY="$(find /root/.cache/camoufox -type f -name camoufox-bin)" \
