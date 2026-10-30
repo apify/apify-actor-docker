@@ -10,7 +10,7 @@
         "apify": "APIFY_VERSION",
         "crawlee": "CRAWLEE_VERSION",
         "playwright": "PLAYWRIGHT_VERSION",
-        "typescript": "^5.4.3"
+        "typescript": "^6.0.0"
     },
     "overrides": {
         "apify": {
