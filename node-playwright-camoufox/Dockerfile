@@ -138,7 +138,7 @@ RUN if [ "$SLIM" = "1" ]; then mv package.slim.json package.json; else rm packag
 RUN npm --quiet set progress=false \
     \
     # Install Camoufox browser
-    && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=0 npx camoufox-js fetch \
+    && npx camoufox fetch \
     # Resolve both flat and versioned Camoufox cache layouts.
     && CAMOUFOX_BINARY="$(find /home/myuser/.cache/camoufox -type f -name camoufox-bin)" \
     && test -x "$CAMOUFOX_BINARY" \

@@ -1,5 +1,5 @@
 const playwright = require('playwright');
-const { launchOptions: camoufoxLaunchOptions } = require('camoufox-js');
+const { launchOptions: camoufoxLaunchOptions } = require('camoufox');
 
 const testPageLoading = async (browser) => {
     const page = await browser.newPage();
