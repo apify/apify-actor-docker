@@ -43,7 +43,7 @@ ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 # Prevent playwright from downloading browsers when users install playwright via pip
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 
-ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/MiniBrowser
+ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/webkit/pw_run.sh
 
 RUN apt update \
     && apt install --fix-missing -yq --no-install-recommends \
@@ -97,8 +97,10 @@ RUN python -m pip install --upgrade \
     playwright~=${PLAYWRIGHT_VERSION} \
     # Install Playwright browsers
     && python -m playwright install webkit \
-    # symlink the webkit binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
-    && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/webkit-*/minibrowser-gtk/MiniBrowser ${PLAYWRIGHT_BROWSERS_PATH}/
+    # Version-independent path to the bundled WebKit build for APIFY_DEFAULT_BROWSER_PATH. Launching goes
+    # through Playwright's own pw_run.sh in it, which runs the WPE build for --headless and the GTK build
+    # otherwise; the GTK MiniBrowser alone does not accept --headless.
+    && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/webkit-*/ ${PLAYWRIGHT_BROWSERS_PATH}/webkit
 
 # Copy the dummy source code to the image
 COPY --chown=myuser:myuser . .

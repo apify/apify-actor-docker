@@ -34,11 +34,14 @@ const run = async () => {
     // and crawlee needs it at runtime to measure memory.
     execSync('ps');
 
-    // Full Webkit headless
+    // Bundled WebKit: once resolved via PLAYWRIGHT_BROWSERS_PATH, once via the
+    // APIFY_DEFAULT_BROWSER_PATH launcher the image sets up.
     await testWebkit({ headless: true });
+    await testWebkit({ executablePath: process.env.APIFY_DEFAULT_BROWSER_PATH, headless: true });
 
     // Full Webkit with XVFB (headful)
     await testWebkit({ headless: false });
+    await testWebkit({ executablePath: process.env.APIFY_DEFAULT_BROWSER_PATH, headless: false });
 
     console.log('... test PASSED');
 };

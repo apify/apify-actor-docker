@@ -26,7 +26,7 @@ ENV PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
 # Tell the crawlee cli that we already have browsers installed, so it skips installing them
 ENV CRAWLEE_SKIP_BROWSER_INSTALL=1
 
-ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/MiniBrowser
+ENV APIFY_DEFAULT_BROWSER_PATH=${PLAYWRIGHT_BROWSERS_PATH}/webkit/pw_run.sh
 
 # Prevent installing of browsers by future `npm install`.
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
@@ -49,8 +49,10 @@ RUN apt update \
     && npx playwright@${_PW_VERSION} install-deps webkit \
     && apt install -y libgtk-3-0 \
     && npx playwright@${_PW_VERSION} install webkit \
-    # symlink the webkit binary to the root folder in order to bypass the versioning and resulting browser launch crashes.
-    && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/webkit-*/minibrowser-gtk/MiniBrowser ${PLAYWRIGHT_BROWSERS_PATH}/ \
+    # Version-independent path to the bundled WebKit build for APIFY_DEFAULT_BROWSER_PATH. Launching goes
+    # through Playwright's own pw_run.sh in it, which runs the WPE build for --headless and the GTK build
+    # otherwise; the GTK MiniBrowser alone does not accept --headless.
+    && ln -s ${PLAYWRIGHT_BROWSERS_PATH}/webkit-*/ ${PLAYWRIGHT_BROWSERS_PATH}/webkit \
     \
     # Add user so we don't need --no-sandbox.
     && groupadd -r myuser && useradd -r -g myuser -G audio,video myuser \
