@@ -9,7 +9,7 @@ import { fetchPackageVersion, findRequirementSpecifierSet, pythonSpecifierSetToS
  * That range is not pinned here. It is read from the camoufox package metadata instead, so that the images follow
  * whatever camoufox currently supports:
  *
- * - `camoufox-js` declares it as a `playwright-core` peer dependency
+ * - `camoufox` (npm) declares it as a `playwright-core` peer dependency
  * - `camoufox` (PyPI) declares it as a `playwright` requirement
  *
  * Note that the images install camoufox with a caret / compatible-release range, so the version actually installed
@@ -18,7 +18,7 @@ import { fetchPackageVersion, findRequirementSpecifierSet, pythonSpecifierSetToS
  */
 const camoufoxPackages = {
 	node: {
-		packageName: 'camoufox-js',
+		packageName: 'camoufox',
 		// `playwright` and `playwright-core` are released in lockstep under the same version numbers, so the range
 		// declared for `playwright-core` applies as-is to the `playwright` version installed in the image
 		dependencyName: 'playwright-core',

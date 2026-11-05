@@ -3,7 +3,7 @@
 NODE_VERSION ?= 22
 # Tag must have format: v1.42.0-
 PLAYWRIGHT_VERSION ?= v1.57.0-
-CAMOUFOX_VERSION ?= 0.12.0
+CAMOUFOX_VERSION ?= 0.5.8
 # Tag must have format: 22.6.2
 PUPPETEER_VERSION ?= 24.34.0
 # Set SLIM=1 to build the -slim variant of a node image (uses package.slim.json)
