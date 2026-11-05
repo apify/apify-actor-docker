@@ -27,9 +27,9 @@ def print_image_info():
     print()
 
 
-async def run_test(launcher, headless=True):
-    print(f"Testing {launcher.name} with {headless=}")
-    browser = await launcher.launch(headless=headless)
+async def run_test(launcher, headless=True, **launch_options):
+    print(f"Testing {launcher.name} with {headless=} {launch_options}")
+    browser = await launcher.launch(headless=headless, **launch_options)
     page = await browser.new_page()
     await page.goto("http://www.example.com")
     title = await page.title()
@@ -43,6 +43,11 @@ async def main():
     print_image_info()
     async with async_playwright() as playwright:
         print("Testing docker image by opening browsers...")
+        # Bundled WebKit: once resolved via PLAYWRIGHT_BROWSERS_PATH, once via the
+        # APIFY_DEFAULT_BROWSER_PATH launcher the image sets up.
+        default_browser_path = os.environ["APIFY_DEFAULT_BROWSER_PATH"]
         await run_test(playwright.webkit, headless=True)
+        await run_test(playwright.webkit, headless=True, executable_path=default_browser_path)
         await run_test(playwright.webkit, headless=False)
+        await run_test(playwright.webkit, headless=False, executable_path=default_browser_path)
         print("All browser tests passed.")
