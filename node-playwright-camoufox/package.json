@@ -8,7 +8,7 @@
     },
     "dependencies": {
         "apify": "APIFY_VERSION",
-        "camoufox-js": "CAMOUFOX_VERSION",
+        "camoufox": "CAMOUFOX_VERSION",
         "crawlee": "CRAWLEE_VERSION",
         "impit": "latest",
         "playwright": "PLAYWRIGHT_VERSION",
