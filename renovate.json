@@ -14,11 +14,6 @@
 	},
 	"packageRules": [
 		{
-			"matchManagers": ["github-actions"],
-			"matchPackageNames": ["apify/**"],
-			"pinDigests": false
-		},
-		{
 			"matchUpdateTypes": ["patch", "minor"],
 			"matchCurrentVersion": "!/^0/",
 			"groupName": "patch/minor dependencies",

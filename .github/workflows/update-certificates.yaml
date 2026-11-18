@@ -46,7 +46,7 @@ jobs:
 
       - name: Commit certificate changes
         if: steps.check-changes.outputs.has_changes == 'true'
-        uses: apify/actions/signed-commit@v1.2.0
+        uses: apify/actions/signed-commit@759dbf815126db4195f96d702fce40aa64583a21 # v1.2.0
         with:
           message: "chore(certificates): update Firefox intermediate certificates"
           add: ./certificates/
