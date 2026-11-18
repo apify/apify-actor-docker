@@ -14,8 +14,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Install dependencies
         run: |
