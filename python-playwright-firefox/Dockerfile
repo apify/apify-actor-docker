@@ -57,6 +57,8 @@ RUN apt update \
     ca-certificates jq p11-kit \
     # Found this in other images, not sure whether it's needed, it does not come from Playwright deps
     procps \
+    # The Node.js runtime bundled with Playwright 1.65+ links against libatomic.so.1.
+    libatomic1 \
     && sh -c 'echo "deb http://ftp.us.debian.org/debian trixie main non-free" >> /etc/apt/sources.list.d/fonts.list' \
     && apt update \
     && apt install -y --no-install-recommends \
