@@ -105,6 +105,9 @@ RUN python -m pip install --upgrade \
 # Copy the dummy source code to the image
 COPY --chown=myuser:myuser . .
 
+# Run everything after as non-privileged user.
+USER myuser
+
 # The entrypoint script will be the one handling the CMD passed in, and will always wrap it into xvfb-run
 ENTRYPOINT ["./xvfb-entrypoint.sh"]
 
