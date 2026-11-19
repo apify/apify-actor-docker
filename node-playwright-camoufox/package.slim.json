@@ -7,7 +7,7 @@
         "start": "node main.js"
     },
     "dependencies": {
-        "camoufox-js": "CAMOUFOX_VERSION",
+        "camoufox": "CAMOUFOX_VERSION",
         "impit": "latest",
         "playwright": "PLAYWRIGHT_VERSION"
     },

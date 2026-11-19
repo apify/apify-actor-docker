@@ -18,7 +18,7 @@ import { fetchNodeRuntimeVersions } from '../../shared/runtime-versions.ts';
 const playwrightVersions = await fetchPackageVersions('playwright');
 const apifyVersions = await fetchPackageVersions('apify');
 const crawleeVersions = await fetchPackageVersions('crawlee');
-const camoufoxVersions = await fetchPackageVersions('camoufox-js');
+const camoufoxVersions = await fetchPackageVersions('camoufox');
 const nodeRuntimeVersions = await fetchNodeRuntimeVersions(supportedNodeVersions);
 
 if (!shouldUseLastFive) {
@@ -46,7 +46,7 @@ console.error('Latest apify version', latestApifyVersion);
 console.error('Latest crawlee version', latestCrawleeVersion);
 console.error('Latest camoufox version', latestCamoufoxVersion);
 console.error(
-	`Playwright versions for camoufox (camoufox-js@${latestCamoufoxVersion} supports ${camoufoxPlaywrightRange ?? 'nothing we could resolve'})`,
+	`Playwright versions for camoufox (camoufox@${latestCamoufoxVersion} supports ${camoufoxPlaywrightRange ?? 'nothing we could resolve'})`,
 	camoufoxPlaywrightVersions.length ? camoufoxPlaywrightVersions : '(none, camoufox images will be skipped)',
 );
 console.error('Node runtime versions', nodeRuntimeVersions);
