@@ -45,6 +45,8 @@ env:
 jobs:
   matrix:
     runs-on: ubuntu-latest
+    # Pull request runs cannot use the environment, and they skip every step that needs its token.
+    environment: ${{ github.event_name != 'pull_request' && 'automation' || '' }}
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 
