@@ -3,8 +3,7 @@
 	"extends": [
 		"config:recommended",
 		":semanticCommitTypeAll(chore)",
-		"docker:disable",
-		"helpers:pinGitHubActionDigests"
+		"docker:disable"
 	],
 	"semanticCommits": "enabled",
 	"lockFileMaintenance": {
