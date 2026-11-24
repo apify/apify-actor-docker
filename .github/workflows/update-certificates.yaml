@@ -9,6 +9,9 @@ on:
 jobs:
   update-certificates:
     runs-on: ubuntu-latest
+    environment:
+      name: automation
+      deployment: false
 
     steps:
       - name: Checkout repository
